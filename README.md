@@ -174,6 +174,18 @@ python scripts/eval_tracking.py --video "<clip.mp4>" --frames 120
 records who verified it and how. `export-yolo --split eval` writes YOLO txt labels if you prefer
 to review in LabelImg or CVAT.
 
+### Step 2c: Lanes, traffic lights and regression
+```powershell
+python scripts/evaluate.py --only lane --lane-model tusimple --lane-preprocess stretch
+python scripts/evaluate.py --only lane --lane-model culane  --lane-preprocess stretch
+python scripts/eval_traffic_lights.py --compare-legacy
+python tests/test_regression.py
+```
+`--lane-model` selects between the TuSimple and CULane checkpoints (both official, free).
+The CULane profile needs `models/culane_18.pth`; everything else runs without it.
+Status and measured results for lanes, traffic lights and the integrated run are in
+[EVALUATION.md](EVALUATION.md) section 8 - including what does *not* work.
+
 ### Step 3: Run Full Static Image Test Suite
 Executes multi-module testing across all local curated images and saves a summary report:
 ```powershell
