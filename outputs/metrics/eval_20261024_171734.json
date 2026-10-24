@@ -1,0 +1,99 @@
+{
+  "timestamp": "2026-10-24T11:47:33+00:00",
+  "labels": {
+    "file": "labels\\eval_labels.json",
+    "provenance": {
+      "labelled_by": "coding agent, by visual inspection of the image files",
+      "labelled_on": "2026-10-24",
+      "labelling_type": "single annotator, no second pass, no inter-annotator agreement",
+      "coordinate_system": "original image pixels (x, y), origin top-left",
+      "warning": "This is a small, agent-labelled sanity set for regression testing. It is NOT a benchmark, has no published-protocol guarantees, and must not be cited as an accuracy measurement of the models themselves.",
+      "lane_note": "lane rows read by the coding agent from gridded images; highway rows +/-20 px, curved-road rows +/-10 px"
+    }
+  },
+  "env": {
+    "python": "3.13.13",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cpu",
+    "ultralytics": "8.4.175",
+    "opencv": "5.0.0",
+    "device": "cpu"
+  },
+  "config": {
+    "detection_imgsz": 640,
+    "tl_detection_imgsz": 640,
+    "dt_conf": 0.25,
+    "tl_conf": 0.2,
+    "lane_preprocess": "stretch",
+    "lane_temporal": true,
+    "lane_existence_threshold": 0.5,
+    "tl_min_state_conf": 0.5
+  },
+  "lanes": {
+    "model": "culane",
+    "preprocess": "stretch",
+    "images": [
+      {
+        "path": "test_data/highway_road.jpg",
+        "lane_points": [
+          0,
+          0,
+          18,
+          12
+        ],
+        "corridor_established": true,
+        "diagnostics": {
+          "candidates": [
+            [
+              2,
+              684
+            ],
+            [
+              3,
+              1126
+            ]
+          ],
+          "fallback": "widest pair (centre not bracketed)",
+          "left_idx": 2,
+          "right_idx": 3,
+          "bottom_width_px": 442.0
+        },
+        "row_errors": [
+          {
+            "y": 500,
+            "left_error_px": 54.5,
+            "right_error_px": 149.3
+          },
+          {
+            "y": 380,
+            "left_error_px": 54.1,
+            "right_error_px": 49.9
+          }
+        ],
+        "mean_abs_error_px": 77.0,
+        "latency_ms": 176.2
+      },
+      {
+        "path": "my_test_images/sir_image7.jpeg",
+        "lane_points": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "corridor_established": false,
+        "diagnostics": {
+          "candidates": [],
+          "reason": "fewer than two usable boundaries"
+        },
+        "row_errors": [],
+        "mean_abs_error_px": null,
+        "latency_ms": 130.9
+      }
+    ],
+    "mean_abs_boundary_error_px": 77.0,
+    "images_with_corridor": 1,
+    "images_evaluated": 2
+  }
+}

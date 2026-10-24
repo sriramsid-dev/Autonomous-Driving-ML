@@ -74,13 +74,14 @@ Models were never modified.
 | `README.md` | Module A claims updated; labelling/eval commands added | the previous text said no detection metric was possible |
 
 ## Measured outcome
+Lanes: neither checkpoint is suitable (TuSimple 58.4 px mean error, CULane 77.0 px and zero lanes
+found on the curved road); TuSimple stays the default. Traffic lights: 7/11 held-out correct vs
+6/11 for v1.0, but green-to-yellow confusion (3/6) and weak abstention (1/6 unlit) remain. The
+cause is housing colour winning over the small lamp; it was not patched because that would tune
+on the held-out set. The sample driving clip contains no lane markings at all, so lane behaviour
+on it is not scoreable.
 
-`yolo11n` retained: mAP@0.5 0.710 vs 0.911 for `yolo11s`, but the paired bootstrap difference is
-−0.116 with 95 % CI [−0.229, +0.045] (not significant) while `yolo11s` costs ~70 % more latency
-and is behind on car AP/precision/recall. `yolo11m` not tested — justified in `EVALUATION.md` §7.4.
-
-## Still not done
-
-* 67 instances across 8 images is too few for tight intervals; bicycle/motorcycle/bus have zero support.
-* Boxes are proposal-derived, not redrawn; GT is therefore optimistic for both models.
-* No MOTA/IDF1: no ground-truth tracks.
+## Notes
+* `models/culane_18.pth` (178 MB) is untracked by design (see .gitignore); re-download with the
+  Google Drive id in EVALUATION.md 8.3 if needed. Everything else runs without it.
+* Passing regression tests mean 'behaved as specified', not 'detected correctly'.

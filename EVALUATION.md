@@ -160,3 +160,129 @@ python scripts/eval_tracking.py --video "<clip>" --frames 120
 ```
 Every run writes a timestamped directory under `outputs/runs/`; nothing overwrites the v1.0
 baseline artifacts.
+
+---
+
+# 8. v1.3 — lane diagnosis, held-out traffic lights, integrated run
+
+## 8.1 Why the lane module "fails" on the driving video
+
+The clip `Wyamo Car video.mp4` (480x848, 376 frames) is **not a forward-facing driving
+view**. Frames 10, 60, 120, 200 and 300 were inspected: the camera is hand-held on a
+sidewalk, tracking a parked Waymo, with buildings, a hedge and parked cars filling the
+frame. There is no road ahead and no lane marking anywhere in the clip.
+
+Therefore zero detected lanes is the **correct** output, not a detector failure. The
+lane module cannot be validated on this footage at all. Any earlier claim that the
+pipeline performs lane detection on this video was unsupported.
+
+## 8.2 Preprocessing comparison (measured)
+
+Two images with real markings, 7 manually read ego-boundary rows
+(`labels/eval_labels.json`: highway 3 rows, curved forest road 4 rows):
+
+| Profile | Mean abs boundary error | Corridors established | Rows reachable by both boundaries |
+|---|---|---|---|
+| stretch (default) | **58.4 px** | 2 / 2 | 2 / 7 |
+| letterbox | 86.5 px | 1 / 2 | 2 / 7 |
+| crop (top=0) | 58.4 px (identical to stretch) | 2 / 2 | 2 / 7 |
+
+Per image with `stretch`: highway y=380 → 6.7 px (left) / 44.8 px (right);
+curved road y=480 → 110.8 px (left) / 71.3 px (right). **Only 2 of 7 labelled rows can be
+evaluated at all**, because the decoder stops producing points above/below them.
+
+## 8.3 CULane-pretrained UFLD comparison (measured)
+
+Downloaded the official CULane ResNet-18 checkpoint (178 MB, free, Google Drive; shape
+verified `cls.2 = 14472 = 201x18x4`). A `--lane-model {tusimple,culane}` profile system
+now selects weights and decoding grid (100x56 vs 200x18) with strict loading.
+
+| Checkpoint | Mean abs error | Corridors | Highway rows | Curved road |
+|---|---|---|---|---|
+| tusimple_18 | **58.4 px** | 2 / 2 | 6.7 / 44.8 px (y=380) | 110.8 / 71.3 px (y=480) |
+| culane_18 | 77.0 px | 1 / 2 | 54.5 / 149.3 px (y=500), 54.1 / 49.9 px (y=380) | **0 lanes found** |
+
+Visually, TuSimple draws a straight-sided triangle that ignores the curve entirely;
+CULane draws nothing on the curve and a corridor that juts to the shoulder on the
+highway. **Neither checkpoint is suitable** for these scenes. TuSimple stays the default
+because it is measurably better on the two images and on the highway; the CULane profile
+is available for future data. Lane runtime: 130-200 ms/frame on CPU for both.
+
+## 8.4 Held-out traffic-light set (real crops, manually labelled)
+
+39 crops cut from 10 real photographs by the detector, then **every crop inspected and
+labelled by eye** (`labels/traffic_lights/gt.json`, contact sheet
+`outputs/runs/tl_set/sheet.jpg`). Labels are independent of the classifier under test.
+
+| Label | n | Meaning |
+|---|---|---|
+| red | 5 | lit red vehicle signal (incl. one red-arrow signal in backlight) |
+| green | 6 | lit green vehicle signal (day, night, small distant) |
+| unlit | 6 | housing present, no lit lamp (incl. the backs of CULane-style heads) |
+| not_a_traffic_light | 3 | detector false positive (two flower baskets, one pole) |
+| other_signal | 2 | pedestrian signals (cyan "walk", red hand) |
+| unlabelable | 17 | crops 4x13 - 9x20 px: too small to judge by eye, excluded |
+
+Results on the 11 labelable vehicle signals (5 red, 6 green):
+
+| Version | Accuracy | red P / R | green P / R | Abstention |
+|---|---|---|---|---|
+| v1.0 HSV + spatial prior | 6/11 = 0.545 | 1.000 / 0.800 | 1.000 / 0.333 | 0.091 |
+| v1.1 blob + circular hue | 7/11 = 0.636 | 0.833 / 1.000 | 1.000 / 0.333 | 0.000 |
+
+Confusion matrix (v1.1): red→red 5; green→green 2, green→**yellow 3**, green→**red 1**.
+
+* **Green is the failure mode.** Three of six green lights are called *yellow*. Cause: the
+  signal housing in those crops is cream/yellow, and the blob selector takes the largest
+  lit region, so the painted housing wins over the small green lamp. The integrated run
+  shows the same bug on a large green light (below).
+* **Abstention is too weak**: only 1 of 6 unlit housings abstains; the classifier asserts a
+  state on dark or inert hardware.
+* **Yellow has zero support** in this set — no yellow precision/recall is reported.
+* **Small distant signals cannot be assessed**: 10 of 39 crops were under 10 px wide and all
+  were unlabelable, so the "small light" claim remains untested.
+* Detector precision at box level: **3 of 39 boxes (7.7 %) were not traffic lights**.
+
+The one-sample difference between v1.0 and v1.1 is **not evidence of improvement**; at
+n=11 a single sample moves accuracy by 9 points. I deliberately did **not** tune the
+classifier on this set: doing so would destroy its held-out status. The housing/lamp
+selection fix needs a fresh set to validate.
+
+## 8.5 Integrated pipeline run
+
+`outputs/runs/integrated_v13/` (annotated video, 4 annotated images, montage).
+
+| Input | Result | Verdict |
+|---|---|---|
+| video, 120 frames | 5.3 FPS end-to-end (23.7 s), 3 vehicles/frame typical, tracks 1-3 stable over 15 frames | objects OK; one class flip (truck→car) kept the same ID; "No Lanes (Vehicle Occluded)" correct |
+| `sir_image6` | 8 vehicles, 3 pedestrians, 11 tracks, **TL state YELLOW** on a clearly green light, **3 lanes (no corridor)** | TL wrong; lane false positives |
+| `sir_image3` | 2 lanes on a street crossing | lane false positives |
+| `highway_road` | 2 lanes, corridor | as measured in 8.2 |
+
+Observed failures, by looking at the outputs: the green signal is labelled YELLOW
+(housing-colour bug); sparse white lane dots appear on urban asphalt with no markings;
+low-confidence object boxes (0.28 on a roof rack, 0.42 on a wing mirror) are false
+positives that a 0.25 threshold admits.
+
+## 8.6 Regression suite
+
+`python tests/test_regression.py` — **8/8 checks pass**: config/weights present; both lane
+profiles load strictly and return the right slot count; blank/tiny crops are rejected;
+image pipeline with all modules and each subset, plus crop mode; missing image raises
+`FileNotFoundError`; 5-frame video writes a playable file; tracker IDs **restart at 1**
+after `reset_tracker()`; CLI options (`--imgsz`, `--lane-model`, `--lane-preprocess`,
+`--crop`, `-o`) still work and a bad path exits non-zero; all three evaluation harnesses
+run green.
+
+Passing means "behaved as specified", not "detected correctly" — the failures in 8.5 are
+exactly what these tests cannot catch.
+
+## 8.7 Reproduce
+
+```bash
+python tests/test_regression.py
+python scripts/evaluate.py --only lane --lane-model tusimple --lane-preprocess stretch
+python scripts/evaluate.py --only lane --lane-model culane  --lane-preprocess stretch
+python scripts/eval_traffic_lights.py --compare-legacy
+python main.py --video "<clip>" --max-frames 120 --output-video outputs/runs/integrated_v13/annotated.mp4
+```

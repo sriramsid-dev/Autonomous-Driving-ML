@@ -1,0 +1,641 @@
+{
+  "provenance": {
+    "labelled_by": "coding agent, visual inspection of the crop contact sheet",
+    "labelled_on": "2026-10-24",
+    "note": "Crops were produced by the detector, then every crop was inspected and labelled by eye. Labels are independent of the state classifier under test. 'unlabelable' = crop too small/blurred to judge; 'not_a_traffic_light' = detector false positive; 'other_signal' = non-vehicle signal.",
+    "taxonomy": {
+      "red": "lit red vehicle signal",
+      "green": "lit green vehicle signal",
+      "unlit": "signal housing with no lit lamp",
+      "not_a_traffic_light": "no signal present",
+      "other_signal": "pedestrian/other signal",
+      "unlabelable": "excluded"
+    }
+  },
+  "samples": [
+    {
+      "index": 1,
+      "crop": "labels/traffic_lights/crops/01.jpg",
+      "src": "test_data/red_tl.jpg",
+      "box": [
+        1273,
+        623,
+        1513,
+        859
+      ],
+      "w": 240,
+      "h": 236,
+      "detector_conf": 0.459,
+      "label": "other_signal",
+      "condition": "night"
+    },
+    {
+      "index": 2,
+      "crop": "labels/traffic_lights/crops/02.jpg",
+      "src": "test_data/green_tl.jpg",
+      "box": [
+        504,
+        677,
+        771,
+        1197
+      ],
+      "w": 267,
+      "h": 520,
+      "detector_conf": 0.899,
+      "label": "green",
+      "condition": "day"
+    },
+    {
+      "index": 3,
+      "crop": "labels/traffic_lights/crops/03.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        3144,
+        1297,
+        3192,
+        1437
+      ],
+      "w": 48,
+      "h": 140,
+      "detector_conf": 0.864,
+      "label": "unlit",
+      "condition": "day"
+    },
+    {
+      "index": 4,
+      "crop": "labels/traffic_lights/crops/04.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        1567,
+        825,
+        1644,
+        1033
+      ],
+      "w": 77,
+      "h": 208,
+      "detector_conf": 0.827,
+      "label": "unlit",
+      "condition": "day"
+    },
+    {
+      "index": 5,
+      "crop": "labels/traffic_lights/crops/05.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        1125,
+        1669,
+        1194,
+        1839
+      ],
+      "w": 69,
+      "h": 170,
+      "detector_conf": 0.575,
+      "label": "unlit",
+      "condition": "day"
+    },
+    {
+      "index": 6,
+      "crop": "labels/traffic_lights/crops/06.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        370,
+        1691,
+        502,
+        1802
+      ],
+      "w": 132,
+      "h": 111,
+      "detector_conf": 0.429,
+      "label": "unlit",
+      "condition": "day"
+    },
+    {
+      "index": 7,
+      "crop": "labels/traffic_lights/crops/07.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        4743,
+        1816,
+        4832,
+        1976
+      ],
+      "w": 89,
+      "h": 160,
+      "detector_conf": 0.329,
+      "label": "not_a_traffic_light",
+      "condition": "day"
+    },
+    {
+      "index": 8,
+      "crop": "labels/traffic_lights/crops/08.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        1299,
+        1847,
+        1419,
+        1928
+      ],
+      "w": 120,
+      "h": 81,
+      "detector_conf": 0.282,
+      "label": "not_a_traffic_light",
+      "condition": "day"
+    },
+    {
+      "index": 9,
+      "crop": "labels/traffic_lights/crops/09.jpg",
+      "src": "test_data/yellow_inuvik.jpg",
+      "box": [
+        4746,
+        1818,
+        4823,
+        1899
+      ],
+      "w": 77,
+      "h": 81,
+      "detector_conf": 0.203,
+      "label": "not_a_traffic_light",
+      "condition": "day"
+    },
+    {
+      "index": 10,
+      "crop": "labels/traffic_lights/crops/10.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        380,
+        54,
+        404,
+        104
+      ],
+      "w": 24,
+      "h": 50,
+      "detector_conf": 0.857,
+      "label": "green",
+      "condition": "day"
+    },
+    {
+      "index": 11,
+      "crop": "labels/traffic_lights/crops/11.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        310,
+        213,
+        318,
+        230
+      ],
+      "w": 8,
+      "h": 17,
+      "detector_conf": 0.843,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 12,
+      "crop": "labels/traffic_lights/crops/12.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        110,
+        63,
+        134,
+        112
+      ],
+      "w": 24,
+      "h": 49,
+      "detector_conf": 0.833,
+      "label": "green",
+      "condition": "day"
+    },
+    {
+      "index": 13,
+      "crop": "labels/traffic_lights/crops/13.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        246,
+        214,
+        253,
+        230
+      ],
+      "w": 7,
+      "h": 16,
+      "detector_conf": 0.824,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 14,
+      "crop": "labels/traffic_lights/crops/14.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        29,
+        196,
+        38,
+        217
+      ],
+      "w": 9,
+      "h": 21,
+      "detector_conf": 0.797,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 15,
+      "crop": "labels/traffic_lights/crops/15.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        238,
+        58,
+        262,
+        108
+      ],
+      "w": 24,
+      "h": 50,
+      "detector_conf": 0.782,
+      "label": "green",
+      "condition": "day"
+    },
+    {
+      "index": 16,
+      "crop": "labels/traffic_lights/crops/16.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        95,
+        216,
+        104,
+        236
+      ],
+      "w": 9,
+      "h": 20,
+      "detector_conf": 0.744,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 17,
+      "crop": "labels/traffic_lights/crops/17.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        353,
+        214,
+        359,
+        230
+      ],
+      "w": 6,
+      "h": 16,
+      "detector_conf": 0.73,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 18,
+      "crop": "labels/traffic_lights/crops/18.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        77,
+        193,
+        86,
+        215
+      ],
+      "w": 9,
+      "h": 22,
+      "detector_conf": 0.661,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 19,
+      "crop": "labels/traffic_lights/crops/19.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        86,
+        239,
+        92,
+        254
+      ],
+      "w": 6,
+      "h": 15,
+      "detector_conf": 0.443,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 20,
+      "crop": "labels/traffic_lights/crops/20.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        145,
+        240,
+        149,
+        253
+      ],
+      "w": 4,
+      "h": 13,
+      "detector_conf": 0.414,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 21,
+      "crop": "labels/traffic_lights/crops/21.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        91,
+        240,
+        96,
+        253
+      ],
+      "w": 5,
+      "h": 13,
+      "detector_conf": 0.346,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 22,
+      "crop": "labels/traffic_lights/crops/22.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        148,
+        240,
+        158,
+        253
+      ],
+      "w": 10,
+      "h": 13,
+      "detector_conf": 0.336,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 23,
+      "crop": "labels/traffic_lights/crops/23.jpg",
+      "src": "my_test_images/sir_image2.jpg",
+      "box": [
+        93,
+        240,
+        98,
+        253
+      ],
+      "w": 5,
+      "h": 13,
+      "detector_conf": 0.223,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 24,
+      "crop": "labels/traffic_lights/crops/24.jpg",
+      "src": "my_test_images/sir_image3.jpg",
+      "box": [
+        2425,
+        181,
+        2665,
+        552
+      ],
+      "w": 240,
+      "h": 371,
+      "detector_conf": 0.267,
+      "label": "red",
+      "condition": "glare"
+    },
+    {
+      "index": 25,
+      "crop": "labels/traffic_lights/crops/25.jpg",
+      "src": "my_test_images/sir_image5.jpeg",
+      "box": [
+        287,
+        27,
+        405,
+        287
+      ],
+      "w": 118,
+      "h": 260,
+      "detector_conf": 0.342,
+      "label": "red",
+      "condition": "glare"
+    },
+    {
+      "index": 26,
+      "crop": "labels/traffic_lights/crops/26.jpg",
+      "src": "my_test_images/sir_image6.jpeg",
+      "box": [
+        501,
+        30,
+        611,
+        280
+      ],
+      "w": 110,
+      "h": 250,
+      "detector_conf": 0.844,
+      "label": "green",
+      "condition": "day"
+    },
+    {
+      "index": 27,
+      "crop": "labels/traffic_lights/crops/27.jpg",
+      "src": "my_test_images/sir_image6.jpeg",
+      "box": [
+        621,
+        60,
+        630,
+        78
+      ],
+      "w": 9,
+      "h": 18,
+      "detector_conf": 0.492,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 28,
+      "crop": "labels/traffic_lights/crops/28.jpg",
+      "src": "my_test_images/sir_image6.jpeg",
+      "box": [
+        406,
+        64,
+        503,
+        193
+      ],
+      "w": 97,
+      "h": 129,
+      "detector_conf": 0.438,
+      "label": "unlit",
+      "condition": "day"
+    },
+    {
+      "index": 29,
+      "crop": "labels/traffic_lights/crops/29.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        314,
+        58,
+        329,
+        93
+      ],
+      "w": 15,
+      "h": 35,
+      "detector_conf": 0.591,
+      "label": "red",
+      "condition": "night"
+    },
+    {
+      "index": 30,
+      "crop": "labels/traffic_lights/crops/30.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        15,
+        180,
+        25,
+        200
+      ],
+      "w": 10,
+      "h": 20,
+      "detector_conf": 0.444,
+      "label": "red",
+      "condition": "night"
+    },
+    {
+      "index": 31,
+      "crop": "labels/traffic_lights/crops/31.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        387,
+        78,
+        397,
+        96
+      ],
+      "w": 10,
+      "h": 18,
+      "detector_conf": 0.36,
+      "label": "unlabelable",
+      "condition": "night"
+    },
+    {
+      "index": 32,
+      "crop": "labels/traffic_lights/crops/32.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        489,
+        179,
+        498,
+        197
+      ],
+      "w": 9,
+      "h": 18,
+      "detector_conf": 0.347,
+      "label": "red",
+      "condition": "night"
+    },
+    {
+      "index": 33,
+      "crop": "labels/traffic_lights/crops/33.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        387,
+        174,
+        395,
+        185
+      ],
+      "w": 8,
+      "h": 11,
+      "detector_conf": 0.239,
+      "label": "unlabelable",
+      "condition": "night"
+    },
+    {
+      "index": 34,
+      "crop": "labels/traffic_lights/crops/34.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        80,
+        202,
+        93,
+        216
+      ],
+      "w": 13,
+      "h": 14,
+      "detector_conf": 0.236,
+      "label": "unlabelable",
+      "condition": "night"
+    },
+    {
+      "index": 35,
+      "crop": "labels/traffic_lights/crops/35.jpg",
+      "src": "my_test_images/sir_image4.jpeg",
+      "box": [
+        573,
+        202,
+        588,
+        217
+      ],
+      "w": 15,
+      "h": 15,
+      "detector_conf": 0.203,
+      "label": "unlabelable",
+      "condition": "night"
+    },
+    {
+      "index": 36,
+      "crop": "labels/traffic_lights/crops/36.jpg",
+      "src": "my_test_images/sir_image9.jpeg",
+      "box": [
+        140,
+        1,
+        300,
+        186
+      ],
+      "w": 160,
+      "h": 185,
+      "detector_conf": 0.367,
+      "label": "other_signal",
+      "condition": "night"
+    },
+    {
+      "index": 37,
+      "crop": "labels/traffic_lights/crops/37.jpg",
+      "src": "my_test_images/sir_image9.jpeg",
+      "box": [
+        80,
+        194,
+        136,
+        294
+      ],
+      "w": 56,
+      "h": 100,
+      "detector_conf": 0.217,
+      "label": "unlit",
+      "condition": "day"
+    },
+    {
+      "index": 38,
+      "crop": "labels/traffic_lights/crops/38.jpg",
+      "src": "my_test_images/sir_image10.jpeg",
+      "box": [
+        186,
+        107,
+        289,
+        307
+      ],
+      "w": 103,
+      "h": 200,
+      "detector_conf": 0.25,
+      "label": "unlabelable",
+      "condition": "day"
+    },
+    {
+      "index": 39,
+      "crop": "labels/traffic_lights/crops/39.jpg",
+      "src": "my_test_images/sir_image10.jpeg",
+      "box": [
+        187,
+        175,
+        289,
+        405
+      ],
+      "w": 102,
+      "h": 230,
+      "detector_conf": 0.222,
+      "label": "green",
+      "condition": "day"
+    }
+  ]
+}

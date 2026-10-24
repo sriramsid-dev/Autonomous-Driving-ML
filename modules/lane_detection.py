@@ -155,17 +155,23 @@ class UltraFastLaneDetector:
 
     def __init__(
         self,
-        model_path: str = config.UFLD_MODEL_PATH,
+        model_path: Optional[str] = None,
         device: str = config.DEVICE,
         min_lane_conf: float = config.LANE_EXISTENCE_THRESHOLD,
         min_lane_points: int = 5,
         preprocess: str = config.LANE_PREPROCESS,
         temporal: bool = config.LANE_TEMPORAL_SMOOTHING,
+        model_key: str = config.LANE_MODEL,
     ):
-        self.model_path = model_path
+        if model_key not in config.LANE_PROFILES:
+            raise ValueError(f"unknown lane model profile '{model_key}'; "
+                             f"choose from {sorted(config.LANE_PROFILES)}")
+        self.model_key = model_key
+        self.profile = config.LANE_PROFILES[model_key]
+        self.model_path = model_path or self.profile["weights"]
         self.device = device
-        self.row_anchors = np.asarray(config.UFLD_ROW_ANCHORS, dtype=np.float32)
-        self.num_gridding = config.UFLD_NUM_GRIDDING
+        self.row_anchors = np.asarray(self.profile["anchors"], dtype=np.float32)
+        self.num_gridding = int(self.profile["griding"])
         self.lane_colors = config.LANE_COLORS
         self.min_lane_conf = min_lane_conf
         self.min_lane_points = min_lane_points
@@ -191,7 +197,9 @@ class UltraFastLaneDetector:
             return
 
         try:
-            net = ParsingNet()
+            net = ParsingNet(cls_dim=(self.num_gridding + 1,
+                                      int(self.profile["rows"]),
+                                      int(self.profile["lanes"])))
             checkpoint = torch.load(self.model_path, map_location=self.device, weights_only=True)
             state_dict = checkpoint["model"] if isinstance(checkpoint, dict) and "model" in checkpoint else checkpoint
             state_dict = {(k[6:] if k.startswith("model.") else k): v for k, v in state_dict.items()}
@@ -203,7 +211,7 @@ class UltraFastLaneDetector:
             net.to(self.device).eval()
             self.model = net
             self.is_loaded = True
-            print(f"[Module C] UFLD weights loaded and verified (strict) from {self.model_path}")
+            print(f"[Module C] UFLD '{self.model_key}' weights loaded and verified (strict) from {self.model_path}")
         except Exception as exc:  # noqa: BLE001 - surfaced to the caller
             self.load_error = f"{type(exc).__name__}: {exc}"
             print(f"[Module C - Error] Failed to load UFLD model: {self.load_error}")
@@ -272,7 +280,7 @@ class UltraFastLaneDetector:
         loc = (grid_prob * centres.reshape(-1, 1, 1)).sum(axis=0)  # (56, 4)
 
         lanes: List[List[Tuple[int, int]]] = []
-        for lane_idx in range(config.UFLD_NUM_LANES):
+        for lane_idx in range(int(self.profile["lanes"])):
             pts: List[Tuple[int, int]] = []
             for r_idx in range(len(self.row_anchors)):
                 if argmax[r_idx, lane_idx] >= self.num_gridding:
@@ -297,7 +305,7 @@ class UltraFastLaneDetector:
         list of (x, y) points in ORIGINAL image coordinates, top -> bottom.
         """
         if not self.is_loaded or self.model is None:
-            return [[], [], [], []], 0.0
+            return [[] for _ in range(int(self.profile["lanes"]))], 0.0
 
         t0 = time.perf_counter()
         h_orig, w_orig = frame_bgr.shape[:2]
@@ -352,10 +360,9 @@ class UltraFastLaneDetector:
                 return True
         return False
 
-    @staticmethod
-    def _restore_slots(original, smoothed):
-        """Temporal filter drops/reorders lanes; restore the 4-slot layout."""
-        slots: List[List[Tuple[int, int]]] = [[] for _ in range(config.UFLD_NUM_LANES)]
+    def _restore_slots(self, original, smoothed):
+        """Temporal filter drops/reorders lanes; restore the per-profile slot layout."""
+        slots: List[List[Tuple[int, int]]] = [[] for _ in range(int(self.profile["lanes"]))]
         pool = [l for l in smoothed if len(l) >= 2]
         for idx, lane in enumerate(original):
             if len(lane) < 2:

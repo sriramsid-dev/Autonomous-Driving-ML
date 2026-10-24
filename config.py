@@ -69,7 +69,31 @@ TL_DUPLICATE_IOU = 0.55        # Overlapping lamp boxes describing one signal
 TL_DETECTION_IMGSZ = int(os.environ.get("PERCEPTION_TL_IMGSZ", str(DETECTION_IMGSZ)))
 
 # Module C: Ultra-Fast Lane Detection (UFLD)
+# Two official checkpoints share the same ResNet-18 parsing head but differ in the
+# decoding grid, so the profile selects both weights and decoder geometry.
 UFLD_MODEL_PATH = str(MODELS_DIR / "tusimple_18.pth")
+LANE_PROFILES = {
+    "tusimple": {
+        "weights": str(MODELS_DIR / "tusimple_18.pth"),
+        "griding": 100,
+        "rows": 56,
+        "lanes": 4,
+        "source": "TuSimple (highway, daytime, marked lanes)",
+        "anchors": [64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124,
+                    128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184,
+                    188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244,
+                    248, 252, 256, 260, 264, 268, 272, 276, 280, 284],
+    },
+    "culane": {
+        "weights": str(MODELS_DIR / "culane_18.pth"),
+        "griding": 200,
+        "rows": 18,
+        "lanes": 4,
+        "source": "CULane (urban/curved, 9 categories incl. night, crowd, no-line)",
+        "anchors": [121, 131, 141, 150, 160, 170, 180, 189, 199, 209, 219, 228, 238, 248, 258, 267, 277, 287],
+    },
+}
+LANE_MODEL = os.environ.get("PERCEPTION_LANE_MODEL", "tusimple")
 UFLD_INPUT_WIDTH = 800
 UFLD_INPUT_HEIGHT = 288
 UFLD_NUM_GRIDDING = 100

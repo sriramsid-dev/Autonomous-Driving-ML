@@ -4,27 +4,100 @@
     "labelled_on": "2026-10-24",
     "labelling_type": "single annotator, no second pass, no inter-annotator agreement",
     "coordinate_system": "original image pixels (x, y), origin top-left",
-    "warning": "This is a small, agent-labelled sanity set for regression testing. It is NOT a benchmark, has no published-protocol guarantees, and must not be cited as an accuracy measurement of the models themselves."
+    "warning": "This is a small, agent-labelled sanity set for regression testing. It is NOT a benchmark, has no published-protocol guarantees, and must not be cited as an accuracy measurement of the models themselves.",
+    "lane_note": "lane rows read by the coding agent from gridded images; highway rows +/-20 px, curved-road rows +/-10 px"
   },
   "traffic_light_states": [
-    {"path": "test_data/red_tl.jpg", "kind": "scene", "state": "red",
-     "note": "night scene; a second, green pedestrian signal is visible and is not the labelled signal"},
-    {"path": "test_data/green_tl.jpg", "kind": "scene", "state": "green"},
-    {"path": "my_test_images/sir_image3.jpg", "kind": "scene", "state": "red",
-     "note": "two red arrow lamps in one horizontal housing, strong backlight"},
-    {"path": "test_data/tl_crop_red.jpg", "kind": "synthetic_crop", "state": "red",
-     "note": "matplotlib figure with axis frame and title text, not a sensor crop"},
-    {"path": "test_data/tl_crop_yellow.jpg", "kind": "synthetic_crop", "state": "yellow"},
-    {"path": "test_data/tl_crop_green.jpg", "kind": "synthetic_crop", "state": "green"}
+    {
+      "path": "test_data/red_tl.jpg",
+      "kind": "scene",
+      "state": "red",
+      "note": "night scene; a second, green pedestrian signal is visible and is not the labelled signal"
+    },
+    {
+      "path": "test_data/green_tl.jpg",
+      "kind": "scene",
+      "state": "green"
+    },
+    {
+      "path": "my_test_images/sir_image3.jpg",
+      "kind": "scene",
+      "state": "red",
+      "note": "two red arrow lamps in one horizontal housing, strong backlight"
+    },
+    {
+      "path": "test_data/tl_crop_red.jpg",
+      "kind": "synthetic_crop",
+      "state": "red",
+      "note": "matplotlib figure with axis frame and title text, not a sensor crop"
+    },
+    {
+      "path": "test_data/tl_crop_yellow.jpg",
+      "kind": "synthetic_crop",
+      "state": "yellow"
+    },
+    {
+      "path": "test_data/tl_crop_green.jpg",
+      "kind": "synthetic_crop",
+      "state": "green"
+    }
   ],
   "lane_ego_boundaries": [
-    {"path": "test_data/highway_road.jpg", "image_size": [1280, 649],
-     "rows": [
-       {"y": 640, "left_x": 645, "right_x": 1150},
-       {"y": 500, "left_x": 632, "right_x": 1046},
-       {"y": 380, "left_x": 620, "right_x": 905}
-     ],
-     "note": "coarse manual reading of the yellow centre line and the right white edge line; uncertainty about +/-20 px"}
+    {
+      "path": "test_data/highway_road.jpg",
+      "image_size": [
+        1280,
+        649
+      ],
+      "rows": [
+        {
+          "y": 640,
+          "left_x": 645,
+          "right_x": 1150
+        },
+        {
+          "y": 500,
+          "left_x": 632,
+          "right_x": 1046
+        },
+        {
+          "y": 380,
+          "left_x": 620,
+          "right_x": 905
+        }
+      ],
+      "note": "coarse manual reading of the yellow centre line and the right white edge line; uncertainty about +/-20 px"
+    },
+    {
+      "path": "my_test_images/sir_image7.jpeg",
+      "image_size": [
+        451,
+        679
+      ],
+      "rows": [
+        {
+          "y": 640,
+          "left_x": 297,
+          "right_x": 424
+        },
+        {
+          "y": 560,
+          "left_x": 287,
+          "right_x": 408
+        },
+        {
+          "y": 480,
+          "left_x": 270,
+          "right_x": 390
+        },
+        {
+          "y": 400,
+          "left_x": 248,
+          "right_x": 360
+        }
+      ],
+      "note": "coarse manual reading of the double-yellow centre line (left) and right white edge line on a curved two-lane road; +/-10 px"
+    }
   ],
   "object_boxes": [],
   "object_boxes_note": "No bounding-box labels were produced: hand-drawing reliable boxes was out of scope for this pass, so no precision/recall/mAP is reported for Module A. Runtime and tracking behaviour are reported instead."

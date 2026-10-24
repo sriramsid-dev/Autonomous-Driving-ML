@@ -909,6 +909,7 @@ def main():
     parser.add_argument("--max-frames", type=int, default=120, help="Maximum number of video frames to process (None for all)")
     parser.add_argument("--imgsz", type=int, default=config.DETECTION_IMGSZ, help="Detector input size (640 default; 960/1280 improve small objects)")
     parser.add_argument("--lane-preprocess", type=str, default=config.LANE_PREPROCESS, choices=["stretch", "letterbox", "crop"], help="Lane preprocessing profile")
+    parser.add_argument("--lane-model", type=str, default=config.LANE_MODEL, choices=sorted(config.LANE_PROFILES), help="Pretrained lane checkpoint profile")
     parser.add_argument("--test-all", action="store_true", default=False, help="Run legacy static benchmark tests")
     parser.add_argument("--skip-video", action="store_true", help="Skip video processing")
     parser.add_argument("--device", type=str, default=config.DEVICE, help="Device to use ('cpu' or 'cuda')")
@@ -925,6 +926,7 @@ def main():
         config.DETECTION_IMGSZ = args.imgsz
         config.TL_DETECTION_IMGSZ = args.imgsz
     config.LANE_PREPROCESS = args.lane_preprocess
+    config.LANE_MODEL = args.lane_model
 
     # Mode 1: Individual Image Inference
     if args.image:

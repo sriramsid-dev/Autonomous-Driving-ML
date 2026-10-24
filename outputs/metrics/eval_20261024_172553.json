@@ -1,0 +1,242 @@
+{
+  "timestamp": "2026-10-24T11:55:50+00:00",
+  "labels": {
+    "file": "labels\\eval_labels.json",
+    "provenance": {
+      "labelled_by": "coding agent, by visual inspection of the image files",
+      "labelled_on": "2026-10-24",
+      "labelling_type": "single annotator, no second pass, no inter-annotator agreement",
+      "coordinate_system": "original image pixels (x, y), origin top-left",
+      "warning": "This is a small, agent-labelled sanity set for regression testing. It is NOT a benchmark, has no published-protocol guarantees, and must not be cited as an accuracy measurement of the models themselves.",
+      "lane_note": "lane rows read by the coding agent from gridded images; highway rows +/-20 px, curved-road rows +/-10 px"
+    }
+  },
+  "env": {
+    "python": "3.13.13",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cpu",
+    "ultralytics": "8.4.175",
+    "opencv": "5.0.0",
+    "device": "cpu"
+  },
+  "config": {
+    "detection_imgsz": 640,
+    "tl_detection_imgsz": 640,
+    "dt_conf": 0.25,
+    "tl_conf": 0.2,
+    "lane_preprocess": "stretch",
+    "lane_temporal": true,
+    "lane_existence_threshold": 0.5,
+    "tl_min_state_conf": 0.5
+  },
+  "traffic_lights": {
+    "samples": [
+      {
+        "path": "test_data/red_tl.jpg",
+        "kind": "scene",
+        "ground_truth": "red",
+        "predicted": "red",
+        "confidence": 1.0,
+        "lights_detected": 2,
+        "latency_ms": 549.4,
+        "correct": true
+      },
+      {
+        "path": "test_data/green_tl.jpg",
+        "kind": "scene",
+        "ground_truth": "green",
+        "predicted": "green",
+        "confidence": 0.95,
+        "lights_detected": 1,
+        "latency_ms": 72.6,
+        "correct": true
+      },
+      {
+        "path": "my_test_images/sir_image3.jpg",
+        "kind": "scene",
+        "ground_truth": "red",
+        "predicted": "red",
+        "confidence": 1.0,
+        "lights_detected": 1,
+        "latency_ms": 99.4,
+        "correct": true
+      },
+      {
+        "path": "test_data/tl_crop_red.jpg",
+        "kind": "synthetic_crop",
+        "ground_truth": "red",
+        "predicted": "red",
+        "confidence": 0.983,
+        "lights_detected": 1,
+        "latency_ms": 26.1,
+        "correct": true
+      },
+      {
+        "path": "test_data/tl_crop_yellow.jpg",
+        "kind": "synthetic_crop",
+        "ground_truth": "yellow",
+        "predicted": "red",
+        "confidence": 1.0,
+        "lights_detected": 1,
+        "latency_ms": 16.2,
+        "correct": false
+      },
+      {
+        "path": "test_data/tl_crop_green.jpg",
+        "kind": "synthetic_crop",
+        "ground_truth": "green",
+        "predicted": "green",
+        "confidence": 0.894,
+        "lights_detected": 1,
+        "latency_ms": 16.0,
+        "correct": true
+      }
+    ],
+    "task": "detect-then-classify (scene) or classify-only (crop)",
+    "metrics_natural_only": {
+      "n": 3,
+      "correct": 3,
+      "accuracy": 1.0
+    },
+    "metrics_synthetic_crops_only": {
+      "n": 3,
+      "correct": 2,
+      "accuracy": 0.667,
+      "note": "matplotlib renderings, not sensor data; kept only for regression continuity"
+    },
+    "all_samples_unchanged_api": {
+      "overall_accuracy": 0.8333333333333334,
+      "sample_count": 6,
+      "per_class": {
+        "red": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1_score": 0.8571428571428571,
+          "support": 3
+        },
+        "yellow": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "support": 1
+        },
+        "green": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 2
+        },
+        "unknown": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "support": 0
+        }
+      },
+      "confusion_matrix": {
+        "red": {
+          "red": 3,
+          "yellow": 0,
+          "green": 0,
+          "unknown": 0
+        },
+        "yellow": {
+          "red": 1,
+          "yellow": 0,
+          "green": 0,
+          "unknown": 0
+        },
+        "green": {
+          "red": 0,
+          "yellow": 0,
+          "green": 2,
+          "unknown": 0
+        },
+        "unknown": {
+          "red": 0,
+          "yellow": 0,
+          "green": 0,
+          "unknown": 0
+        }
+      }
+    }
+  },
+  "lanes": {
+    "model": "tusimple",
+    "preprocess": "stretch",
+    "images": [
+      {
+        "path": "test_data/highway_road.jpg",
+        "lane_points": [
+          0,
+          44,
+          28,
+          0
+        ],
+        "corridor_established": true,
+        "diagnostics": {
+          "candidates": [
+            [
+              1,
+              552
+            ],
+            [
+              2,
+              1006
+            ]
+          ],
+          "left_idx": 1,
+          "right_idx": 2,
+          "bottom_width_px": 453.5
+        },
+        "row_errors": [
+          {
+            "y": 380,
+            "left_error_px": 6.7,
+            "right_error_px": 44.8
+          }
+        ],
+        "mean_abs_error_px": 25.8,
+        "latency_ms": 294.6
+      },
+      {
+        "path": "my_test_images/sir_image7.jpeg",
+        "lane_points": [
+          0,
+          24,
+          17,
+          0
+        ],
+        "corridor_established": true,
+        "diagnostics": {
+          "candidates": [
+            [
+              1,
+              148
+            ],
+            [
+              2,
+              318
+            ]
+          ],
+          "left_idx": 1,
+          "right_idx": 2,
+          "bottom_width_px": 169.5
+        },
+        "row_errors": [
+          {
+            "y": 480,
+            "left_error_px": 110.8,
+            "right_error_px": 71.3
+          }
+        ],
+        "mean_abs_error_px": 91.0,
+        "latency_ms": 221.0
+      }
+    ],
+    "mean_abs_boundary_error_px": 58.4,
+    "images_with_corridor": 2,
+    "images_evaluated": 2
+  }
+}

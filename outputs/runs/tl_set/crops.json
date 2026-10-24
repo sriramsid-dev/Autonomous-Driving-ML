@@ -1,0 +1,470 @@
+[
+  {
+    "src": "test_data/red_tl.jpg",
+    "box": [
+      1273,
+      623,
+      1513,
+      859
+    ],
+    "w": 240,
+    "h": 236,
+    "conf": 0.459
+  },
+  {
+    "src": "test_data/green_tl.jpg",
+    "box": [
+      504,
+      677,
+      771,
+      1197
+    ],
+    "w": 267,
+    "h": 520,
+    "conf": 0.899
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      3144,
+      1297,
+      3192,
+      1437
+    ],
+    "w": 48,
+    "h": 140,
+    "conf": 0.864
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      1567,
+      825,
+      1644,
+      1033
+    ],
+    "w": 77,
+    "h": 208,
+    "conf": 0.827
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      1125,
+      1669,
+      1194,
+      1839
+    ],
+    "w": 69,
+    "h": 170,
+    "conf": 0.575
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      370,
+      1691,
+      502,
+      1802
+    ],
+    "w": 132,
+    "h": 111,
+    "conf": 0.429
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      4743,
+      1816,
+      4832,
+      1976
+    ],
+    "w": 89,
+    "h": 160,
+    "conf": 0.329
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      1299,
+      1847,
+      1419,
+      1928
+    ],
+    "w": 120,
+    "h": 81,
+    "conf": 0.282
+  },
+  {
+    "src": "test_data/yellow_inuvik.jpg",
+    "box": [
+      4746,
+      1818,
+      4823,
+      1899
+    ],
+    "w": 77,
+    "h": 81,
+    "conf": 0.203
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      380,
+      54,
+      404,
+      104
+    ],
+    "w": 24,
+    "h": 50,
+    "conf": 0.857
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      310,
+      213,
+      318,
+      230
+    ],
+    "w": 8,
+    "h": 17,
+    "conf": 0.843
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      110,
+      63,
+      134,
+      112
+    ],
+    "w": 24,
+    "h": 49,
+    "conf": 0.833
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      246,
+      214,
+      253,
+      230
+    ],
+    "w": 7,
+    "h": 16,
+    "conf": 0.824
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      29,
+      196,
+      38,
+      217
+    ],
+    "w": 9,
+    "h": 21,
+    "conf": 0.797
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      238,
+      58,
+      262,
+      108
+    ],
+    "w": 24,
+    "h": 50,
+    "conf": 0.782
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      95,
+      216,
+      104,
+      236
+    ],
+    "w": 9,
+    "h": 20,
+    "conf": 0.744
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      353,
+      214,
+      359,
+      230
+    ],
+    "w": 6,
+    "h": 16,
+    "conf": 0.73
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      77,
+      193,
+      86,
+      215
+    ],
+    "w": 9,
+    "h": 22,
+    "conf": 0.661
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      86,
+      239,
+      92,
+      254
+    ],
+    "w": 6,
+    "h": 15,
+    "conf": 0.443
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      145,
+      240,
+      149,
+      253
+    ],
+    "w": 4,
+    "h": 13,
+    "conf": 0.414
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      91,
+      240,
+      96,
+      253
+    ],
+    "w": 5,
+    "h": 13,
+    "conf": 0.346
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      148,
+      240,
+      158,
+      253
+    ],
+    "w": 10,
+    "h": 13,
+    "conf": 0.336
+  },
+  {
+    "src": "my_test_images/sir_image2.jpg",
+    "box": [
+      93,
+      240,
+      98,
+      253
+    ],
+    "w": 5,
+    "h": 13,
+    "conf": 0.223
+  },
+  {
+    "src": "my_test_images/sir_image3.jpg",
+    "box": [
+      2425,
+      181,
+      2665,
+      552
+    ],
+    "w": 240,
+    "h": 371,
+    "conf": 0.267
+  },
+  {
+    "src": "my_test_images/sir_image5.jpeg",
+    "box": [
+      287,
+      27,
+      405,
+      287
+    ],
+    "w": 118,
+    "h": 260,
+    "conf": 0.342
+  },
+  {
+    "src": "my_test_images/sir_image6.jpeg",
+    "box": [
+      501,
+      30,
+      611,
+      280
+    ],
+    "w": 110,
+    "h": 250,
+    "conf": 0.844
+  },
+  {
+    "src": "my_test_images/sir_image6.jpeg",
+    "box": [
+      621,
+      60,
+      630,
+      78
+    ],
+    "w": 9,
+    "h": 18,
+    "conf": 0.492
+  },
+  {
+    "src": "my_test_images/sir_image6.jpeg",
+    "box": [
+      406,
+      64,
+      503,
+      193
+    ],
+    "w": 97,
+    "h": 129,
+    "conf": 0.438
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      314,
+      58,
+      329,
+      93
+    ],
+    "w": 15,
+    "h": 35,
+    "conf": 0.591
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      15,
+      180,
+      25,
+      200
+    ],
+    "w": 10,
+    "h": 20,
+    "conf": 0.444
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      387,
+      78,
+      397,
+      96
+    ],
+    "w": 10,
+    "h": 18,
+    "conf": 0.36
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      489,
+      179,
+      498,
+      197
+    ],
+    "w": 9,
+    "h": 18,
+    "conf": 0.347
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      387,
+      174,
+      395,
+      185
+    ],
+    "w": 8,
+    "h": 11,
+    "conf": 0.239
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      80,
+      202,
+      93,
+      216
+    ],
+    "w": 13,
+    "h": 14,
+    "conf": 0.236
+  },
+  {
+    "src": "my_test_images/sir_image4.jpeg",
+    "box": [
+      573,
+      202,
+      588,
+      217
+    ],
+    "w": 15,
+    "h": 15,
+    "conf": 0.203
+  },
+  {
+    "src": "my_test_images/sir_image9.jpeg",
+    "box": [
+      140,
+      1,
+      300,
+      186
+    ],
+    "w": 160,
+    "h": 185,
+    "conf": 0.367
+  },
+  {
+    "src": "my_test_images/sir_image9.jpeg",
+    "box": [
+      80,
+      194,
+      136,
+      294
+    ],
+    "w": 56,
+    "h": 100,
+    "conf": 0.217
+  },
+  {
+    "src": "my_test_images/sir_image10.jpeg",
+    "box": [
+      186,
+      107,
+      289,
+      307
+    ],
+    "w": 103,
+    "h": 200,
+    "conf": 0.25
+  },
+  {
+    "src": "my_test_images/sir_image10.jpeg",
+    "box": [
+      187,
+      175,
+      289,
+      405
+    ],
+    "w": 102,
+    "h": 230,
+    "conf": 0.222
+  }
+]

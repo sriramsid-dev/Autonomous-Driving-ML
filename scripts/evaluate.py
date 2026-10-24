@@ -113,8 +113,8 @@ def evaluate_traffic_lights(labels, device):
     }
 
 
-def evaluate_lanes(labels, device, preprocess):
-    det = UltraFastLaneDetector(device=device, preprocess=preprocess)
+def evaluate_lanes(labels, device, preprocess, model_key="tusimple"):
+    det = UltraFastLaneDetector(device=device, preprocess=preprocess, model_key=model_key)
     if not det.is_loaded:
         return {"error": det.load_error or "lane model not loaded"}
 
@@ -163,6 +163,7 @@ def evaluate_lanes(labels, device, preprocess):
     errs = [e["left_error_px"] for r in out for e in r.get("row_errors", [])] + \
            [e["right_error_px"] for r in out for e in r.get("row_errors", [])]
     return {
+        "model": model_key,
         "preprocess": preprocess,
         "images": out,
         "mean_abs_boundary_error_px": round(statistics.mean(errs), 1) if errs else None,
@@ -201,6 +202,7 @@ def main():
     ap.add_argument("--only", default="tl,lane,objects")
     ap.add_argument("--device", default=config.DEVICE)
     ap.add_argument("--lane-preprocess", default=config.LANE_PREPROCESS, choices=["stretch", "letterbox", "crop"])
+    ap.add_argument("--lane-model", default=config.LANE_MODEL, choices=sorted(config.LANE_PROFILES))
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
@@ -239,7 +241,7 @@ def main():
     if "tl" in wanted:
         report["traffic_lights"] = evaluate_traffic_lights(labels, args.device)
     if "lane" in wanted:
-        report["lanes"] = evaluate_lanes(labels, args.device, args.lane_preprocess)
+        report["lanes"] = evaluate_lanes(labels, args.device, args.lane_preprocess, args.lane_model)
     if "objects" in wanted:
         report["objects"] = evaluate_objects(labels, args.device)
 
