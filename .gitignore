@@ -9,3 +9,4 @@ __pycache__/
 *.pyc
 notebooks/*.ipynb
 test_data*.zip
+outputs/runs/*.jpg
