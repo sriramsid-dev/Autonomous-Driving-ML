@@ -114,6 +114,14 @@ def evaluate_traffic_lights(labels, device):
 
 
 def evaluate_lanes(labels, device, preprocess, model_key="tusimple"):
+    """
+    DEPRECATED for reporting. The rows in labels/eval_labels.json were read by
+    eye and their right-boundary column followed the shoulder instead of the
+    paint (70-110 px off). Those numbers are withdrawn - use scripts/eval_lane.py
+    and labels/lane/gt.json. This stays only so the old command still runs.
+    """
+    print("[warn] lane rows in labels/eval_labels.json are WITHDRAWN - the right\n"
+          "       boundary was misread. Report with scripts/eval_lane.py instead.")
     det = UltraFastLaneDetector(device=device, preprocess=preprocess, model_key=model_key)
     if not det.is_loaded:
         return {"error": det.load_error or "lane model not loaded"}
@@ -151,6 +159,7 @@ def evaluate_lanes(labels, device, preprocess, model_key="tusimple"):
         out.append(
             {
                 "path": case["path"],
+                "ground_truth_withdrawn": True,
                 "lane_points": [len(l) for l in lanes],
                 "corridor_established": det.last_corridor_established,
                 "diagnostics": diag,
