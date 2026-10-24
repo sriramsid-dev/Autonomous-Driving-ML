@@ -22,10 +22,9 @@ def audit_dataset_availability() -> Dict[str, object]:
     audit = {
         "waymo_tfrecords_accessible": False,
         "waymo_ground_truth_accessible": False,
-        "local_driving_videos_found": [
-            r"D:\downloads\Wyamo Car video.mp4",
-            r"C:\Users\Sriram Siddhartha\Downloads\gemini_generated_video_06bdb8d4.mp4",
-        ],
+        "local_driving_videos_found": sorted(
+            str(p) for p in (Path(__file__).resolve().parent.parent / "test_data").glob("*.mp4")
+        ),
         "local_test_images_found": [
             "highway_road.jpg (Straight Highway Lane Markings)",
             "sample_wyamo.jpg (Urban Multi-vehicle driving scene)",
@@ -81,6 +80,33 @@ def evaluate_detection_map50(
     - mAP@0.5 measures mean Average Precision across classes when a detection
       is counted as a true positive if its IoU with a ground truth box is >= 0.50.
     """
+    # V1-FIX: true per-class AP@0.5. The previous version pooled every class into
+    # a single Precision/Recall curve and reported the value at maximum recall,
+    # which is neither mAP nor a usable operating point.
+    class_ids = sorted(
+        {p.get("class_id") for preds in predictions_per_image for p in preds}
+        | {g.get("class_id") for gts in ground_truth_per_image for g in gts}
+        - {None}
+    )
+    per_class = {}
+    for cid in class_ids:
+        res = _ap_single_class(
+            [[p for p in preds if p.get("class_id") == cid] for preds in predictions_per_image],
+            [[g for g in gts if g.get("class_id") == cid] for gts in ground_truth_per_image],
+            iou_thresh,
+        )
+        per_class[str(cid)] = res
+
+    aps = [v["ap50"] for v in per_class.values() if v["total_gt"] > 0]
+    return {
+        "map50": float(np.mean(aps)) if aps else 0.0,
+        "per_class": per_class,
+        "evaluated_classes": len(aps),
+        "note": "AP uses all-point interpolation; classes without ground truth are skipped.",
+    }
+
+
+def _ap_single_class(predictions_per_image, ground_truth_per_image, iou_thresh):
     all_scores = []
     all_matched = []
     total_gt = 0
@@ -124,19 +150,23 @@ def evaluate_detection_map50(
     fp_cumsum = np.cumsum(1 - all_matched[sort_indices])
 
     recalls = tp_cumsum / float(total_gt)
-    precisions = tp_cumsum / (tp_cumsum + fp_cumsum)
+    precisions = tp_cumsum / (tp_cumsum + fp_cumsum + 1e-9)
 
-    # 11-point interpolated AP
-    ap = 0.0
-    for t in np.arange(0.0, 1.1, 0.1):
-        prec_at_rec = precisions[recalls >= t]
-        p = np.max(prec_at_rec) if len(prec_at_rec) > 0 else 0.0
-        ap += p / 11.0
+    # All-point interpolated AP (COCO-style monotone envelope)
+    mrec = np.concatenate(([0.0], recalls, [1.0]))
+    mpre = np.concatenate(([0.0], precisions, [0.0]))
+    for i in range(len(mpre) - 2, -1, -1):
+        mpre[i] = max(mpre[i], mpre[i + 1])
+    idx = np.where(mrec[1:] != mrec[:-1])[0]
+    ap = float(np.sum((mrec[idx + 1] - mrec[idx]) * mpre[idx + 1]))
+
+    f1 = 2 * precisions * recalls / (precisions + recalls + 1e-9)
+    best = int(np.argmax(f1)) if len(f1) else 0
 
     return {
-        "precision": float(precisions[-1]) if len(precisions) > 0 else 0.0,
-        "recall": float(recalls[-1]) if len(recalls) > 0 else 0.0,
-        "ap50": float(ap),
+        "precision_at_best_f1": float(precisions[best]) if len(precisions) else 0.0,
+        "recall_at_best_f1": float(recalls[best]) if len(recalls) else 0.0,
+        "ap50": ap,
         "total_gt": int(total_gt),
         "total_pred": int(len(all_scores)),
     }

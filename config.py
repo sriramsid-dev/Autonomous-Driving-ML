@@ -28,9 +28,13 @@ DEVICE = "cuda" if os.environ.get("USE_CUDA", "0") == "1" else "cpu"
 
 # Module A: Object Detection and Tracking
 YOLO_MODEL_PATH = str(MODELS_DIR / "yolo11n.pt")
-TRACKER_CONFIG = "bytetrack.yaml"
+TRACKER_CONFIG = os.environ.get("PERCEPTION_TRACKER", "bytetrack.yaml")
 DETECTION_CONF_THRESHOLD = 0.25
 DETECTION_IOU_THRESHOLD = 0.45
+# Detection input size passed to the detector. 640 keeps the previous speed;
+# 960/1280 measurably improves small-object recall (see EVALUATION.md) at a
+# proportional CPU cost.
+DETECTION_IMGSZ = int(os.environ.get("PERCEPTION_IMGSZ", "640"))
 
 # COCO Class IDs for Autonomous Driving Context
 # 0: person, 1: bicycle, 2: car, 3: motorcycle, 5: bus, 7: truck, 9: traffic light, 11: stop sign
@@ -52,6 +56,18 @@ TL_MIN_HEIGHT = 10
 TL_AMBIGUITY_THRESHOLD = 0.42  # Confidence margin required over competing colors
 TRAFFIC_LIGHT_STATES = ["red", "yellow", "green", "unknown"]
 
+# Lamp-blob classifier (replaces whole-crop HSV scoring)
+TL_BLOB_MIN_SAT = 90           # HSV saturation floor for a lit lamp candidate
+TL_BLOB_MIN_VALUE = 70         # HSV value floor (rejects dark housing)
+TL_LAMP_MIN_PIXELS = 12        # Minimum lit-lamp pixels before a state is emitted
+TL_MIN_STATE_CONF = 0.50       # Per-crop confidence required to commit a state
+TL_TEMPORAL_WINDOW = 5         # Frames of state history used for voting
+TL_TEMPORAL_MIN_VOTES = 3      # Votes required before a state is published
+TL_DUPLICATE_IOU = 0.55        # Overlapping lamp boxes describing one signal
+
+# Shared detector input size for the traffic-light pass when it runs alone.
+TL_DETECTION_IMGSZ = int(os.environ.get("PERCEPTION_TL_IMGSZ", str(DETECTION_IMGSZ)))
+
 # Module C: Ultra-Fast Lane Detection (UFLD)
 UFLD_MODEL_PATH = str(MODELS_DIR / "tusimple_18.pth")
 UFLD_INPUT_WIDTH = 800
@@ -67,6 +83,14 @@ UFLD_ROW_ANCHORS = [
     272, 276, 280, 284
 ]
 
+# V1-FIX: lane geometry / decoding controls
+LANE_PREPROCESS = os.environ.get("PERCEPTION_LANE_PREPROCESS", "stretch")  # stretch|letterbox|crop
+LANE_CROP_TOP = 0.0            # only used by the 'crop' profile
+LANE_EXISTENCE_THRESHOLD = 0.50
+LANE_TEMPORAL_SMOOTHING = os.environ.get("PERCEPTION_LANE_TEMPORAL", "1") == "1"
+LANE_MIN_WIDTH_FRAC = 0.08     # plausible ego-lane width at the bottom row
+LANE_MAX_WIDTH_FRAC = 0.75
+
 # Color Palette for Lane Overlays (BGR format)
 LANE_COLORS = [
     (255, 105, 65),   # Lane 0: Royal Blue
@@ -75,8 +99,8 @@ LANE_COLORS = [
     (220, 20, 60),    # Lane 3: Crimson
 ]
 
-# Video I/O Defaults
-DEFAULT_DRIVING_VIDEO = r"D:\downloads\Wyamo Car video.mp4"
+# Video I/O Defaults (portable: override with --video or PERCEPTION_VIDEO)
+DEFAULT_DRIVING_VIDEO = os.environ.get("PERCEPTION_VIDEO", str(TEST_DATA_DIR / ".." / "demo_video.mp4"))
 FALLBACK_DRIVING_VIDEO = str(WORKSPACE_DIR / "Wyamo Car video.mp4")
 DEFAULT_VIDEO_CODEC = "mp4v"
 OPENH264_DLL = str(MODELS_DIR / "openh264-2.5.0-win64.dll")

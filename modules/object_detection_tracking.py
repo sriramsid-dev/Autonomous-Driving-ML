@@ -29,6 +29,7 @@ class ObjectDetectionTracker:
         tracker_config: str = config.TRACKER_CONFIG,
         target_classes: Optional[Dict[int, str]] = None,
         device: str = config.DEVICE,
+        imgsz: int = config.DETECTION_IMGSZ,
     ):
         self.model_path = model_path
         self.conf_thresh = conf_thresh
@@ -36,6 +37,11 @@ class ObjectDetectionTracker:
         self.tracker_config = tracker_config
         self.target_classes = target_classes or config.PERCEPTION_TARGET_CLASSES
         self.device = device
+        self.imgsz = imgsz
+        # Raw (unfiltered) boxes of the most recent call, so the traffic-light
+        # module can reuse the same forward pass instead of running the same
+        # network a second time on the same frame.
+        self.last_raw_boxes: List[Dict] = []
 
         print(f"[Module A] Initializing ObjectDetectionTracker with model: {self.model_path} on {self.device}")
         self.model = YOLO(self.model_path)
@@ -56,8 +62,28 @@ class ObjectDetectionTracker:
         self.max_history_len = 30
 
     def reset_tracker(self):
-        """Reset internal tracking state for a new video sequence."""
+        """
+        Reset internal tracking state for a new video sequence.
+
+        V1-FIX: clearing the trail history alone did not reset ByteTrack - the
+        association state lives in Ultralytics' predictor and kept producing
+        continuing IDs (measured: IDs resumed at 4..10 instead of 1).
+        """
         self.track_history.clear()
+        predictor = getattr(self.model, "predictor", None)
+        if predictor is not None:
+            trackers = getattr(predictor, "trackers", None)
+            for trk in trackers or []:
+                try:
+                    trk.reset()
+                except Exception:  # noqa: BLE001 - best effort across versions
+                    pass
+            try:
+                predictor.trackers = []
+            except Exception:  # noqa: BLE001
+                pass
+        # Drop the predictor entirely so the next track() call rebuilds it.
+        self.model.predictor = None
 
     def detect(self, frame_bgr: np.ndarray) -> List[Dict]:
         """
@@ -69,6 +95,8 @@ class ObjectDetectionTracker:
             frame_bgr,
             conf=self.conf_thresh,
             iou=self.iou_thresh,
+            imgsz=self.imgsz,
+            classes=sorted(self.target_classes),
             device=self.device,
             verbose=False,
         )[0]
@@ -100,18 +128,25 @@ class ObjectDetectionTracker:
         Returns (tracked_objects, inference_time_ms).
         """
         t0 = time.perf_counter()
+        # V1-FIX: restrict the tracker itself to the classes we care about.
+        # Previously all 80 COCO classes were tracked and filtered afterwards,
+        # so signs/benches/lights consumed association slots and track IDs.
+        track_classes = sorted(set(self.target_classes) | {config.TRAFFIC_LIGHT_CLASS_ID})
         results = self.model.track(
             frame_bgr,
-            conf=self.conf_thresh,
+            conf=min(self.conf_thresh, config.TL_DETECTION_CONF_THRESHOLD),
             iou=self.iou_thresh,
+            imgsz=self.imgsz,
             tracker=self.tracker_config,
             persist=persist,
+            classes=track_classes,
             device=self.device,
             verbose=False,
         )[0]
         inference_time_ms = (time.perf_counter() - t0) * 1000.0
 
         tracked_objects = []
+        self.last_raw_boxes = []
         if results.boxes is not None and len(results.boxes) > 0:
             boxes = results.boxes.xyxy.cpu().numpy()
             confs = results.boxes.conf.cpu().numpy()
@@ -123,6 +158,12 @@ class ObjectDetectionTracker:
             )
 
             for box, conf, cls_id, tid in zip(boxes, confs, clses, track_ids):
+                self.last_raw_boxes.append({
+                    "box": [float(b) for b in box],
+                    "class_id": int(cls_id),
+                    "confidence": float(conf),
+                    "track_id": int(tid) if tid is not None else None,
+                })
                 if int(cls_id) in self.target_classes:
                     label = self.target_classes[int(cls_id)]
                     t_id = int(tid) if tid is not None else None

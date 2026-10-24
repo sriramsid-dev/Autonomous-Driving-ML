@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-10-24T11:17:45+00:00",
+  "labels": {
+    "file": "labels\\eval_labels.json",
+    "provenance": {
+      "labelled_by": "coding agent, by visual inspection of the image files",
+      "labelled_on": "2026-10-24",
+      "labelling_type": "single annotator, no second pass, no inter-annotator agreement",
+      "coordinate_system": "original image pixels (x, y), origin top-left",
+      "warning": "This is a small, agent-labelled sanity set for regression testing. It is NOT a benchmark, has no published-protocol guarantees, and must not be cited as an accuracy measurement of the models themselves."
+    }
+  },
+  "env": {
+    "python": "3.13.13",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cpu",
+    "ultralytics": "8.4.175",
+    "opencv": "5.0.0",
+    "device": "cpu"
+  },
+  "config": {
+    "detection_imgsz": 640,
+    "tl_detection_imgsz": 640,
+    "dt_conf": 0.25,
+    "tl_conf": 0.2,
+    "lane_preprocess": "stretch",
+    "lane_temporal": true,
+    "lane_existence_threshold": 0.5,
+    "tl_min_state_conf": 0.5
+  },
+  "lanes": {
+    "preprocess": "stretch",
+    "images": [
+      {
+        "path": "test_data/highway_road.jpg",
+        "lane_points": [
+          0,
+          44,
+          28,
+          0
+        ],
+        "corridor_established": true,
+        "diagnostics": {
+          "candidates": [
+            [
+              1,
+              552
+            ],
+            [
+              2,
+              1006
+            ]
+          ],
+          "left_idx": 1,
+          "right_idx": 2,
+          "bottom_width_px": 453.5
+        },
+        "row_errors": [
+          {
+            "y": 380,
+            "left_error_px": 6.7,
+            "right_error_px": 44.8
+          }
+        ],
+        "mean_abs_error_px": 25.8,
+        "latency_ms": 179.6
+      }
+    ],
+    "mean_abs_boundary_error_px": 25.8,
+    "images_with_corridor": 1,
+    "images_evaluated": 1
+  }
+}

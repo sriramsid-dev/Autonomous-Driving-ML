@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-10-24T11:17:54+00:00",
+  "labels": {
+    "file": "labels\\eval_labels.json",
+    "provenance": {
+      "labelled_by": "coding agent, by visual inspection of the image files",
+      "labelled_on": "2026-10-24",
+      "labelling_type": "single annotator, no second pass, no inter-annotator agreement",
+      "coordinate_system": "original image pixels (x, y), origin top-left",
+      "warning": "This is a small, agent-labelled sanity set for regression testing. It is NOT a benchmark, has no published-protocol guarantees, and must not be cited as an accuracy measurement of the models themselves."
+    }
+  },
+  "env": {
+    "python": "3.13.13",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cpu",
+    "ultralytics": "8.4.175",
+    "opencv": "5.0.0",
+    "device": "cpu"
+  },
+  "config": {
+    "detection_imgsz": 640,
+    "tl_detection_imgsz": 640,
+    "dt_conf": 0.25,
+    "tl_conf": 0.2,
+    "lane_preprocess": "letterbox",
+    "lane_temporal": true,
+    "lane_existence_threshold": 0.5,
+    "tl_min_state_conf": 0.5
+  },
+  "lanes": {
+    "preprocess": "letterbox",
+    "images": [
+      {
+        "path": "test_data/highway_road.jpg",
+        "lane_points": [
+          0,
+          44,
+          31,
+          0
+        ],
+        "corridor_established": true,
+        "diagnostics": {
+          "candidates": [
+            [
+              1,
+              545
+            ],
+            [
+              2,
+              1133
+            ]
+          ],
+          "left_idx": 1,
+          "right_idx": 2,
+          "bottom_width_px": 588.0
+        },
+        "row_errors": [
+          {
+            "y": 500,
+            "left_error_px": 106.1,
+            "right_error_px": 165.0
+          },
+          {
+            "y": 380,
+            "left_error_px": 19.0,
+            "right_error_px": 55.8
+          }
+        ],
+        "mean_abs_error_px": 86.5,
+        "latency_ms": 238.9
+      }
+    ],
+    "mean_abs_boundary_error_px": 86.5,
+    "images_with_corridor": 1,
+    "images_evaluated": 1
+  }
+}

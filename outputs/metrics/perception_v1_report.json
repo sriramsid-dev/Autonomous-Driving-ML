@@ -1,14 +1,11 @@
 {
   "system_version": "Version 1 (Pretrained Baseline)",
-  "timestamp": "2026-10-12 13:04:11",
+  "timestamp": "2026-10-24 16:49:33",
   "hardware_device": "cpu",
   "dataset_audit": {
     "waymo_tfrecords_accessible": false,
     "waymo_ground_truth_accessible": false,
-    "local_driving_videos_found": [
-      "D:\\downloads\\Wyamo Car video.mp4",
-      "C:\\Users\\Sriram Siddhartha\\Downloads\\gemini_generated_video_06bdb8d4.mp4"
-    ],
+    "local_driving_videos_found": [],
     "local_test_images_found": [
       "highway_road.jpg (Straight Highway Lane Markings)",
       "sample_wyamo.jpg (Urban Multi-vehicle driving scene)",
@@ -21,83 +18,29 @@
     ],
     "evaluation_strategy": "Because raw Waymo TFRecords and ground-truth bounding box/track labels are not stored locally in this workspace (they reside on Google Cloud / Google Drive as described in 'Waymo Open Dataset.pptx'), formal mAP@0.5 and MOTA are evaluated via rigorous unit test cases with ground-truth test vectors, while video inference is evaluated using empirical tracking continuity and detection distribution statistics."
   },
-  "unit_test_results": {
-    "module_A": {
-      "test_image": "sample_wyamo.jpg",
-      "detections_count": 2,
-      "detected_labels": [
-        "car",
-        "car"
-      ],
-      "confidences": [
-        0.83,
-        0.33
-      ],
-      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_module_A_objects.jpg"
+  "unit_test_results": {},
+  "video_pipeline_summary": {
+    "frames_processed": 6,
+    "total_processing_time_seconds": 1.82,
+    "average_fps": 3.3,
+    "latency_p50_ms": 222.9,
+    "latency_p90_ms": 477.7,
+    "latency_p99_ms": 603.5,
+    "total_detections_by_class": {
+      "car": 17
     },
-    "module_C": {
-      "test_image": "highway_road.jpg",
-      "lane_points_detected": [
-        0,
-        44,
-        31,
-        0
-      ],
-      "active_lanes": 2,
-      "inference_time_ms": 353.6,
-      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_module_C_lanes.jpg"
+    "unique_tracking_ids": 3,
+    "mean_track_lifetime_frames": 5.7,
+    "max_track_lifetime_frames": 6,
+    "traffic_light_states_detected": {
+      "red": 0,
+      "yellow": 0,
+      "green": 0,
+      "unknown": 0
     },
-    "module_B": {
-      "labeled_crops_tested": [
-        {
-          "file": "tl_crop_red.jpg",
-          "ground_truth": "red",
-          "predicted": "red",
-          "confidence": 1.0,
-          "is_correct": true
-        },
-        {
-          "file": "tl_crop_yellow.jpg",
-          "ground_truth": "yellow",
-          "predicted": "yellow",
-          "confidence": 0.67,
-          "is_correct": true
-        },
-        {
-          "file": "tl_crop_green.jpg",
-          "ground_truth": "green",
-          "predicted": "green",
-          "confidence": 0.84,
-          "is_correct": true
-        }
-      ],
-      "classification_accuracy": 1.0,
-      "scene_detection_tests": [
-        {
-          "file": "red_tl.jpg",
-          "detected_lights_count": 2,
-          "states": [
-            "red",
-            "unknown"
-          ]
-        },
-        {
-          "file": "green_tl.jpg",
-          "detected_lights_count": 1,
-          "states": [
-            "green"
-          ]
-        },
-        {
-          "file": "yellow_inuvik.jpg",
-          "detected_lights_count": 2,
-          "states": [
-            "yellow",
-            "yellow"
-          ]
-        }
-      ]
-    }
-  },
-  "video_pipeline_summary": {}
+    "lane_detection_visibility_rate": 0.167,
+    "wall_clock_time_seconds": 2.1,
+    "output_video_path": "outputs/audit_baseline/new_video.mp4",
+    "video_resolution": "480x848"
+  }
 }

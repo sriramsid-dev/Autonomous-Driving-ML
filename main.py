@@ -154,15 +154,23 @@ class PerceptionPipeline:
         tl_detections = []
         top_tl_state = "None"
         if self.tl_detector is not None and self.tl_classifier is not None:
-            raw_tls, _ = self.tl_detector.detect(frame_bgr)
+            # V1-FIX: reuse the object detector's forward pass instead of running
+            # a second identical YOLO network on the same frame.
+            if self.tracker is not None:
+                raw_tls = self.tl_detector.detect_from_boxes(frame_bgr, self.tracker.last_raw_boxes)
+            else:
+                raw_tls, _ = self.tl_detector.detect(frame_bgr)
             for tl in raw_tls:
                 crop = tl["crop"]
-                state, s_conf = self.tl_classifier.classify(crop)
+                # Stable spatial key so temporal voting follows the same signal
+                cx = 0.5 * (tl["box"][0] + tl["box"][2])
+                cy = 0.5 * (tl["box"][1] + tl["box"][3])
+                key = (int(cx // 40), int(cy // 40))
+                state, s_conf = self.tl_classifier.classify(crop, key=key)
                 tl["state"] = state
                 tl["state_conf"] = s_conf
                 tl_detections.append(tl)
 
-                # Annotate traffic light badge
                 annotated = self.tl_classifier.annotate(
                     annotated, tl["box"], state, s_conf
                 )
@@ -454,6 +462,10 @@ class PerceptionPipeline:
         # Reset tracking history for clean video start
         if self.tracker:
             self.tracker.reset_tracker()
+        if self.lane_detector is not None:
+            self.lane_detector.reset()
+        if self.tl_classifier is not None:
+            self.tl_classifier.reset_temporal()
 
         writer = create_video_writer(
             output_video_path,
@@ -868,6 +880,23 @@ def run_all_image_tests(device: str = config.DEVICE) -> Dict[str, object]:
     return summary_report
 
 
+def resolve_video_path(explicit: Optional[str]) -> Optional[str]:
+    """
+    Resolve a driving video without hard-coded machine-specific paths.
+    Order: explicit argument -> $PERCEPTION_VIDEO / config default -> workspace
+    fallback -> any .mp4 inside test_data/. Returns None when nothing is found.
+    """
+    candidates = [explicit, config.DEFAULT_DRIVING_VIDEO, config.FALLBACK_DRIVING_VIDEO]
+    for cand in candidates:
+        if cand and os.path.exists(cand):
+            return cand
+    for pattern in ("*.mp4", "*.avi", "*.mov"):
+        matches = sorted(config.TEST_DATA_DIR.glob(pattern))
+        if matches:
+            return str(matches[0])
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser(description="Autonomous Driving Perception System - Version 1")
     parser.add_argument("--image", "-i", type=str, default=None, help="Path to input image for single-image perception inference")
@@ -875,12 +904,27 @@ def main():
     parser.add_argument("--output-image", "-o", type=str, default=None, help="Custom output path for annotated image (default: outputs/result_images/<name>_annotated.jpg)")
     parser.add_argument("--crop", action="store_true", help="Treat input image directly as a cropped traffic light image")
     parser.add_argument("--test-images", action="store_true", help="Run comprehensive image perception test suite on all curated local test images")
-    parser.add_argument("--video", type=str, default=None, help="Path to input driving video (default: Wyamo Car video.mp4)")
+    parser.add_argument("--video", type=str, default=None, help="Path to input driving video (default: $PERCEPTION_VIDEO or a video inside test_data/)")
+    parser.add_argument("--output-video", type=str, default=None, help="Destination path for the annotated video")
     parser.add_argument("--max-frames", type=int, default=120, help="Maximum number of video frames to process (None for all)")
+    parser.add_argument("--imgsz", type=int, default=config.DETECTION_IMGSZ, help="Detector input size (640 default; 960/1280 improve small objects)")
+    parser.add_argument("--lane-preprocess", type=str, default=config.LANE_PREPROCESS, choices=["stretch", "letterbox", "crop"], help="Lane preprocessing profile")
     parser.add_argument("--test-all", action="store_true", default=False, help="Run legacy static benchmark tests")
     parser.add_argument("--skip-video", action="store_true", help="Skip video processing")
     parser.add_argument("--device", type=str, default=config.DEVICE, help="Device to use ('cpu' or 'cuda')")
     args = parser.parse_args()
+
+    # V1-FIX: validate the requested device instead of failing deep inside torch
+    if args.device.startswith("cuda"):
+        import torch
+
+        if not torch.cuda.is_available():
+            print("[Warning] CUDA requested but not available; falling back to CPU.")
+            args.device = "cpu"
+    if args.imgsz != config.DETECTION_IMGSZ:
+        config.DETECTION_IMGSZ = args.imgsz
+        config.TL_DETECTION_IMGSZ = args.imgsz
+    config.LANE_PREPROCESS = args.lane_preprocess
 
     # Mode 1: Individual Image Inference
     if args.image:
@@ -966,27 +1010,25 @@ def main():
 
     video_summary = {}
     if not args.skip_video:
-        video_input = args.video or config.DEFAULT_DRIVING_VIDEO
-        if not os.path.exists(video_input):
-            print(f"[Warning] Primary video '{video_input}' not found. Searching alternatives...")
-            if os.path.exists(config.FALLBACK_DRIVING_VIDEO):
-                video_input = config.FALLBACK_DRIVING_VIDEO
-            else:
-                cand = r"C:\Users\Sriram Siddhartha\Downloads\gemini_generated_video_06bdb8d4.mp4"
-                if os.path.exists(cand):
-                    video_input = cand
+        video_input = resolve_video_path(args.video)
+        if video_input is None:
+            print(
+                "[Warning] No driving video found. Pass --video <path> (or set PERCEPTION_VIDEO) "
+                "to run the video pipeline. Static modes are unaffected."
+            )
+        else:
+            out_video_path = args.output_video or str(
+                config.ANNOTATED_VIDEOS_DIR / f"annotated_perception_{Path(video_input).stem}.mp4"
+            )
 
-        out_video_name = f"annotated_perception_{Path(video_input).stem}.mp4"
-        out_video_path = str(config.ANNOTATED_VIDEOS_DIR / out_video_name)
-
-        pipeline = PerceptionPipeline(device=args.device)
-        video_summary = pipeline.process_video(
-            video_path=video_input,
-            output_video_path=out_video_path,
-            max_frames=args.max_frames,
-            save_keyframes=True,
-            keyframe_dir=str(config.RESULT_IMAGES_DIR),
-        )
+            pipeline = PerceptionPipeline(device=args.device)
+            video_summary = pipeline.process_video(
+                video_path=video_input,
+                output_video_path=out_video_path,
+                max_frames=args.max_frames,
+                save_keyframes=True,
+                keyframe_dir=str(config.RESULT_IMAGES_DIR),
+            )
 
     final_report = {
         "system_version": "Version 1 (Pretrained Baseline)",

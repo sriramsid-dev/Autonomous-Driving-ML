@@ -6,7 +6,10 @@
 [![ByteTrack](https://img.shields.io/badge/Tracking-ByteTrack-orange.svg)](https://github.com/ifzhang/ByteTrack)
 [![UFLD](https://img.shields.io/badge/Lane%20Detection-Ultra--Fast--Lane--Detection-purple.svg)](https://github.com/cfzd/Ultra-Fast-Lane-Detection)
 
-A complete, production-ready autonomous driving perception prototype built entirely with **pretrained models**—requiring zero training or fine-tuning. This system implements an end-to-end multi-task perception pipeline combining:
+> **Status: experimental research prototype — not production-ready and not validated for vehicle control.**
+> Version 1.1 results, including the regressions, are in [EVALUATION.md](EVALUATION.md); the audit that produced them and every changed file are in [CHANGES.md](CHANGES.md).
+
+A perception research prototype built entirely with **pretrained models**—requiring zero training or fine-tuning. It implements an end-to-end multi-task perception pipeline combining:
 1. **Multi-Object Detection and Tracking** (YOLO11n + ByteTrack)
 2. **Traffic-Light Localization and State Classification** (YOLO11n + Spatial-Chrominance Baseline)
 3. **Deep Lane Detection and Drive Corridor Projection** (Ultra-Fast Lane Detection / UFLD ResNet-18)
@@ -192,15 +195,21 @@ jupyter lab notebooks/Version1_Final.ipynb
 ## 6. Experimental Results & Verification
 
 ### Static Unit Tests
-- **Module A (Object Detection):** Detected 2 vehicles (`car: 0.83`, `car: 0.33`) on urban driving scene `sample_wyamo.jpg`.
-- **Module B (Traffic Light Classification):** Achieved **100.0% accuracy** on labeled crops (Red, Yellow, Green). Correctly localized and classified traffic signals across real street scenes (`red_tl.jpg` -> Red, `green_tl.jpg` -> Green, `yellow_inuvik.jpg` -> Yellow).
-- **Module C (Lane Detection):** UFLD detected ego left boundary (44 keypoints) and ego right boundary (31 keypoints) on `highway_road.jpg` in 182 ms on CPU.
+
+**Corrected in v1.1.** The earlier text here reported "100.0% accuracy" on labelled crops; those "crops" are matplotlib figures with axis frames and titles, the labels were hard-coded for those same three files, and the metric was therefore training-set accuracy on synthetic images. It is withdrawn.
+
+What is actually measured now (details and caveats in [EVALUATION.md](EVALUATION.md)):
+- **Module B (traffic lights):** 3/3 natural scenes correct, 1/3 on the withdrawn matplotlib figures, n=6 agent-labelled samples — too small to be an accuracy estimate.
+- **Module C (lanes):** ego-boundary error 6.7 px (left) / 44.8 px (right) at one labelled row on `highway_road.jpg`; the model remains inaccurate at the image bottom.
+- **Module A (objects):** runtime only. No bounding-box ground truth exists, so no mAP/precision/recall is claimed.
+
+Reproduce with `python scripts/evaluate.py`.
 
 ### Driving Video Performance (`Wyamo Car video.mp4`)
 - **Frames Processed:** 120 frames (4.0 seconds of driving footage).
 - **Processing Speed:** **3.89 - 4.22 FPS on CPU**.
 - **Detection Summary:** 237 total vehicle instances detected across 120 frames.
-- **Tracking Continuity:** ByteTrack maintained continuous tracks with zero ID switches on primary leading vehicles.
+- **Tracking Continuity:** not measured. No ground-truth tracks exist, so no MOTA/ID-switch figure is claimed (the earlier "zero ID switches" statement was unsupported).
 - **Output Artifacts:** Generated browser-compatible MP4 video with full HUD overlay (`outputs/annotated_videos/annotated_perception_Wyamo Car video.mp4`).
 
 ---
