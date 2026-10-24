@@ -10,3 +10,4 @@ __pycache__/
 notebooks/*.ipynb
 test_data*.zip
 outputs/runs/*.jpg
+test_data/tl_v2/*.jpg

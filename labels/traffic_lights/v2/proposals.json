@@ -1,0 +1,246 @@
+{
+  "generated_by": "scripts/make_tl_v2_proposals.py",
+  "imgsz": 1280,
+  "conf": 0.2,
+  "warning": "detector output only - NOT labels; do not evaluate against this file",
+  "proposals": [
+    {
+      "index": 1,
+      "src": "test_data/tl_v2/02_Amber_traffic_signal__Stamford_Road__Sin.jpg",
+      "box": [
+        588,
+        337,
+        1183,
+        1726
+      ],
+      "w": 595,
+      "h": 1389,
+      "detector_conf": 0.805,
+      "verified": false
+    },
+    {
+      "index": 2,
+      "src": "test_data/tl_v2/02_Amber_traffic_signal__Stamford_Road__Sin.jpg",
+      "box": [
+        608,
+        851,
+        1235,
+        2178
+      ],
+      "w": 627,
+      "h": 1327,
+      "detector_conf": 0.608,
+      "verified": false
+    },
+    {
+      "index": 3,
+      "src": "test_data/tl_v2/03_Traffic_light_yellow_Drammen_jpg.jpg",
+      "box": [
+        840,
+        220,
+        1491,
+        1560
+      ],
+      "w": 651,
+      "h": 1340,
+      "detector_conf": 0.456,
+      "verified": false
+    },
+    {
+      "index": 4,
+      "src": "test_data/tl_v2/04_LED_traffic_light_on_red_jpg.jpg",
+      "box": [
+        800,
+        475,
+        1102,
+        1287
+      ],
+      "w": 302,
+      "h": 812,
+      "detector_conf": 0.676,
+      "verified": false
+    },
+    {
+      "index": 5,
+      "src": "test_data/tl_v2/05_UK_Red_Traffic_Light_Signal___geograph_o.jpg",
+      "box": [
+        105,
+        1090,
+        267,
+        1463
+      ],
+      "w": 162,
+      "h": 373,
+      "detector_conf": 0.663,
+      "verified": false
+    },
+    {
+      "index": 6,
+      "src": "test_data/tl_v2/05_UK_Red_Traffic_Light_Signal___geograph_o.jpg",
+      "box": [
+        266,
+        1200,
+        394,
+        1449
+      ],
+      "w": 128,
+      "h": 249,
+      "detector_conf": 0.484,
+      "verified": false
+    },
+    {
+      "index": 7,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        982,
+        820,
+        1018,
+        895
+      ],
+      "w": 36,
+      "h": 75,
+      "detector_conf": 0.889,
+      "verified": false
+    },
+    {
+      "index": 8,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        444,
+        767,
+        484,
+        843
+      ],
+      "w": 40,
+      "h": 76,
+      "detector_conf": 0.876,
+      "verified": false
+    },
+    {
+      "index": 9,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        776,
+        785,
+        812,
+        860
+      ],
+      "w": 36,
+      "h": 75,
+      "detector_conf": 0.8,
+      "verified": false
+    },
+    {
+      "index": 10,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        1315,
+        958,
+        1352,
+        1035
+      ],
+      "w": 37,
+      "h": 77,
+      "detector_conf": 0.709,
+      "verified": false
+    },
+    {
+      "index": 11,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        1585,
+        513,
+        1643,
+        629
+      ],
+      "w": 58,
+      "h": 116,
+      "detector_conf": 0.639,
+      "verified": false
+    },
+    {
+      "index": 12,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        1287,
+        962,
+        1311,
+        1038
+      ],
+      "w": 24,
+      "h": 76,
+      "detector_conf": 0.362,
+      "verified": false
+    },
+    {
+      "index": 13,
+      "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg",
+      "box": [
+        1585,
+        513,
+        1634,
+        583
+      ],
+      "w": 49,
+      "h": 70,
+      "detector_conf": 0.255,
+      "verified": false
+    },
+    {
+      "index": 14,
+      "src": "test_data/tl_v2/09_Cyclist_traffic_light_at_the_oval_jpg.jpg",
+      "box": [
+        120,
+        1360,
+        1197,
+        3126
+      ],
+      "w": 1077,
+      "h": 1766,
+      "detector_conf": 0.632,
+      "verified": false
+    },
+    {
+      "index": 15,
+      "src": "test_data/tl_v2/10_Traffic_light_in_Kumasi_jpg.jpg",
+      "box": [
+        1441,
+        130,
+        1554,
+        402
+      ],
+      "w": 113,
+      "h": 272,
+      "detector_conf": 0.882,
+      "verified": false
+    },
+    {
+      "index": 16,
+      "src": "test_data/tl_v2/11_Traffic_light__Frankfurt_Wolkenkratzerfe.jpg",
+      "box": [
+        587,
+        114,
+        1081,
+        907
+      ],
+      "w": 494,
+      "h": 793,
+      "detector_conf": 0.699,
+      "verified": false
+    },
+    {
+      "index": 17,
+      "src": "test_data/tl_v2/11_Traffic_light__Frankfurt_Wolkenkratzerfe.jpg",
+      "box": [
+        580,
+        477,
+        1156,
+        1182
+      ],
+      "w": 576,
+      "h": 705,
+      "detector_conf": 0.312,
+      "verified": false
+    }
+  ]
+}

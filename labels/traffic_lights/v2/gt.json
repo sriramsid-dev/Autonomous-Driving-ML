@@ -1,0 +1,48 @@
+{
+  "provenance": {
+    "set": "traffic-light held-out v2",
+    "labelled_by": "coding agent, by eye: every crop inspected at 2x and compared with its source photograph",
+    "labelled_on": "2026-10-24",
+    "labelling_type": "single annotator, no second pass, no inter-annotator agreement",
+    "independence": "This set was built AFTER the v1.4 classifier was frozen and was never used to choose any threshold. Order of work: (1) thresholds fixed on labels/traffic_lights/gt.json (the v1.1 dev set), (2) classifier frozen, (3) images fetched, (4) proposals generated, (5) labels written from the crops only.",
+    "crop_tier": "verified-proposal: crops are the detector's boxes; presence and state were checked by eye, boxes were not redrawn. Crop labels describe what the crop shows, which is not always the state of the signal in the scene (see 'src_state' and 'crop_missed_lamp').",
+    "taxonomy": {
+      "red": "lit red lamp",
+      "yellow": "lit amber/yellow lamp",
+      "green": "lit green lamp",
+      "unlit": "signal housing with no lit lamp visible in this crop",
+      "other_signal": "pedestrian/bicycle signal, reported separately from vehicle heads",
+      "not_a_traffic_light": "detector box that does not contain a signal",
+      "ambiguous": "all three lamps appear lit (long exposure); no single correct state"
+    },
+    "sources": "test_data/tl_v2/sources.json - Wikimedia Commons, each entry with author, licence and page URL",
+    "note": "Images are 1600 px renderings; the crops are adaptations of CC BY-SA / CC BY / CC0 works and carry the same licence as their source."
+  },
+  "samples": [
+    {"index": 1, "crop": "labels/traffic_lights/v2/crops/01.jpg", "src": "test_data/tl_v2/02_Amber_traffic_signal__Stamford_Road__Sin.jpg", "w": 595, "h": 1389, "detector_conf": 0.81, "label": "yellow", "src_state": "yellow", "condition": "day", "note": "duplicate box with #2 on the same housing; amber lamp lit"},
+    {"index": 2, "crop": "labels/traffic_lights/v2/crops/02.jpg", "src": "test_data/tl_v2/02_Amber_traffic_signal__Stamford_Road__Sin.jpg", "w": 627, "h": 1327, "detector_conf": 0.61, "label": "yellow", "src_state": "yellow", "condition": "day", "note": "same signal as #1, lower half"},
+    {"index": 3, "crop": "labels/traffic_lights/v2/crops/03.jpg", "src": "test_data/tl_v2/03_Traffic_light_yellow_Drammen_jpg.jpg", "w": 651, "h": 1340, "detector_conf": 0.46, "label": "yellow", "src_state": "yellow", "condition": "day"},
+    {"index": 4, "crop": "labels/traffic_lights/v2/crops/04.jpg", "src": "test_data/tl_v2/04_LED_traffic_light_on_red_jpg.jpg", "w": 302, "h": 812, "detector_conf": 0.68, "label": "red", "src_state": "red", "condition": "day"},
+    {"index": 5, "crop": "labels/traffic_lights/v2/crops/05.jpg", "src": "test_data/tl_v2/05_UK_Red_Traffic_Light_Signal___geograph_o.jpg", "w": 162, "h": 373, "detector_conf": 0.66, "label": "unlit", "src_state": "red", "condition": "day", "crop_missed_lamp": true, "note": "the source signal shows red higher up; the box covers the unlit lower housing"},
+    {"index": 6, "crop": "labels/traffic_lights/v2/crops/06.jpg", "src": "test_data/tl_v2/05_UK_Red_Traffic_Light_Signal___geograph_o.jpg", "w": 128, "h": 249, "detector_conf": 0.48, "label": "unlit", "src_state": "red", "condition": "day", "crop_missed_lamp": true},
+    {"index": 7, "crop": "labels/traffic_lights/v2/crops/07.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 36, "h": 75, "detector_conf": 0.89, "label": "green", "src_state": "green", "condition": "day"},
+    {"index": 8, "crop": "labels/traffic_lights/v2/crops/08.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 40, "h": 76, "detector_conf": 0.88, "label": "not_a_traffic_light", "src_state": "none", "condition": "day", "note": "illuminated white left-turn arrow sign, not a red/amber/green head"},
+    {"index": 9, "crop": "labels/traffic_lights/v2/crops/09.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 36, "h": 75, "detector_conf": 0.80, "label": "green", "src_state": "green", "condition": "day"},
+    {"index": 10, "crop": "labels/traffic_lights/v2/crops/10.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 37, "h": 77, "detector_conf": 0.71, "label": "green", "src_state": "green", "condition": "day"},
+    {"index": 11, "crop": "labels/traffic_lights/v2/crops/11.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 58, "h": 116, "detector_conf": 0.64, "label": "unlit", "src_state": "unlit", "condition": "day", "note": "back of a housing seen from behind"},
+    {"index": 12, "crop": "labels/traffic_lights/v2/crops/12.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 24, "h": 76, "detector_conf": 0.36, "label": "unlit", "src_state": "green", "condition": "day", "crop_missed_lamp": true, "note": "left edge of the same signal as #10; box sits beside the lit lens"},
+    {"index": 13, "crop": "labels/traffic_lights/v2/crops/13.jpg", "src": "test_data/tl_v2/08_Traffic_light_at_Jeffrey_Road_and_Smoket.jpg", "w": 49, "h": 70, "detector_conf": 0.26, "label": "unlit", "src_state": "unlit", "condition": "day", "note": "duplicate of #11"},
+    {"index": 14, "crop": "labels/traffic_lights/v2/crops/14.jpg", "src": "test_data/tl_v2/09_Cyclist_traffic_light_at_the_oval_jpg.jpg", "w": 1077, "h": 1766, "detector_conf": 0.63, "label": "other_signal", "src_state": "red", "condition": "day", "note": "bicycle signal head, red bicycle symbol lit"},
+    {"index": 15, "crop": "labels/traffic_lights/v2/crops/15.jpg", "src": "test_data/tl_v2/10_Traffic_light_in_Kumasi_jpg.jpg", "w": 113, "h": 272, "detector_conf": 0.88, "label": "other_signal", "src_state": "green", "condition": "day", "note": "green walking-person signal"},
+    {"index": 16, "crop": "labels/traffic_lights/v2/crops/16.jpg", "src": "test_data/tl_v2/11_Traffic_light__Frankfurt_Wolkenkratzerfe.jpg", "w": 494, "h": 793, "detector_conf": 0.70, "label": "yellow", "src_state": "yellow", "condition": "day", "note": "amber arrow"},
+    {"index": 17, "crop": "labels/traffic_lights/v2/crops/17.jpg", "src": "test_data/tl_v2/11_Traffic_light__Frankfurt_Wolkenkratzerfe.jpg", "w": 576, "h": 705, "detector_conf": 0.31, "label": "yellow", "src_state": "yellow", "condition": "day", "note": "duplicate of #16"},
+    {"index": 18, "crop": "labels/traffic_lights/v2/crops/handcut_07_ambiguous.jpg", "src": "test_data/tl_v2/07_Traffic_lights_at_night1_jpg.jpg", "w": 1037, "h": 2361, "detector_conf": null, "label": "ambiguous", "src_state": "ambiguous", "condition": "night", "note": "hand-cut, NOT detector output: long exposure shows red, amber and green lit at once"}
+  ],
+  "scenes": [
+    {"src": "test_data/tl_v2/01_Flashing_yellow_traffic_light_3086_jpg.jpg", "signals_visible": 0, "note": "yellow diamond pedestrian-crossing sign; no signal head in frame"},
+    {"src": "test_data/tl_v2/06_Traffic_lights_at_night_jpg.jpg", "signals_visible": 1, "note": "one red gantry signal, detector found 0 boxes (miss)"},
+    {"src": "test_data/tl_v2/07_Traffic_lights_at_night1_jpg.jpg", "signals_visible": 1, "note": "close-up, detector found 0 boxes (miss); hand-cut crop used"},
+    {"src": "test_data/tl_v2/12_Out_of_focus_dashboard_and_traffic_light.jpg", "signals_visible": 0, "note": "out-of-focus car tail-lights; 0 detections is correct"},
+    {"src": "test_data/tl_v2/05_UK_Red_Traffic_Light_Signal___geograph_o.jpg", "signals_visible": 1, "note": "red signal present; both detector boxes cover the unlit lower housing"}
+  ]
+}

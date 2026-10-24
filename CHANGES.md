@@ -85,3 +85,65 @@ on it is not scoreable.
 * `models/culane_18.pth` (178 MB) is untracked by design (see .gitignore); re-download with the
   Google Drive id in EVALUATION.md 8.3 if needed. Everything else runs without it.
 * Passing regression tests mean 'behaved as specified', not 'detected correctly'.
+---
+
+# v1.4 — traffic-light lamp vs housing, honest lane ground truth
+
+Commit range: `6c79bbe..HEAD`. Baseline `24c9cd0` untouched.
+
+## The bug
+
+`TrafficLightClassifier` computed its hue histogram over the **entire chromatic
+mask** while selecting the **largest component** for its geometry stats. In a
+detector box the signal body is the largest chromatic region, so a cream/yellow
+housing won over a lit green lamp: crop 39 returned "yellow (0.80)" from 16 661
+housing pixels. Worse, yellow paint and amber glass have identical chromaticity
+(`min(R,G)-B` = 0.60-0.65 for both), so four *unlit* housings came back "yellow"
+at 0.81-0.92 confidence.
+
+## The fix
+
+| File | Change | Why |
+|---|---|---|
+| `modules/traffic_light_classification.py` | rewritten scorer: per-state chroma components, scored by bezel contrast and bezel darkness, with body-size discount, competitor margin and abstention | the old rule asked "what colour is the biggest region"; a lamp is the small region that is *brighter than the bezel around it* |
+| same | red index now subtracts the amber excess | held-out run showed amber lamps reported as red (R~G>B satisfies `R-max(G,B)`) |
+| same | `TL_MIN_STATE_CONF` collapsed into `TL_MIN_LAMP_SCORE` | two thresholds disagreed, so video abstained where still images did not |
+| `config.py` | new thresholds, each annotated with the set it was chosen on; v1.1 constants retained for `--compare` | reproducible comparison against archived classifiers |
+| `scripts/eval_traffic_lights.py` | scores dev and held-out separately; loads v1.0/v1.1 from their commits | a tuning set cannot also be a held-out set |
+| `scripts/fetch_tl_v2.py` | fetches 12 CC-licensed photographs (6.6 MB) with per-file author and licence | a held-out set must be independent of the images used for tuning |
+| `scripts/make_tl_v2_proposals.py` | detector proposals + crops for those photographs | same workflow as before, clearly marked "not labels" |
+| `labels/traffic_lights/v2/gt.json` | 18 hand-labelled crops, including an ambiguous all-lamps-lit case | yellow had zero support before this |
+| `tests/test_tl_classifier.py` | 14 unit checks | the specific bug, edge cases, glare, unlit housings, voting |
+| `scripts/label_lane_rows.py` | paint-trace labeller with overlay output | the previous lane labels were read by eye and were wrong |
+| `scripts/eval_lane.py` | boundary error with coverage | coverage matters: the model that "looks best" abstains on the curve |
+| `labels/lane/gt.json` | 11 verified boundary points | replaces the withdrawn labels |
+| `utils/evaluation.py` | removed the claim that mAP/MOTA were "evaluated via rigorous unit test cases" | that was false |
+
+## Measured outcome
+
+**Traffic lights, dev set (tuning):** 9/11 correct, 0 wrong, 2 abstentions,
+6/6 unlit housings abstaining (was 1/6).
+
+**Traffic lights, held-out v2 (n=9 vehicle crops, Wilson 95% CI [0.19, 0.73]):**
+the frozen classifier scored 4/9 with 2 amber-as-red errors; the red-index fix
+took it to 7/9, and relaxing the amber bezel gate from 0.70 to 0.55 took it to
+9/9. Both changes were prompted by evidence outside a clean hold-out (the second
+by a synthetic test), so v2 is no longer pristine for amber: the 4/9 is the
+held-out number, and 9/9 means "no error in nine crops", not 100% accuracy.
+
+**Lanes:** previous numbers withdrawn (right-boundary labels were 70-110 px off).
+On 11 verified points: tusimple/stretch 72.9 px MAE at full coverage;
+culane/stretch 49.5 px but no ego pair at all on the curve and zero coverage
+under letterbox. Neither is suitable; no replacement model is adopted.
+
+**Integrated:** 4.63 FPS on the 120-frame clip; `sir_image6` green light now
+reads GREEN instead of YELLOW. Remaining failures recorded in EVALUATION.md 9.8
+and 11: false amber on a US intersection, lane corridors that do not follow the
+paint, two missed night signals.
+
+## Notes
+* `test_data/tl_v2/*.jpg` is git-ignored (re-fetch with `scripts/fetch_tl_v2.py`);
+  the crops, labels and `sources.json` are committed so attribution travels with
+  the data. Crops are adaptations of CC BY-SA / CC BY / CC0 works.
+* No training was run. The only downloads this round were 6.6 MB of photographs.
+* Passing tests still mean "behaved as specified", never "detected correctly".

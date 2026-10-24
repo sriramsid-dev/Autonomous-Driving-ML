@@ -16,34 +16,45 @@ from pathlib import Path
 
 def audit_dataset_availability() -> Dict[str, object]:
     """
-    Audits local workspace for ground-truth datasets and input media.
-    Distinguishes locally available video/image resources from cloud/Drive assets.
+    Report what evaluation data actually exists locally.
+
+    Rewritten in v1.4. The previous text claimed that "formal mAP@0.5 and MOTA
+    are evaluated via rigorous unit test cases with ground-truth test vectors" and
+    listed a test_tl/ directory that does not exist. Neither metric was ever
+    computed by a unit test, so the claim is withdrawn here at the source.
     """
-    audit = {
+    root = Path(__file__).resolve().parent.parent
+    images = sorted(
+        str(p.relative_to(root)).replace("\\", "/")
+        for sub in ("test_data", "my_test_images")
+        for p in (root / sub).glob("*")
+        if p.suffix.lower() in (".jpg", ".jpeg", ".png")
+    )
+    return {
         "waymo_tfrecords_accessible": False,
         "waymo_ground_truth_accessible": False,
-        "local_driving_videos_found": sorted(
-            str(p) for p in (Path(__file__).resolve().parent.parent / "test_data").glob("*.mp4")
-        ),
-        "local_test_images_found": [
-            "highway_road.jpg (Straight Highway Lane Markings)",
-            "sample_wyamo.jpg (Urban Multi-vehicle driving scene)",
-            "test_tl/red_tl.jpg (Real Red Stoplight)",
-            "test_tl/green_tl.jpg (Real Green Traffic Signal)",
-            "test_tl/yellow_inuvik.jpg (Real Amber Traffic Signal)",
-            "test_tl/tl_crop_red.jpg (Isolated Red Lamp)",
-            "test_tl/tl_crop_yellow.jpg (Isolated Amber Lamp)",
-            "test_tl/tl_crop_green.jpg (Isolated Green Lamp)",
+        "local_test_images_found": images,
+        "labelled_sets": {
+            "labels/detection/gt": "bounding boxes (verified-proposal tier): car/person/truck",
+            "labels/traffic_lights/gt.json": "39 dev crops with state labels",
+            "labels/traffic_lights/v2/gt.json": "18 held-out crops with state labels",
+            "labels/lane/gt.json": "11 ego-left boundary points on 2 photographs",
+        },
+        "metrics_with_labels": [
+            "object detection mAP@0.5 / precision / recall  (scripts/eval_detection.py)",
+            "traffic-light confusion, precision, recall, abstention  (scripts/eval_traffic_lights.py)",
+            "lane boundary pixel error  (scripts/eval_lane.py)",
+        ],
+        "metrics_without_labels": [
+            "MOTA, IDF1, ID switches: no ground-truth track annotations exist in this project",
+            "long-tail classes (bus, bicycle, motorcycle): zero labelled instances",
         ],
         "evaluation_strategy": (
-            "Because raw Waymo TFRecords and ground-truth bounding box/track labels "
-            "are not stored locally in this workspace (they reside on Google Cloud / Google Drive "
-            "as described in 'Waymo Open Dataset.pptx'), formal mAP@0.5 and MOTA are evaluated "
-            "via rigorous unit test cases with ground-truth test vectors, while video inference "
-            "is evaluated using empirical tracking continuity and detection distribution statistics."
+            "Every metric in EVALUATION.md comes from one of the scripts above on a committed "
+            "label file, and each result records its label provenance. Unlabelled footage is "
+            "reported through inspection only, never as accuracy."
         ),
     }
-    return audit
 
 
 def calculate_box_iou(box1: List[float], box2: List[float]) -> float:

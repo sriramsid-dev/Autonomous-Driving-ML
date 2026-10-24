@@ -1,23 +1,40 @@
 """
-Module B (Part 2): Traffic Light State Classification
+Lamp classifier v1.4: per-state chromatic components scored by surrounding contrast.
 
-V1-FIX: replaces whole-crop HSV scoring with a lamp-blob + circular-hue
-classifier, plus temporal voting.
+Why the earlier versions failed (all measured on the dev crops, EVALUATION.md 9.1):
 
-Why the previous approach failed (measured, see EVALUATION.md):
-  * the spatial prior assumed the crop is a complete 3-lamp housing, but the
-    COCO detector returns the housing *plus* background (measured boxes up to
-    369x461 px), so sky / foliage / brick hue was scored as if it were a lamp;
-  * a crop tight around one lit lamp was penalised by that same prior
-    (w_red falls to 0.1 at the bottom row of the crop);
-  * at night the lit core blows out to white, so saturation -> 0 and hue is
-    undefined; fixed hue ranges then lose the lamp entirely.
+  * v1.0 scored the *whole crop* with a spatial prior that assumed a complete
+    3-lamp housing. Sky/foliage/brick hue counted as a lamp, and a crop tight
+    around one lit lamp was penalised for being tight.
+  * v1.1 took the *largest* saturated blob and then computed the hue histogram
+    over the *entire* mask instead of that blob. Two measured consequences:
+      - the cream/yellow housing is the largest chromatic region in most boxes,
+        so its hue won even with a clearly lit green lamp (crop 39: peak hue
+        17.5 = amber, from 16 661 pixels of housing);
+      - yellow paint and amber glass have the *same* chromaticity
+        (`min(R,G)-B` ~0.6 for both), so no colour rule can separate them.
+        Unlit housings came back "yellow" at 0.8-1.0 confidence.
 
-The classifier below is still deterministic (no trained weights), but it works
-on the *lit lamp blob* instead of the whole box, measures hue circularly on the
-saturated halo of that blob, and only emits a state after temporal agreement.
-It is a baseline, not a learned classifier: `capability` is reported so callers
-cannot mistake it for a trained model.
+v1.4 keeps the deterministic approach but changes the decision. A lit lamp is a
+small chromatic region sitting in a *dark bezel* and brighter than it; paint is
+a large chromatic region surrounded by more of the same paint. So each candidate
+component is scored by
+
+    chroma_strength x min(1, ring_contrast / TL_RING_FULL_CONTRAST)
+
+where ring_contrast is the component's 80th-percentile luminance minus the
+median luminance of a ring grown outwards from it. A region that fills the box
+in a structural crop is the signal body and is discounted, and a state is only
+returned when it beats the best competing state by TL_SCORE_MARGIN, otherwise
+the answer is "unknown". The score is heuristic evidence, not a probability.
+
+Regimes: a crop whose short side is <= TL_TIGHT_CROP_SIDE cannot contain a
+full 3-lamp housing, so the body discount is skipped there (a detector box
+tight on one lamp head is judged on its own chroma and bezel contrast).
+
+Known limits, stated rather than hidden: hand-built features, thresholds fixed
+on the dev crops, no learned weights, and no verified amber example anywhere in
+the repository - so no accuracy is claimed for yellow. It abstains when torn.
 """
 
 from collections import deque
@@ -32,23 +49,41 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import config
 
 
-# Reference hues in OpenCV's 8-bit H scale (0-179)
-_HUE_CENTRES = {"red": 0.0, "yellow": 25.0, "green": 60.0}
-# Per-state tolerance: LED "green" signals are often cyan (H ~ 80-90), while red
-# and yellow are tightly separated and need a narrow window.
-_HUE_TOLERANCE_BY_STATE = {"red": 20.0, "yellow": 18.0, "green": 35.0}
-_HUE_TOLERANCE = max(_HUE_TOLERANCE_BY_STATE.values())
+def _chroma_maps(bgr: np.ndarray) -> Dict[str, np.ndarray]:
+    """
+    Chromatic index per state on 0..1 float BGR - "excess of this state's colour
+    over its competitors":
+      red    : R beyond both G and B
+      yellow : R and G together beyond B (amber glass *and* cream paint, which is
+               exactly why chroma alone is never sufficient)
+      green  : G beyond the R/B average, so cyan LEDs (G~B) are still recognised
+    """
+    b = bgr[:, :, 0].astype(np.float32) / 255.0
+    g = bgr[:, :, 1].astype(np.float32) / 255.0
+    r = bgr[:, :, 2].astype(np.float32) / 255.0
+    amber = np.minimum(r, g) - b
+    return {
+        # Red must be redder than it is amber: subtracting the amber excess stops
+        # an amber lamp (R~G>B) from being reported as red, which the frozen v1.4
+        # red index did on the held-out set.
+        "red": (r - np.maximum(g, b)) - np.maximum(0.0, amber),
+        "yellow": amber,
+        "green": g - 0.5 * (r + b),
+    }
 
 
-def _circular_delta(a: float, b: float) -> float:
-    d = abs(a - b) % 180.0
-    return min(d, 180.0 - d)
+def _fill_holes(comp: np.ndarray) -> np.ndarray:
+    """Fill interior holes so a blown-out white lamp core counts as part of it."""
+    contours, _ = cv2.findContours(comp.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    filled = np.zeros_like(comp, dtype=np.uint8)
+    cv2.drawContours(filled, contours, -1, 1, -1)
+    return filled.astype(bool)
 
 
 class TrafficLightClassifier:
     """Classifies a traffic-light crop into red / yellow / green / unknown."""
 
-    capability = "heuristic-baseline (lamp blob + circular hue + temporal voting)"
+    capability = "heuristic-baseline (per-state chroma components + bezel contrast + reject option)"
 
     def __init__(
         self,
@@ -75,65 +110,108 @@ class TrafficLightClassifier:
         self._votes: Dict[object, Deque[str]] = {}
         self.last_debug: Dict[str, object] = {}
 
-    # ------------------------------------------------------------------ blob
+    # ------------------------------------------------------------- geometry
     @staticmethod
-    def _upsample(crop_bgr: np.ndarray) -> Tuple[np.ndarray, float]:
-        """Upscale small crops so blob geometry is measurable; return scale used."""
+    def _normalise_scale(crop_bgr: np.ndarray) -> Tuple[np.ndarray, float]:
+        """
+        Work at a bounded short side so ring radii mean the same thing for a 9x18
+        sliver and a 260x520 box. Only modest upscaling, always allow downscale.
+        """
         h, w = crop_bgr.shape[:2]
-        shortest = min(h, w)
-        if shortest >= 48:
+        short = min(h, w)
+        if short == 0:
             return crop_bgr, 1.0
-        scale = 48.0 / max(1, shortest)
-        return cv2.resize(crop_bgr, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_CUBIC), scale
+        scale = min(config.TL_WORK_SHORT_SIDE / float(short), config.TL_MAX_UPSCALE)
+        if abs(scale - 1.0) < 0.08:
+            return crop_bgr, 1.0
+        interp = cv2.INTER_CUBIC if scale > 1.0 else cv2.INTER_AREA
+        return cv2.resize(
+            crop_bgr,
+            (max(1, int(round(w * scale))), max(1, int(round(h * scale)))),
+            interpolation=interp,
+        ), scale
 
-    @staticmethod
-    def _lit_lamp_mask(bgr: np.ndarray) -> np.ndarray:
-        """
-        Lit-lamp candidate mask: saturated *or* strongly over-exposed relative to
-        the crop's own median brightness (the night-time white core).
-        """
-        hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-        h, s, v = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
-        v_med = float(np.median(v))
-        bright = (v >= max(150, 1.45 * v_med)).astype(np.uint8)
-        saturated = ((s >= config.TL_BLOB_MIN_SAT) & (v >= config.TL_BLOB_MIN_VALUE)).astype(np.uint8)
-        mask = cv2.bitwise_or(bright, saturated)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-        return mask
+    # ------------------------------------------------------------ candidate
+    def _candidates(self, bgr: np.ndarray) -> list:
+        """Every chromatic component of every state, with its bezel statistics."""
+        hh, ww = bgr.shape[:2]
+        crop_area = float(hh * ww)
+        v = cv2.GaussianBlur(bgr.max(axis=2).astype(np.float32) / 255.0, (3, 3), 0)
+        maps = _chroma_maps(bgr)
+        out = []
 
-    def _dominant_hue(self, bgr: np.ndarray, mask: np.ndarray):
-        """
-        Circular hue histogram over the blob's saturated pixels.
+        for state, raw in maps.items():
+            m = cv2.GaussianBlur(raw, (5, 5), 0)
+            mask = cv2.morphologyEx(
+                (m > config.TL_LAMP_CHROMA_FLOOR[state]).astype(np.uint8),
+                cv2.MORPH_OPEN, np.ones((3, 3), np.uint8),
+            )
+            n_lab, labels, stats, cents = cv2.connectedComponentsWithStats(mask, connectivity=8)
+            for i in range(1, n_lab):
+                area = float(stats[i, cv2.CC_STAT_AREA])
+                area_frac = area / crop_area
+                if area_frac < config.TL_LAMP_MIN_AREA_FRAC or area_frac > 0.95:
+                    continue
+                comp = labels == i
+                chroma = float(m[comp].mean())
+                if chroma < config.TL_LAMP_MIN_CHROMA:
+                    continue
 
-        Returns (peak_hue, share, pixel_count) where share is the fraction of
-        analysed saturated pixels inside +-tolerance of the peak.
-        """
-        hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-        sel = (mask > 0) & (hsv[:, :, 1] >= 60) & (hsv[:, :, 2] >= 60)
-        n = int(sel.sum())
-        if n < config.TL_LAMP_MIN_PIXELS:
-            return None, 0.0, n
+                filled = _fill_holes(comp)
+                filled_area = float(filled.sum())
+                # Ring grown outwards by ~30% of the blob radius: the bezel for a
+                # lamp, more of the same paint for a housing face.
+                radius = max(3, int(round(0.30 * np.sqrt(filled_area))))
+                k = 2 * radius + 1
+                grown = cv2.dilate(filled.astype(np.uint8),
+                                   cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))) > 0
+                ring = grown & ~filled
+                if ring.sum() < 6:
+                    continue
+                contrast = float(np.percentile(v[filled], 80) - np.median(v[ring]))
+                bezel_dark = float((v[ring] < 0.6 * np.median(v[filled])).mean())
 
-        hues = hsv[:, :, 0][sel].astype(np.float32)
-        hist = np.zeros(36, dtype=np.float32)  # 5-degree bins
-        np.add.at(hist, (hues // 5).astype(np.int32) % 36, 1.0)
-        # circular smoothing so a hue split across the 0/180 wrap is not lost
-        kernel = np.array([1.0, 2.0, 3.0, 2.0, 1.0], dtype=np.float32)
-        kernel /= kernel.sum()
-        smooth = np.array([np.sum(hist[(np.arange(-2, 3) + i) % 36] * kernel) for i in range(36)])
-        peak_bin = int(np.argmax(smooth))
-        peak_hue = peak_bin * 5.0 + 2.5
-        # Confidence = fraction of analysed lamp pixels whose hue is within
-        # tolerance of the peak (a smoothed-histogram peak share is far too
-        # pessimistic and rejected most real lamps).
-        within = np.array([_circular_delta(float(h), peak_hue) <= _HUE_TOLERANCE for h in hues])
-        share = float(within.mean()) if within.size else 0.0
-        return peak_hue, share, n
+                out.append({
+                    "state": state,
+                    "area_frac": area_frac,
+                    "chroma": chroma,
+                    "contrast": contrast,
+                    "bezel_dark": bezel_dark,
+                    "bbox": (int(stats[i, cv2.CC_STAT_LEFT]), int(stats[i, cv2.CC_STAT_TOP]),
+                             int(stats[i, cv2.CC_STAT_WIDTH]), int(stats[i, cv2.CC_STAT_HEIGHT])),
+                    "cx": float(cents[i][0]),
+                    "cy": float(cents[i][1]),
+                })
+        return out
+
+    def _score(self, cand: dict, structural: bool) -> float:
+        """
+        Chroma x bezel contrast x bezel darkness, with box-filling regions
+        discounted in a structural crop because those are the signal body rather
+        than a lamp. Amber gets an extra gate: paint and amber glass are
+        chromatically identical, so amber needs the lamp-on-dark-bezel signature
+        before it is allowed to win.
+        """
+        if cand["state"] == "yellow":
+            if (cand["contrast"] < config.TL_YELLOW_MIN_CONTRAST
+                    or cand["bezel_dark"] < config.TL_YELLOW_MIN_BEZEL
+                    or cand["area_frac"] > config.TL_YELLOW_MAX_AREA_FRAC):
+                return 0.0
+
+        evidence = min(1.0, max(0.0, cand["contrast"]) / config.TL_RING_FULL_CONTRAST)
+        if evidence < config.TL_RING_MIN_EVIDENCE:
+            return 0.0
+        floor = config.TL_BEZEL_FLOOR
+        bezel = floor + (1.0 - floor) * cand["bezel_dark"]
+        score = cand["chroma"] * evidence * bezel
+        if structural and cand["area_frac"] > config.TL_BODY_AREA_FRAC:
+            score *= config.TL_BODY_PENALTY
+        return score
 
     # -------------------------------------------------------------- classify
     def classify(self, crop_bgr: np.ndarray, key: Optional[object] = None) -> Tuple[str, float]:
         """
-        Classify one crop. When `key` is given, the result is subject to temporal
+        Classify one crop. When `key` is given the result is subject to temporal
         voting (call once per frame with a stable per-signal key).
         """
         state, conf = self._classify_single(crop_bgr)
@@ -143,7 +221,7 @@ class TrafficLightClassifier:
 
     def _classify_single(self, crop_bgr: np.ndarray) -> Tuple[str, float]:
         self.last_debug = {}
-        if crop_bgr is None or crop_bgr.size == 0:
+        if crop_bgr is None or getattr(crop_bgr, "size", 0) == 0:
             return "unknown", 0.0
 
         h, w = crop_bgr.shape[:2]
@@ -151,64 +229,54 @@ class TrafficLightClassifier:
             self.last_debug["reject"] = "crop smaller than configured minimum"
             return "unknown", 0.0
 
-        bgr, scale = self._upsample(crop_bgr)
-        hh, ww = bgr.shape[:2]
-        mask = self._lit_lamp_mask(bgr)
-
-        # Keep only the largest connected blob plus its saturated halo: this is
-        # the lamp itself, not the surrounding scene.
-        n_lab, labels, stats, cents = cv2.connectedComponentsWithStats(mask, connectivity=8)
-        if n_lab <= 1:
-            self.last_debug["reject"] = "no lit region found"
-            return "unknown", 0.0
-        areas = stats[1:, cv2.CC_STAT_AREA]
-        best = int(np.argmax(areas)) + 1
-        lamp_area = float(areas[best - 1])
-        cx, cy = cents[best]
-
-        hue, share, n_px = self._dominant_hue(bgr, mask)
-        self.last_debug.update(
-            {
-                "lamp_pixels": n_px,
-                "lamp_area_px": int(lamp_area),
-                "lamp_share": round(lamp_area / float(ww * hh), 3),
-                "peak_hue": None if hue is None else round(float(hue), 1),
-                "hue_share": round(share, 3),
-                "upscale": round(scale, 2),
-            }
-        )
-        if hue is None:
-            self.last_debug["reject"] = "lit region has too little saturated evidence"
-            return "unknown", 0.0
-        if n_px < config.TL_LAMP_MIN_PIXELS:
-            self.last_debug["reject"] = f"only {n_px} lamp pixels"
+        structural = min(h, w) > config.TL_TIGHT_CROP_SIDE
+        bgr, scale = self._normalise_scale(crop_bgr)
+        cands = self._candidates(bgr)
+        self.last_debug["regime"] = "structural" if structural else "tight"
+        self.last_debug["n_candidates"] = len(cands)
+        self.last_debug["scale"] = round(scale, 2)
+        if not cands:
+            self.last_debug["reject"] = "no chromatic component large enough"
             return "unknown", 0.0
 
-        # Normalise distance by the state's tolerance so a cyan-green lamp is
-        # still matched to green rather than rejected.
-        norm = {name: _circular_delta(hue, c) / _HUE_TOLERANCE_BY_STATE[name] for name, c in _HUE_CENTRES.items()}
-        state = min(norm, key=norm.get)
-        if norm[state] > 1.0:
-            self.last_debug["reject"] = f"hue {hue:.0f} matches no state"
+        scored = [(self._score(c, structural), c) for c in cands]
+        scored = [(s, c) for s, c in scored if s > 0]
+        if not scored:
+            self.last_debug["reject"] = "no component contrasts with its surround (flat paint, dark lens or background)"
             return "unknown", 0.0
 
-        conf = float(share)
+        scored.sort(key=lambda t: -t[0])
+        best_score, best = scored[0]
+        self.last_debug.update({
+            "state": best["state"],
+            "score": round(float(best_score), 3),
+            "area_frac": round(best["area_frac"], 3),
+            "chroma": round(best["chroma"], 2),
+            "contrast": round(best["contrast"], 2),
+            "bezel_dark": round(best["bezel_dark"], 2),
+        })
 
-        # Weak spatial veto only when the crop really looks like a multi-lamp
-        # housing (tall, with the blob in a clearly contradictory slot).
-        blob_h = float(stats[best, cv2.CC_STAT_HEIGHT])
-        if hh >= 2.2 * blob_h:
-            rel = cy / hh
-            if state == "red" and rel > 0.70:
-                conf *= 0.55
-            elif state == "green" and rel < 0.30:
-                conf *= 0.55
-            self.last_debug["spatial_rel_y"] = round(float(rel), 2)
+        if best_score < config.TL_MIN_LAMP_SCORE:
+            self.last_debug["reject"] = f"weak lamp evidence {best_score:.2f}"
+            return "unknown", float(best_score)
 
-        if conf < self.ambiguity_threshold:
-            self.last_debug["reject"] = f"low confidence {conf:.2f}"
-            return "unknown", conf
-        return state, conf
+        # Only a competitor with comparable support counts as ambiguity; a
+        # 1%-of-box speck of another hue is noise, not a rival reading.
+        runner_up = 0.0
+        for score, cand in scored:
+            if cand["state"] == best["state"]:
+                continue
+            if cand["area_frac"] < config.TL_COMPETITOR_MIN_AREA_FRAC:
+                continue
+            runner_up = max(runner_up, score)
+        self.last_debug["runner_up"] = round(float(runner_up), 3)
+        if runner_up > 0 and best_score < config.TL_SCORE_MARGIN * runner_up:
+            self.last_debug["reject"] = (
+                f"ambiguous: {best['state']} {best_score:.2f} vs competing state {runner_up:.2f}"
+            )
+            return "unknown", float(best_score)
+
+        return best["state"], float(best_score)
 
     # ------------------------------------------------------------------ vote
     def _vote(self, key: object, state: str, conf: float) -> Tuple[str, float]:

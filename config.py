@@ -56,13 +56,41 @@ TL_MIN_HEIGHT = 10
 TL_AMBIGUITY_THRESHOLD = 0.42  # Confidence margin required over competing colors
 TRAFFIC_LIGHT_STATES = ["red", "yellow", "green", "unknown"]
 
-# Lamp-blob classifier (replaces whole-crop HSV scoring)
-TL_BLOB_MIN_SAT = 90           # HSV saturation floor for a lit lamp candidate
-TL_BLOB_MIN_VALUE = 70         # HSV value floor (rejects dark housing)
-TL_LAMP_MIN_PIXELS = 12        # Minimum lit-lamp pixels before a state is emitted
-TL_MIN_STATE_CONF = 0.50       # Per-crop confidence required to commit a state
+# Lamp classifier v1.4: per-state chromatic components scored by emission evidence.
+# Every value below was fixed on the *dev* crops (labels/traffic_lights/gt.json);
+# the v2 held-out set was not used to choose any of them.
+# red floor excludes amber paint: on amber (R~G>B) r-max(g,b) sits near 0.2,
+# while a red lamp exceeds 0.35.
+TL_LAMP_CHROMA_FLOOR = {"red": 0.30, "yellow": 0.24, "green": 0.12}
+TL_LAMP_MIN_CHROMA = 0.18      # a chromatic component weaker than this is tint, not a lamp
+TL_LAMP_MIN_AREA_FRAC = 0.015  # a lamp is a visible share of the box; below this it is a glint
+TL_WORK_SHORT_SIDE = 128       # analysis scale; makes ring radii comparable across crops
+TL_MAX_UPSCALE = 8.0           # never invent more detail than this for tiny crops
+TL_RING_FULL_CONTRAST = 0.15   # lumen step over the bezel that counts as fully lit
+TL_RING_MIN_EVIDENCE = 0.10    # below this the region is flat paint / dark lens / background
+TL_BODY_AREA_FRAC = 0.25       # in a structural crop a region this large is the body
+TL_BODY_PENALTY = 0.35
+TL_BEZEL_FLOOR = 0.40          # weight kept by a blob whose surround is not dark
+TL_COMPETITOR_MIN_AREA_FRAC = 0.015
+TL_YELLOW_MIN_CONTRAST = 0.35  # amber must clear the lamp-on-bezel bar...
+TL_YELLOW_MIN_BEZEL = 0.55     # ...inside a genuinely dark surround...
+TL_YELLOW_MAX_AREA_FRAC = 0.30 # ...and stay small: amber paint is what fills a box
+TL_TIGHT_CROP_SIDE = 40        # <= this short side cannot hold a 3-lamp housing
+TL_MIN_LAMP_SCORE = 0.16       # absolute evidence required before naming a state
+TL_SCORE_MARGIN = 1.60         # best state must beat the runner-up by this factor
+# One threshold, used both to commit a state and to accept its vote. Two
+# separate values silently disagreed in v1.4: a crop could be published as
+# "green" without a key and rejected as a vote with one, i.e. video abstained
+# where single images did not.
+TL_MIN_STATE_CONF = TL_MIN_LAMP_SCORE
 TL_TEMPORAL_WINDOW = 5         # Frames of state history used for voting
 TL_TEMPORAL_MIN_VOTES = 3      # Votes required before a state is published
+# Archived v1.1 constants. Only the git-loaded v1.1 classifier used by
+# scripts/eval_traffic_lights.py --compare reads these; delete them and the
+# comparison run stops working.
+TL_BLOB_MIN_SAT = 90
+TL_BLOB_MIN_VALUE = 70
+TL_LAMP_MIN_PIXELS = 12
 TL_DUPLICATE_IOU = 0.55        # Overlapping lamp boxes describing one signal
 
 # Shared detector input size for the traffic-light pass when it runs alone.

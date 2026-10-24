@@ -286,3 +286,280 @@ python scripts/evaluate.py --only lane --lane-model culane  --lane-preprocess st
 python scripts/eval_traffic_lights.py --compare-legacy
 python main.py --video "<clip>" --max-frames 120 --output-video outputs/runs/integrated_v13/annotated.mp4
 ```
+---
+
+# 9. v1.4 — traffic-light lamp-versus-housing fix
+
+## 9.1 What was actually wrong (code evidence, not opinion)
+
+`TrafficLightClassifier._classify_single` (v1.1) selected a blob with
+
+```python
+n_lab, labels, stats, cents = cv2.connectedComponentsWithStats(mask, connectivity=8)
+best = int(np.argmax(areas)) + 1                   # <- largest component: the housing
+...
+hue, share, n_px = self._dominant_hue(bgr, mask)   # <- but the hue came from the WHOLE mask
+```
+
+Two defects, both confirmed by instrumenting the classifier on the dev crops:
+
+1. The hue histogram was computed over *every* mask pixel, not over the selected
+   blob. The signal body is the biggest chromatic region in a detector box, so
+   its hue won. Crop 39 (`sir_image10.jpeg`, lit green lamp in a cream housing):
+   **16 661 amber-classified pixels -> peak hue 17.5 -> "yellow" (0.80)**, while
+   the green lamp was a few thousand pixels in the same crop.
+2. Yellow paint and amber glass are chromatically identical. `min(R,G)-B`
+   measured **0.62, 0.65, 0.64, 0.60** on the four unlit housings (crops 3-6) and
+   0.60-0.68 on a real amber lamp. No colour-space rule can separate them, so
+   the old classifier returned "yellow" at **0.81-0.92** confidence on housings
+   that were not lit at all (measured abstention: 1/6).
+
+A third, structural problem: the classifier had no principled reject. It
+returned one of three states for every crop big enough to try.
+
+## 9.2 The replacement rule
+
+A lit lamp is a small chromatic region sitting in a **dark bezel** and brighter
+than that bezel; paint is a large chromatic region surrounded by more paint.
+For every chromatic component of every state the classifier now computes
+
+```
+score = chroma_strength * min(1, ring_contrast / 0.15) * (0.40 + 0.60 * bezel_darkness)
+```
+
+with `ring_contrast = p80(luminance in blob) - median(luminance in a ring grown
+0.3x the blob radius outwards)`. A component covering more than 25% of a
+structural crop is the body and is multiplied by 0.35. A state is returned only
+if its best component scores >= 0.16 **and** beats the best competing state by
+1.6x; otherwise the answer is `unknown`. Amber additionally requires
+`contrast >= 0.35`, `bezel_darkness >= 0.55` and `area <= 30%` of the box,
+because amber is the one state whose paint shares its chromaticity.
+
+Three thresholds were then chosen by a 5x4x4 grid over the dev crops, maximising
+`correct - 2 * wrong` (an abstention costs nothing, a wrong state costs double).
+The chosen point sits on a plateau: `bezel_floor` 0.2-0.5, `min_score` 0.10-0.16
+and `margin` 1.4-1.8 all give the same dev result.
+
+Also fixed while in here: the decision threshold (`TL_MIN_LAMP_SCORE = 0.16`) and
+the vote-acceptance threshold (`TL_MIN_STATE_CONF = 0.20`) disagreed, so a crop
+published as "green" without a key became "unknown" when called with a key, i.e.
+**video abstained where stills did not**. They are now one value.
+
+## 9.3 Dev set (tuning data - not evidence of accuracy)
+
+| classifier | correct | wrong | abstained | unlit housings abstaining |
+|---|---|---|---|---|
+| v1.0 HSV + spatial prior | 6/11 | 4 | 1 | 1/6 |
+| v1.1 global-mask hue | 7/11 | 4 | 0 | 1/6 |
+| **v1.4/v1.5 bezel contrast** | **9/11** | **0** | 2 | **6/6** |
+
+The two remaining abstentions are crops 10 and 15: the same 24x50 night signal
+at 6-10 px lamp size, where red and green both score within 1.3x of each other.
+Abstaining there is the intended behaviour, not a pass.
+
+## 9.4 Held-out set v2 — how it was built
+
+Nothing in `labels/traffic_lights/gt.json` was reused. Twelve photographs were
+fetched from Wikimedia Commons **after the classifier was frozen**
+(`scripts/fetch_tl_v2.py`, 6.6 MB total, 1600 px renderings, licence and author
+recorded per file in `test_data/tl_v2/sources.json`): three amber signals, two
+red, three night scenes, three daytime intersections, one cyclist signal, one
+out-of-focus bokeh frame. The detector then produced 17 boxes
+(`scripts/make_tl_v2_proposals.py --imgsz 1280`); each was inspected at 2x
+against its source photograph and labelled in `labels/traffic_lights/v2/gt.json`.
+One extra crop was cut by hand from the long-exposure frame where all three lamps
+are lit, to give the reject option an ambiguous case.
+
+## 9.5 Held-out results — and an honest accounting of contamination
+
+| step | correct | wrong | abstained | yellow (n=5) |
+|---|---|---|---|---|
+| v1.4 as frozen, evaluated once | 4/9 | **2 (amber read as red)** | 3 | 0/5 |
+| + red index no longer counts amber (mechanism fix) | 7/9 | 0 | 2 | 3/5 |
+| + amber bezel gate 0.70 -> 0.55 | 9/9 | 0 | 0 | 5/5 |
+
+The frozen run found a genuine defect: the red index `R - max(G,B)` also fires on
+amber glass (R~G>B), so **amber lamps were reported as red**. That was fixed at
+the mechanism level — the red index now subtracts the amber excess, so a lamp
+must be redder than it is amber — and the fix was verified on the dev crops
+(no regression, still 9/11 with zero wrong states).
+
+The last row is a second change: the amber gate demanded `bezel_darkness >= 0.70`
+and that rejected a plainly lit amber lamp in a dark housing in the synthetic unit
+tests. The dev crops cannot distinguish 0.55 from 0.70 (the gap in the dev data is
+0.25 to 0.85), so the lower value was adopted; it happens to also unblock the two
+Frankfurt amber crops.
+
+**Be clear about what that does to the held-out claim.** Because the fix was
+motivated by these nine crops, v2 is no longer a pristine held-out set for the
+amber state. The clean held-out number is the frozen one: **4/9, Wilson 95% CI
+[0.19, 0.73]**. The second and third rows are post-hoc re-runs, and 9/9 at n=9 has a 95% CI
+of [0.70, 1.00] — it means "no error observed in nine crops", nothing more. Two
+of the five amber crops are duplicate boxes of the same signal, so the five
+changing pairs are really three signals; a sign test on them is not significant.
+
+## 9.6 Detector behaviour on the v2 scenes
+
+Of the 12 photographs, **4 produced no boxes** at `imgsz=1280`, `conf=0.20`:
+
+* `01_Flashing_yellow...` — a yellow diamond *sign*, no signal head: correct.
+* `12_Out_of_focus_...` — car tail-lights in bokeh, no signal head: correct.
+* `06_Traffic_lights_at_night` — one red gantry signal: **missed**.
+* `07_Traffic_lights_at_night1` — one close-up signal: **missed**.
+
+Of the 17 boxes, 1 was not a signal (an illuminated white left-turn arrow), and
+2 (crops 5-6, the UK scene) covered the *unlit lower housing* while the lit red
+lamp sat higher in the frame — a localisation failure that no classifier can
+recover from. Both abstained, which is the right output for those crops.
+
+## 9.7 Unit tests
+
+`python tests/test_tl_classifier.py` — 14/14 checks:
+
+| check | what it pins down |
+|---|---|
+| invalid / degenerate input | None, 0x0, 1x1, 4x4, flat black/white/grey -> unknown, score in [0,1] |
+| tiny and sliver crops | 6x10, 12x18, 6x200 -> no crash, valid state, score in [0,1] |
+| green lamp in cream housing | the bug this version exists to fix |
+| housing larger *and* more chromatic than the lamp | the "do not use the largest region" requirement |
+| unlit housing (cream and dark body) | must abstain, not name amber |
+| amber lamp in a dark housing | must be named yellow |
+| amber never red | regression for the held-out failure |
+| red lamp with blown-out white core | must still be red |
+| strong glare | green lamp in a bright surround |
+| all three lamps lit | must abstain |
+| lamp cut by the crop edge | no crash, valid output |
+| temporal voting | waits, publishes after N votes, resets to unknown |
+| real cream-housing crops (26, 39) | green; and 3,4,5,6,28 abstain |
+| held-out v2 amber crops | not called red |
+
+## 9.8 Failure examples found by integrated testing
+
+* `sir_image2.jpg` (US intersection, yellow-painted housings): **two of five
+  signal boxes reported YELLOW (0.45) on heads whose lit lamp is green.** Output:
+  `outputs/runs/integrated_v14/sir_image2.jpg`. This is amber paint again, in a
+  housing whose green lens was partly outside the box — the amber gate is not
+  sufficient on its own.
+* `sir_image3.jpg` (two red arrows on a dark plate, backlit): the detector boxes
+  the arrows and the state is reported, but the object boxes around the two
+  trucks merge into one.
+* Frame `07_...` (all three lamps lit, long exposure): correctly unknown.
+* Two pedestrian/bicycle signals are still classified as if they were vehicle
+  heads (green walking figure -> green; red bicycle symbol -> red). They are
+  reported separately and not scored as vehicle signals.
+
+No accuracy is claimed for amber on real roads: three distinct amber signals,
+all close-ups, all from one afternoon of photography, is not a sample.
+---
+
+# 10. Lanes — previous numbers withdrawn, and what can be measured
+
+## 10.1 The earlier lane numbers were wrong
+
+`labels/eval_labels.json -> lane_ego_boundaries` was read by eye, and the
+right-boundary column followed the **gravel shoulder edge instead of the painted
+line**: 1046 at y=500 and 1150 at y=640, where the paint is at 1267 and off-frame
+respectively — an error of 70-110 px. Every lane error figure reported before
+v1.4 (`58.4 px` mean, `6.7 px left / 44.8 px right`, `median 1006 vs 1150`) is
+therefore **withdrawn**. That block is marked deprecated in the JSON and the
+numbers are not repeated anywhere else in this repository.
+
+## 10.2 The replacement label set
+
+`labels/lane/gt.json` — **11 ego-left boundary points on 2 photographs**, traced
+by `scripts/label_lane_rows.py` (follows the run of yellow paint down each
+scanline) and checked by eye on the drawn overlay:
+
+* `highway_road.jpg` (1280x649, straight, day): yellow centre line, x = 635, 633,
+  633, 630, 629, 627 at y = 340...620.
+* `sir_image7.jpeg` (451x679, right-hand curve, portrait): x = 215, 210, 210,
+  234, 262 at y = 480...640.
+
+Right boundaries are **not** labelled: on both images the right-hand paint leaves
+the frame (highway at y~510; sir_image7 at y~520, and the right half carries a
+stock-photo watermark). Inventing those numbers is what produced the bad set in
+the first place.
+
+## 10.3 Checkpoint comparison on identical points
+
+`python scripts/eval_lane.py --models tusimple culane --preprocess stretch letterbox --montage`
+
+| checkpoint / preprocess | coverage | MAE | median | p90 | max | inference (CPU) |
+|---|---|---|---|---|---|---|
+| tusimple / stretch | **11/11** | 72.9 px | 73.0 | 109.0 | 142.0 | 247 ms |
+| tusimple / letterbox | 6/11 | 64.2 px | 76.0 | 88.5 | 93.0 | 187 ms |
+| culane / stretch | 6/11 | 49.5 px | 51.0 | 66.5 | 80.0 | 160 ms |
+| culane / letterbox | **0/11** | - | - | - | - | 142 ms |
+
+Read this by coverage as well as error, not by the MAE column alone:
+
+* `culane/stretch` has the lowest MAE but **produces no ego pair at all on the
+  curve** and no lanes at all under letterbox. Its 49.5 px average is computed on
+  the six highway rows only — a model that abstains everywhere can look best.
+* `tusimple/stretch` is the only configuration with full coverage, and it is
+  still 73 px mean / 142 px worst. On the highway its left boundary tracks the
+  yellow line at y=340 (6 px) then drifts left by 96 px at y=620. On the curve it
+  is 56-142 px off, worst at the bottom.
+* No configuration is usable for vehicle control on this evidence, and the
+  TuSimple checkpoint remains out of domain for urban and curved roads.
+
+## 10.4 A suitable dataset — proposal only, nothing downloaded
+
+The right next step is footage that actually contains a road ahead. Options:
+
+| option | size | licence | what it buys | cost |
+|---|---|---|---|---|
+| **A. Short CC-licensed dashcam clips** (Wikimedia Commons / Pexels, 2-3 clips, 720p) | ~30-60 MB | CC BY / CC BY-SA / Pexels licence | 10-15 frames hand-labelled in *our* camera geometry, urban + curve + night; answers "is TuSimple suitable at all" | minutes to download, ~1 hour labelling |
+| B. TuSimple official test set (2 782 images + JSON) | ~3 GB | research use, registration | the published protocol (official accuracy/F1) becomes comparable | 3 GB, and it is highway-only — the domain we already fail on |
+| C. CULane (98 675 images) | ~8.7 GB | research use | the training set that matches `culane_18.pth`; only useful if we fine-tune | 8.7 GB + hours of CPU training |
+
+Recommended: **A**, because it tests the actual question (does this checkpoint
+work on a forward-facing camera at all) for 1% of the bytes, and because B and C
+cannot be compared with anything already in this repository until we have labels
+in our own geometry. B becomes worthwhile only if a published-number comparison
+is wanted; C only if fine-tuning is authorised.
+
+**Planned evaluation for A:** 10-15 frames spanning urban, curve and night, ego
+boundaries labelled with the same paint-trace tool (3-5 rows per frame, ~40
+points), then the same table above from the same script. No training.
+
+## 10.5 Why the handheld clip still contributes nothing
+
+`Wyamo Car video.mp4` is a hand-held sidewalk shot of a parked Waymo; frames 10,
+60, 120, 200 and 300 contain no road markings. It stays in the suite as a
+false-positive test ("must not invent a corridor"), and the pipeline correctly
+prints `No Lanes (Vehicle Occluded)` on it.
+
+---
+
+# 11. v1.4 integrated re-test
+
+New run directory: `outputs/runs/integrated_v14/` (nothing overwritten).
+
+| input | runtime | what was observed |
+|---|---|---|
+| `sir_image6.jpeg` | 709 ms | **TL GREEN (0.18)** — was YELLOW before the fix; 8 vehicles, 3 pedestrians, 11 tracks, corridor present |
+| `highway_road.jpg` | 777 ms | 2 lanes + corridor, both boundaries visibly off (see 10.3); no objects |
+| `sir_image2.jpg` | 858 ms | corridor sits mid-road, not on the dashes; **2 of 5 signal boxes YELLOW on green heads**; 8 vehicles, 8 tracks |
+| `sir_image3.jpg` | 754 ms | TL box on the red arrows; two trucks merged into one box; 1 lane |
+| `sir_image7.jpeg` | 691 ms | curved road drawn as a straight wedge, 142 px off at the bottom |
+| video, 120 frames | 27.2 s wall, **4.63 FPS** | p50 206 ms / p90 242 ms per frame; tracks 1-3 persisted; `No Lanes (Vehicle Occluded)`; TL none |
+
+Tracking continuity: not measured. There are still no ground-truth track
+annotations, so no MOTA, IDF1 or ID-switch figure is reported for any version.
+
+## 11.1 What changed in the repository, and why it is defensible
+
+* `modules/traffic_light_classification.py` — rewritten scorer (9.1-9.2).
+* `config.py` — new thresholds, each labelled with the set it was chosen on; the
+  two disagreeing thresholds collapsed into one; the archived v1.1 constants kept
+  so `--compare` can still reproduce the old classifier from git.
+* `scripts/eval_traffic_lights.py` — scores dev and held-out separately and loads
+  v1.0/v1.1 from their commits.
+* `scripts/fetch_tl_v2.py`, `scripts/make_tl_v2_proposals.py` — reproducible
+  acquisition and proposal generation for the held-out set, with licences.
+* `scripts/label_lane_rows.py`, `scripts/eval_lane.py`, `labels/lane/gt.json` —
+  the paint-trace labeller and the boundary-error harness.
+* `tests/test_tl_classifier.py` — 14 checks.
+* `utils/evaluation.py` — the false "mAP and MOTA are evaluated via rigorous unit
+  test cases" claim is deleted at the source.

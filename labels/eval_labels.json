@@ -100,5 +100,6 @@
     }
   ],
   "object_boxes": [],
-  "object_boxes_note": "No bounding-box labels were produced: hand-drawing reliable boxes was out of scope for this pass, so no precision/recall/mAP is reported for Module A. Runtime and tracking behaviour are reported instead."
+  "object_boxes_note": "No bounding-box labels were produced: hand-drawing reliable boxes was out of scope for this pass, so no precision/recall/mAP is reported for Module A. Runtime and tracking behaviour are reported instead.",
+  "lane_ego_boundaries_deprecated": "WITHDRAWN v1.4: the right-boundary x values were misread by 70-110 px (they followed the shoulder edge, not the painted line). Use labels/lane/gt.json."
 }

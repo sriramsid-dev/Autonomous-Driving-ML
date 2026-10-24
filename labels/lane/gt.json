@@ -1,0 +1,40 @@
+{
+  "provenance": {
+    "labelled_by": "coding agent: painted-line trace (scripts/label_lane_rows.py) plus visual check of the drawn overlay",
+    "labelled_on": "2026-10-24",
+    "method": "for each row, find the run of yellow paint on that scanline and follow it down the image; the trace is drawn back onto the photo and inspected before being accepted. The lane model is never loaded by the labeller.",
+    "uncertainty_px": 6,
+    "why_left_only": "On both images the ego lane's RIGHT paint leaves the frame before the bottom rows (highway_road: right edge exits at y~510; sir_image7: the white edge exits at y~520 and the right half carries a stock-photo watermark), so a right-boundary number would have to be invented. Only boundaries that are painted and inside the frame are labelled.",
+    "supersedes": "labels/eval_labels.json -> lane_ego_boundaries. Those rows were read by eye and the right-boundary column was misread by 70-110 px (it followed the shoulder edge, not the paint). Any lane error computed against them before v1.4 is withdrawn; see EVALUATION.md 10.1.",
+    "coordinate_system": "original image pixels (x, y), origin top-left; x is the centre of the painted stripe",
+    "limitations": "11 points on 2 photographs, one straight and one curving, no night, no rain, no construction zones. This measures boundary placement, not detection rate over a dataset."
+  },
+  "images": [
+    {
+      "path": "test_data/highway_road.jpg",
+      "size": [1280, 649],
+      "scene": "straight desert highway, two-way, ego in the right-hand lane",
+      "condition": "day, clear",
+      "layout": "straight",
+      "boundaries": [
+        {"side": "left", "kind": "yellow_centre_line", "rows": [
+          {"y": 340, "x": 635}, {"y": 400, "x": 633}, {"y": 460, "x": 633},
+          {"y": 520, "x": 630}, {"y": 580, "x": 629}, {"y": 620, "x": 627}
+        ]}
+      ]
+    },
+    {
+      "path": "my_test_images/sir_image7.jpeg",
+      "size": [451, 679],
+      "scene": "two-lane country road curving right, ego right of the double yellow",
+      "condition": "day, overcast under trees",
+      "layout": "right-hand curve, portrait",
+      "boundaries": [
+        {"side": "left", "kind": "yellow_centre_line", "rows": [
+          {"y": 480, "x": 215}, {"y": 520, "x": 210}, {"y": 560, "x": 210},
+          {"y": 600, "x": 234}, {"y": 640, "x": 262}
+        ]}
+      ]
+    }
+  ]
+}

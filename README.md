@@ -176,15 +176,21 @@ to review in LabelImg or CVAT.
 
 ### Step 2c: Lanes, traffic lights and regression
 ```powershell
-python scripts/evaluate.py --only lane --lane-model tusimple --lane-preprocess stretch
-python scripts/evaluate.py --only lane --lane-model culane  --lane-preprocess stretch
-python scripts/eval_traffic_lights.py --compare-legacy
+python scripts/eval_lane.py --models tusimple culane --preprocess stretch letterbox --montage
+python scripts/eval_traffic_lights.py --compare          # dev + held-out, v1.4 vs v1.1 vs v1.0
+python tests/test_tl_classifier.py
 python tests/test_regression.py
 ```
-`--lane-model` selects between the TuSimple and CULane checkpoints (both official, free).
-The CULane profile needs `models/culane_18.pth`; everything else runs without it.
-Status and measured results for lanes, traffic lights and the integrated run are in
-[EVALUATION.md](EVALUATION.md) section 8 - including what does *not* work.
+Lane boundary error is measured against 11 points traced from the paint itself
+(`labels/lane/gt.json`); the earlier hand-read labels are withdrawn because their right-boundary
+column followed the shoulder instead of the line. Traffic-light state is measured on a dev set
+(where the thresholds were chosen) and on a held-out set of 18 crops from 12 CC-licensed
+photographs fetched after the classifier was frozen - `scripts/fetch_tl_v2.py` re-downloads them
+(6.6 MB). `--lane-model` selects between the TuSimple and CULane checkpoints (both official,
+free); the CULane profile needs `models/culane_18.pth`, everything else runs without it.
+
+Measured results, failure examples and the contamination caveat on the held-out set are in
+[EVALUATION.md](EVALUATION.md) sections 9-11 - including what does *not* work.
 
 ### Step 3: Run Full Static Image Test Suite
 Executes multi-module testing across all local curated images and saves a summary report:
@@ -196,6 +202,7 @@ python main.py --test-images
 Stream and annotate driving footage:
 ```powershell
 python main.py --max-frames 120
+python main.py --video "<clip.mp4>" --max-frames 120 --output-video outputs/runs/integrated_v14/video.mp4
 ```
 
 CLI Options Summary:
