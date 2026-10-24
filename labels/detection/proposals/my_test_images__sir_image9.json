@@ -1,0 +1,18 @@
+{
+  "image_id": "my_test_images__sir_image9",
+  "path": "my_test_images\\sir_image9.jpeg",
+  "size": [
+    446,
+    688
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:30+00:00",
+  "proposals": []
+}

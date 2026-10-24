@@ -1,0 +1,37 @@
+{
+  "run_id": "20261024_165811",
+  "video": "D:/downloads/Wyamo Car video.mp4",
+  "frames_requested": 120,
+  "imgsz": 640,
+  "caveat": "No ground-truth tracks exist for this footage. MOTA/IDF1 and true ID-switch counts cannot and are not computed. The figures above are IoU-correspondence proxies for continuity, not tracking accuracy.",
+  "results": [
+    {
+      "setting": "class-filtered",
+      "frames": 120,
+      "detections": 242,
+      "ids_total": 9,
+      "median_track_length_frames": 7,
+      "matched_pairs": 217,
+      "continuity_rate": 1.0,
+      "reassigned_pairs": 0,
+      "latency_ms": {
+        "mean": 123.8,
+        "p50": 90.5
+      }
+    },
+    {
+      "setting": "all-classes (pre-v1.1)",
+      "frames": 120,
+      "detections": 238,
+      "ids_total": 9,
+      "median_track_length_frames": 7,
+      "matched_pairs": 208,
+      "continuity_rate": 1.0,
+      "reassigned_pairs": 0,
+      "latency_ms": {
+        "mean": 94.2,
+        "p50": 89.7
+      }
+    }
+  ]
+}

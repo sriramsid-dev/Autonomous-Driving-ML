@@ -1,0 +1,63 @@
+{
+  "image_id": "test_data__red_tl",
+  "path": "test_data\\red_tl.jpg",
+  "size": [
+    2448,
+    3264
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:31+00:00",
+  "proposals": [
+    {
+      "box": [
+        1956.0,
+        2553.6,
+        2298.2,
+        2854.2
+      ],
+      "class_id": 2,
+      "confidence": 0.8013,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        2027.0,
+        2331.9,
+        2313.8,
+        2544.1
+      ],
+      "class_id": 2,
+      "confidence": 0.5455,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        2295.2,
+        2393.3,
+        2438.1,
+        2530.8
+      ],
+      "class_id": 2,
+      "confidence": 0.4443,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1919.9,
+        2410.8,
+        2150.5,
+        2593.0
+      ],
+      "class_id": 2,
+      "confidence": 0.1497,
+      "model": "yolo11s.pt"
+    }
+  ]
+}

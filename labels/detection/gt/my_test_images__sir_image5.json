@@ -1,0 +1,78 @@
+{
+  "image_id": "my_test_images__sir_image5",
+  "path": "my_test_images\\sir_image5.jpeg",
+  "scene": "street_stock",
+  "split": "eval",
+  "size": [
+    738,
+    414
+  ],
+  "status": "verified",
+  "verified_by": "agent-visual",
+  "verification_method": "proposal-assisted visual review; presence verified, boxes not redrawn",
+  "verified_on": "2026-10-24T11:25:18+00:00",
+  "counts": {
+    "person": 1,
+    "bicycle": 0,
+    "car": 4,
+    "motorcycle": 0,
+    "bus": 0,
+    "truck": 0
+  },
+  "n_boxes": 5,
+  "n_proposals_seen": 6,
+  "n_proposals_rejected": 1,
+  "boxes": [
+    {
+      "box": [
+        478.2,
+        44.0,
+        522.1,
+        129.2
+      ],
+      "class_id": 0,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        554.8,
+        12.1,
+        620.7,
+        69.2
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        0.1,
+        24.1,
+        50.8,
+        72.6
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        0.0,
+        53.4,
+        18.2,
+        106.7
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        33.2,
+        24.0,
+        65.0,
+        66.1
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    }
+  ],
+  "notes": "duplicate frame-edge sliver removed"
+}

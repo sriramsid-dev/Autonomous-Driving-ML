@@ -1,0 +1,249 @@
+{
+  "created": "2026-10-24T11:22:55+00:00",
+  "class_map": {
+    "0": "person",
+    "1": "bicycle",
+    "2": "car",
+    "3": "motorcycle",
+    "5": "bus",
+    "7": "truck"
+  },
+  "scenes": {
+    "variant_clip": {
+      "split": "dev",
+      "note": "480x848 portrait dashcam clip; frames also used to sample the video pipeline"
+    },
+    "waymo_still": {
+      "split": "dev",
+      "note": "Waymo Jaguar close-up still"
+    },
+    "street_stock": {
+      "split": "eval",
+      "note": "single-frame stock photograph, own scene"
+    },
+    "signal_scene": {
+      "split": "eval",
+      "note": "traffic-light street scene"
+    },
+    "highway": {
+      "split": "eval",
+      "note": "open highway, sparse traffic"
+    },
+    "indoor_persons": {
+      "split": "eval",
+      "note": "off-domain indoor photo; pedestrian robustness only"
+    }
+  },
+  "images": [
+    {
+      "id": "my_test_images__sir_image",
+      "path": "my_test_images\\sir_image.jpg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        1500,
+        1099
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image10",
+      "path": "my_test_images\\sir_image10.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        447,
+        447
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image2",
+      "path": "my_test_images\\sir_image2.jpg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        612,
+        408
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image3",
+      "path": "my_test_images\\sir_image3.jpg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        3483,
+        1960
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image4",
+      "path": "my_test_images\\sir_image4.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        612,
+        485
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image5",
+      "path": "my_test_images\\sir_image5.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        738,
+        414
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image6",
+      "path": "my_test_images\\sir_image6.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        678,
+        452
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image7",
+      "path": "my_test_images\\sir_image7.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        451,
+        679
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image8",
+      "path": "my_test_images\\sir_image8.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        250,
+        333
+      ]
+    },
+    {
+      "id": "my_test_images__sir_image9",
+      "path": "my_test_images\\sir_image9.jpeg",
+      "scene": "street_stock",
+      "split": "eval",
+      "size": [
+        446,
+        688
+      ]
+    },
+    {
+      "id": "test_data__sample_wyamo",
+      "path": "test_data\\sample_wyamo.jpg",
+      "scene": "waymo_still",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    },
+    {
+      "id": "test_data__highway_road",
+      "path": "test_data\\highway_road.jpg",
+      "scene": "highway",
+      "split": "eval",
+      "size": [
+        1280,
+        649
+      ]
+    },
+    {
+      "id": "test_data__red_tl",
+      "path": "test_data\\red_tl.jpg",
+      "scene": "signal_scene",
+      "split": "eval",
+      "size": [
+        2448,
+        3264
+      ]
+    },
+    {
+      "id": "test_data__green_tl",
+      "path": "test_data\\green_tl.jpg",
+      "scene": "signal_scene",
+      "split": "eval",
+      "size": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "test_data__sample_gemini",
+      "path": "test_data\\sample_gemini.jpg",
+      "scene": "indoor_persons",
+      "split": "eval",
+      "size": [
+        1280,
+        720
+      ]
+    },
+    {
+      "id": "test_data__wyamo_f10",
+      "path": "test_data\\wyamo_f10.jpg",
+      "scene": "variant_clip",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    },
+    {
+      "id": "test_data__wyamo_f120",
+      "path": "test_data\\wyamo_f120.jpg",
+      "scene": "variant_clip",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    },
+    {
+      "id": "test_data__wyamo_f200",
+      "path": "test_data\\wyamo_f200.jpg",
+      "scene": "variant_clip",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    },
+    {
+      "id": "test_data__wyamo_f300",
+      "path": "test_data\\wyamo_f300.jpg",
+      "scene": "variant_clip",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    },
+    {
+      "id": "test_data__wyamo_f330",
+      "path": "test_data\\wyamo_f330.jpg",
+      "scene": "variant_clip",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    },
+    {
+      "id": "test_data__wyamo_f60",
+      "path": "test_data\\wyamo_f60.jpg",
+      "scene": "variant_clip",
+      "split": "dev",
+      "size": [
+        480,
+        848
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "image_id": "test_data__red_tl",
+  "path": "test_data\\red_tl.jpg",
+  "scene": "signal_scene",
+  "split": "eval",
+  "size": [
+    2448,
+    3264
+  ],
+  "status": "verified",
+  "verified_by": "agent-visual",
+  "verification_method": "proposal-assisted visual review; presence verified, boxes not redrawn",
+  "verified_on": "2026-10-24T11:25:18+00:00",
+  "counts": {
+    "person": 0,
+    "bicycle": 0,
+    "car": 4,
+    "motorcycle": 0,
+    "bus": 0,
+    "truck": 0
+  },
+  "n_boxes": 4,
+  "n_proposals_seen": 4,
+  "n_proposals_rejected": 0,
+  "boxes": [
+    {
+      "box": [
+        1956.0,
+        2553.6,
+        2298.2,
+        2854.2
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        2027.0,
+        2331.9,
+        2313.8,
+        2544.1
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        2295.2,
+        2393.3,
+        2438.1,
+        2530.8
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        1919.9,
+        2410.8,
+        2150.5,
+        2593.0
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    }
+  ],
+  "notes": "night scene, four parked/passing cars"
+}

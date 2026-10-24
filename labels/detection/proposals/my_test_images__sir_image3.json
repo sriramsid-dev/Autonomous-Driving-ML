@@ -1,0 +1,162 @@
+{
+  "image_id": "my_test_images__sir_image3",
+  "path": "my_test_images\\sir_image3.jpg",
+  "size": [
+    3483,
+    1960
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:27+00:00",
+  "proposals": [
+    {
+      "box": [
+        2604.6,
+        780.6,
+        3480.5,
+        1942.4
+      ],
+      "class_id": 2,
+      "confidence": 0.9461,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        805.7,
+        386.6,
+        1730.6,
+        1943.0
+      ],
+      "class_id": 2,
+      "confidence": 0.7161,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1.2,
+        227.3,
+        1147.4,
+        1933.1
+      ],
+      "class_id": 2,
+      "confidence": 0.6223,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        2522.2,
+        796.3,
+        2773.9,
+        1034.1
+      ],
+      "class_id": 2,
+      "confidence": 0.6194,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        3.5,
+        225.2,
+        1159.1,
+        1956.1
+      ],
+      "class_id": 7,
+      "confidence": 0.6091,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        2801.1,
+        775.1,
+        3026.1,
+        925.4
+      ],
+      "class_id": 2,
+      "confidence": 0.3971,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        2734.3,
+        776.1,
+        3023.3,
+        1084.7
+      ],
+      "class_id": 2,
+      "confidence": 0.3743,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        785.6,
+        383.4,
+        1668.1,
+        1915.4
+      ],
+      "class_id": 7,
+      "confidence": 0.37,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1777.4,
+        767.4,
+        2112.8,
+        1002.1
+      ],
+      "class_id": 1,
+      "confidence": 0.2666,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1777.5,
+        821.1,
+        1946.1,
+        1001.7
+      ],
+      "class_id": 1,
+      "confidence": 0.2542,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        2052.9,
+        814.3,
+        2256.9,
+        960.3
+      ],
+      "class_id": 1,
+      "confidence": 0.2461,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        2205.1,
+        808.6,
+        2345.3,
+        948.9
+      ],
+      "class_id": 2,
+      "confidence": 0.2263,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        2053.5,
+        865.3,
+        2239.0,
+        959.5
+      ],
+      "class_id": 1,
+      "confidence": 0.1754,
+      "model": "yolo11s.pt"
+    }
+  ]
+}

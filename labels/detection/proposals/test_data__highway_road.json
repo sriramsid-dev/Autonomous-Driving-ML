@@ -1,0 +1,18 @@
+{
+  "image_id": "test_data__highway_road",
+  "path": "test_data\\highway_road.jpg",
+  "size": [
+    1280,
+    649
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:31+00:00",
+  "proposals": []
+}

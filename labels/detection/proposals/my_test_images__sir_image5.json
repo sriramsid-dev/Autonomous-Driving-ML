@@ -1,0 +1,85 @@
+{
+  "image_id": "my_test_images__sir_image5",
+  "path": "my_test_images\\sir_image5.jpeg",
+  "size": [
+    738,
+    414
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:28+00:00",
+  "proposals": [
+    {
+      "box": [
+        478.2,
+        44.0,
+        522.1,
+        129.2
+      ],
+      "class_id": 0,
+      "confidence": 0.8269,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        554.8,
+        12.1,
+        620.7,
+        69.2
+      ],
+      "class_id": 2,
+      "confidence": 0.7156,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        0.1,
+        24.1,
+        50.8,
+        72.6
+      ],
+      "class_id": 2,
+      "confidence": 0.1574,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        0.0,
+        53.4,
+        18.2,
+        106.7
+      ],
+      "class_id": 2,
+      "confidence": 0.1413,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        33.2,
+        24.0,
+        65.0,
+        66.1
+      ],
+      "class_id": 2,
+      "confidence": 0.1293,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        0.0,
+        80.0,
+        13.2,
+        104.8
+      ],
+      "class_id": 2,
+      "confidence": 0.125,
+      "model": "yolo11n.pt"
+    }
+  ]
+}

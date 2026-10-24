@@ -1,0 +1,27 @@
+{
+  "image_id": "test_data__highway_road",
+  "path": "test_data\\highway_road.jpg",
+  "scene": "highway",
+  "split": "eval",
+  "size": [
+    1280,
+    649
+  ],
+  "status": "verified",
+  "verified_by": "agent-visual",
+  "verification_method": "manual visual inspection (no proposals)",
+  "verified_on": "2026-10-24T11:25:19+00:00",
+  "counts": {
+    "person": 0,
+    "bicycle": 0,
+    "car": 0,
+    "motorcycle": 0,
+    "bus": 0,
+    "truck": 0
+  },
+  "n_boxes": 0,
+  "n_proposals_seen": 0,
+  "n_proposals_rejected": 0,
+  "boxes": [],
+  "notes": "checked: no target-class objects present"
+}

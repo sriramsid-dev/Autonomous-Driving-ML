@@ -47,3 +47,40 @@ Models were never modified.
 * No CNN state classifier was trained — the label set is too small to split by scene.
 * No lane-model change (CULane weights) — P2, requires approval.
 * Tracking continuity is not measured with MOTA; no GT tracks exist.
+
+---
+
+# v1.2 — Module A labelling + object-detection evaluation
+
+## Added
+
+| File | Purpose |
+|---|---|
+| `scripts/annotate.py` | proposal → render → finalize labelling workflow; proposals stored separately from verified GT; `export-yolo` for use with LabelImg/CVAT |
+| `scripts/eval_detection.py` | per-class AP@0.5, P/R at the deployment threshold, 1000-resample paired bootstrap over images, timestamped run directory |
+| `scripts/eval_tracking.py` | tracking-continuity proxy (class-filtered vs pre-v1.1 all-class tracking); explicitly not MOTA |
+| `labels/detection/manifest.json` | image list with scene ids and dev/eval split |
+| `labels/detection/proposals/*.json` | 14 files of **unverified** model suggestions |
+| `labels/detection/gt/*.json` | 8 files of verified labels (67 instances) with verifier, method and counts |
+| `models/yolo11s.pt` | 18.4 MB official YOLO11s weights, for the comparison only (not the default) |
+
+## Modified
+
+| File | Change | Why |
+|---|---|---|
+| `modules/object_detection_tracking.py` | `track(..., filter_classes=True)` switch | A/B the class-filtered tracking change with identical code paths |
+| `scripts/eval_detection.py` | warm-up inference excluded from timing | the first image absorbed graph setup and produced a bogus p90 of 691 ms |
+| `EVALUATION.md` | section 7 added | measured results, prototype-level caveats |
+| `README.md` | Module A claims updated; labelling/eval commands added | the previous text said no detection metric was possible |
+
+## Measured outcome
+
+`yolo11n` retained: mAP@0.5 0.710 vs 0.911 for `yolo11s`, but the paired bootstrap difference is
+−0.116 with 95 % CI [−0.229, +0.045] (not significant) while `yolo11s` costs ~70 % more latency
+and is behind on car AP/precision/recall. `yolo11m` not tested — justified in `EVALUATION.md` §7.4.
+
+## Still not done
+
+* 67 instances across 8 images is too few for tight intervals; bicycle/motorcycle/bus have zero support.
+* Boxes are proposal-derived, not redrawn; GT is therefore optimistic for both models.
+* No MOTA/IDF1: no ground-truth tracks.

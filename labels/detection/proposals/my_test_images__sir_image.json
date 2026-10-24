@@ -1,0 +1,580 @@
+{
+  "image_id": "my_test_images__sir_image",
+  "path": "my_test_images\\sir_image.jpg",
+  "size": [
+    1500,
+    1099
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:24+00:00",
+  "proposals": [
+    {
+      "box": [
+        0.5,
+        809.6,
+        290.0,
+        999.8
+      ],
+      "class_id": 2,
+      "confidence": 0.94,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        375.0,
+        841.7,
+        778.3,
+        997.8
+      ],
+      "class_id": 2,
+      "confidence": 0.9394,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        744.7,
+        679.0,
+        1017.2,
+        862.0
+      ],
+      "class_id": 2,
+      "confidence": 0.9137,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1331.3,
+        526.8,
+        1499.8,
+        688.1
+      ],
+      "class_id": 2,
+      "confidence": 0.9083,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        525.5,
+        597.4,
+        759.1,
+        755.6
+      ],
+      "class_id": 2,
+      "confidence": 0.901,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        973.8,
+        564.6,
+        1178.7,
+        704.7
+      ],
+      "class_id": 2,
+      "confidence": 0.8969,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        0.3,
+        691.9,
+        188.9,
+        821.9
+      ],
+      "class_id": 2,
+      "confidence": 0.8924,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        211.9,
+        579.4,
+        460.0,
+        727.0
+      ],
+      "class_id": 2,
+      "confidence": 0.8905,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        745.3,
+        526.6,
+        932.2,
+        652.8
+      ],
+      "class_id": 2,
+      "confidence": 0.8857,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        892.9,
+        471.5,
+        1054.8,
+        578.6
+      ],
+      "class_id": 2,
+      "confidence": 0.8749,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1123.8,
+        489.0,
+        1289.2,
+        626.9
+      ],
+      "class_id": 2,
+      "confidence": 0.8587,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1013.2,
+        417.2,
+        1138.5,
+        509.0
+      ],
+      "class_id": 2,
+      "confidence": 0.8358,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        515.1,
+        518.7,
+        703.9,
+        639.6
+      ],
+      "class_id": 2,
+      "confidence": 0.8046,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        36.6,
+        478.8,
+        193.4,
+        556.1
+      ],
+      "class_id": 2,
+      "confidence": 0.7833,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1107.9,
+        370.6,
+        1194.2,
+        438.9
+      ],
+      "class_id": 2,
+      "confidence": 0.7732,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        360.4,
+        427.9,
+        478.9,
+        486.7
+      ],
+      "class_id": 2,
+      "confidence": 0.7698,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        835.6,
+        403.8,
+        960.5,
+        501.3
+      ],
+      "class_id": 2,
+      "confidence": 0.7686,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        679.5,
+        462.4,
+        832.3,
+        560.4
+      ],
+      "class_id": 2,
+      "confidence": 0.7677,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1199.8,
+        460.5,
+        1322.2,
+        567.7
+      ],
+      "class_id": 2,
+      "confidence": 0.7549,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        204.4,
+        440.5,
+        349.6,
+        537.8
+      ],
+      "class_id": 2,
+      "confidence": 0.6922,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1238.7,
+        409.6,
+        1351.4,
+        498.8
+      ],
+      "class_id": 2,
+      "confidence": 0.6729,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1427.1,
+        362.2,
+        1499.6,
+        451.2
+      ],
+      "class_id": 2,
+      "confidence": 0.6441,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1002.7,
+        345.8,
+        1080.4,
+        408.6
+      ],
+      "class_id": 2,
+      "confidence": 0.6438,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1389.2,
+        345.5,
+        1467.9,
+        407.5
+      ],
+      "class_id": 2,
+      "confidence": 0.5845,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        0.4,
+        524.6,
+        123.9,
+        585.5
+      ],
+      "class_id": 2,
+      "confidence": 0.572,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        0.1,
+        460.2,
+        85.8,
+        530.8
+      ],
+      "class_id": 2,
+      "confidence": 0.5588,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        929.2,
+        381.4,
+        1020.9,
+        453.3
+      ],
+      "class_id": 2,
+      "confidence": 0.5014,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        189.1,
+        385.4,
+        323.1,
+        451.0
+      ],
+      "class_id": 2,
+      "confidence": 0.4732,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        630.8,
+        265.3,
+        750.1,
+        405.8
+      ],
+      "class_id": 7,
+      "confidence": 0.4365,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        444.3,
+        396.9,
+        574.0,
+        453.7
+      ],
+      "class_id": 2,
+      "confidence": 0.381,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        374.0,
+        331.2,
+        482.0,
+        428.6
+      ],
+      "class_id": 7,
+      "confidence": 0.3604,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1066.6,
+        324.0,
+        1120.8,
+        370.9
+      ],
+      "class_id": 2,
+      "confidence": 0.3567,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1346.1,
+        335.4,
+        1422.6,
+        393.0
+      ],
+      "class_id": 2,
+      "confidence": 0.3519,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        557.4,
+        352.7,
+        633.6,
+        394.2
+      ],
+      "class_id": 2,
+      "confidence": 0.3356,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        521.2,
+        313.8,
+        537.9,
+        352.9
+      ],
+      "class_id": 0,
+      "confidence": 0.3163,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1262.5,
+        381.0,
+        1357.8,
+        454.6
+      ],
+      "class_id": 2,
+      "confidence": 0.3157,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1194.7,
+        320.2,
+        1234.6,
+        357.4
+      ],
+      "class_id": 2,
+      "confidence": 0.3041,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1132.5,
+        359.5,
+        1209.0,
+        420.6
+      ],
+      "class_id": 2,
+      "confidence": 0.2732,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        240.4,
+        464.0,
+        415.2,
+        535.2
+      ],
+      "class_id": 2,
+      "confidence": 0.2511,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        770.7,
+        277.9,
+        834.5,
+        349.4
+      ],
+      "class_id": 7,
+      "confidence": 0.2348,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        595.5,
+        372.6,
+        680.6,
+        418.8
+      ],
+      "class_id": 2,
+      "confidence": 0.2194,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1259.8,
+        345.2,
+        1339.5,
+        399.2
+      ],
+      "class_id": 2,
+      "confidence": 0.1953,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        688.1,
+        376.0,
+        771.7,
+        422.8
+      ],
+      "class_id": 2,
+      "confidence": 0.171,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        314.8,
+        328.2,
+        480.7,
+        437.3
+      ],
+      "class_id": 7,
+      "confidence": 0.1702,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        783.3,
+        352.7,
+        853.4,
+        392.1
+      ],
+      "class_id": 2,
+      "confidence": 0.1682,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        0.2,
+        350.9,
+        107.2,
+        433.8
+      ],
+      "class_id": 5,
+      "confidence": 0.1594,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        1312.6,
+        324.1,
+        1358.1,
+        364.4
+      ],
+      "class_id": 2,
+      "confidence": 0.1568,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        547.6,
+        392.4,
+        617.2,
+        437.8
+      ],
+      "class_id": 2,
+      "confidence": 0.1343,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1160.5,
+        363.5,
+        1208.6,
+        420.4
+      ],
+      "class_id": 2,
+      "confidence": 0.125,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1261.1,
+        372.5,
+        1359.1,
+        414.8
+      ],
+      "class_id": 2,
+      "confidence": 0.1244,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        1241.7,
+        327.7,
+        1296.0,
+        356.9
+      ],
+      "class_id": 2,
+      "confidence": 0.1213,
+      "model": "yolo11n.pt"
+    }
+  ]
+}

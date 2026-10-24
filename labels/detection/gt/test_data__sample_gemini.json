@@ -1,0 +1,58 @@
+{
+  "image_id": "test_data__sample_gemini",
+  "path": "test_data\\sample_gemini.jpg",
+  "scene": "indoor_persons",
+  "split": "eval",
+  "size": [
+    1280,
+    720
+  ],
+  "status": "verified",
+  "verified_by": "agent-visual",
+  "verification_method": "proposal-assisted visual review; presence verified, boxes not redrawn",
+  "verified_on": "2026-10-24T11:25:19+00:00",
+  "counts": {
+    "person": 3,
+    "bicycle": 0,
+    "car": 0,
+    "motorcycle": 0,
+    "bus": 0,
+    "truck": 0
+  },
+  "n_boxes": 3,
+  "n_proposals_seen": 3,
+  "n_proposals_rejected": 0,
+  "boxes": [
+    {
+      "box": [
+        1.1,
+        148.0,
+        455.4,
+        714.2
+      ],
+      "class_id": 0,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        665.5,
+        63.8,
+        1279.9,
+        714.2
+      ],
+      "class_id": 0,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        430.2,
+        124.8,
+        856.7,
+        712.3
+      ],
+      "class_id": 0,
+      "origin": "proposal"
+    }
+  ],
+  "notes": "three persons, no vehicles"
+}

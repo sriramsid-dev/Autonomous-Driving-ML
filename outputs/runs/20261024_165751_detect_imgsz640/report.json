@@ -1,0 +1,151 @@
+{
+  "run_id": "20261024_165751",
+  "protocol": {
+    "imgsz": 640,
+    "conf_floor": 0.02,
+    "conf_operating": 0.25,
+    "nms_iou": 0.45,
+    "ap": "all-point interpolated per class, IoU 0.5, greedy per-image matching",
+    "bootstrap": "paired over images, 1000 resamples, seed 0",
+    "device": "cpu"
+  },
+  "env": {
+    "python": "3.13.13",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "dataset": {
+    "images": [
+      "my_test_images__sir_image",
+      "my_test_images__sir_image5",
+      "my_test_images__sir_image6",
+      "my_test_images__sir_image7",
+      "test_data__green_tl",
+      "test_data__highway_road",
+      "test_data__red_tl",
+      "test_data__sample_gemini"
+    ],
+    "n_images": 8,
+    "n_instances": 67,
+    "support": {
+      "person": 6,
+      "bicycle": 0,
+      "car": 58,
+      "motorcycle": 0,
+      "bus": 0,
+      "truck": 3
+    },
+    "label_tier": "verified-proposal (presence verified by eye, boxes not redrawn)"
+  },
+  "models": {
+    "yolo11n.pt": {
+      "map50_iou50": 0.7095,
+      "per_class": {
+        "person": {
+          "ap50": 1.0,
+          "precision_at_conf": 0.75,
+          "recall_at_conf": 1.0,
+          "tp": 6,
+          "fp": 2,
+          "fn": 0,
+          "support": 6,
+          "insufficient_support": false
+        },
+        "car": {
+          "ap50": 0.8507,
+          "precision_at_conf": 0.921,
+          "recall_at_conf": 0.603,
+          "tp": 35,
+          "fp": 3,
+          "fn": 23,
+          "support": 58,
+          "insufficient_support": false
+        },
+        "truck": {
+          "ap50": 0.2778,
+          "precision_at_conf": 0.0,
+          "recall_at_conf": 0.0,
+          "tp": 0,
+          "fp": 1,
+          "fn": 3,
+          "support": 3,
+          "insufficient_support": true
+        }
+      },
+      "latency_ms": {
+        "mean": 128.0,
+        "p50": 136.3,
+        "p90": 147.0
+      }
+    },
+    "yolo11s.pt": {
+      "map50_iou50": 0.9112,
+      "per_class": {
+        "person": {
+          "ap50": 1.0,
+          "precision_at_conf": 1.0,
+          "recall_at_conf": 1.0,
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "support": 6,
+          "insufficient_support": false
+        },
+        "car": {
+          "ap50": 0.8169,
+          "precision_at_conf": 0.917,
+          "recall_at_conf": 0.569,
+          "tp": 33,
+          "fp": 3,
+          "fn": 25,
+          "support": 58,
+          "insufficient_support": false
+        },
+        "truck": {
+          "ap50": 0.9167,
+          "precision_at_conf": 1.0,
+          "recall_at_conf": 0.667,
+          "tp": 2,
+          "fp": 0,
+          "fn": 1,
+          "support": 3,
+          "insufficient_support": true
+        }
+      },
+      "latency_ms": {
+        "mean": 233.9,
+        "p50": 230.9,
+        "p90": 255.7
+      },
+      "delta_vs_yolo11n": {
+        "mean": -0.1157,
+        "ci95": [
+          -0.2286,
+          0.0452
+        ],
+        "significant": false
+      }
+    }
+  },
+  "per_image_predictions": {
+    "yolo11n": [
+      81,
+      35,
+      17,
+      0,
+      1,
+      1,
+      5,
+      3
+    ],
+    "yolo11s": [
+      75,
+      26,
+      16,
+      0,
+      1,
+      1,
+      5,
+      3
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "image_id": "test_data__green_tl",
+  "path": "test_data\\green_tl.jpg",
+  "size": [
+    1200,
+    1600
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:32+00:00",
+  "proposals": []
+}

@@ -1,0 +1,98 @@
+{
+  "image_id": "my_test_images__sir_image6",
+  "path": "my_test_images\\sir_image6.jpeg",
+  "scene": "street_stock",
+  "split": "eval",
+  "size": [
+    678,
+    452
+  ],
+  "status": "verified",
+  "verified_by": "agent-visual",
+  "verification_method": "proposal-assisted visual review; presence verified, boxes not redrawn",
+  "verified_on": "2026-10-24T11:25:18+00:00",
+  "counts": {
+    "person": 2,
+    "bicycle": 0,
+    "car": 5,
+    "motorcycle": 0,
+    "bus": 0,
+    "truck": 0
+  },
+  "n_boxes": 7,
+  "n_proposals_seen": 12,
+  "n_proposals_rejected": 5,
+  "boxes": [
+    {
+      "box": [
+        100.9,
+        254.7,
+        350.3,
+        401.9
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        259.3,
+        193.0,
+        338.1,
+        246.6
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        0.1,
+        229.0,
+        42.2,
+        296.0
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        142.9,
+        196.4,
+        230.9,
+        250.7
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        615.9,
+        176.6,
+        653.7,
+        203.8
+      ],
+      "class_id": 2,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        255.2,
+        180.6,
+        268.2,
+        221.0
+      ],
+      "class_id": 0,
+      "origin": "proposal"
+    },
+    {
+      "box": [
+        231.3,
+        181.3,
+        245.0,
+        218.7
+      ],
+      "class_id": 0,
+      "origin": "proposal"
+    }
+  ],
+  "notes": "rejected frame-edge slivers and a duplicate person box"
+}

@@ -121,11 +121,19 @@ class ObjectDetectionTracker:
 
         return detections
 
-    def track(self, frame_bgr: np.ndarray, persist: bool = True) -> Tuple[List[Dict], float]:
+    def track(
+        self,
+        frame_bgr: np.ndarray,
+        persist: bool = True,
+        filter_classes: bool = True,
+    ) -> Tuple[List[Dict], float]:
         """
         Run detection and ByteTrack multi-object tracking on a video frame.
         Maintains unique track IDs across consecutive frames.
         Returns (tracked_objects, inference_time_ms).
+
+        `filter_classes=False` reproduces the pre-v1.1 behaviour (track every
+        COCO class, filter afterwards) and exists only for A/B measurement.
         """
         t0 = time.perf_counter()
         # V1-FIX: restrict the tracker itself to the classes we care about.
@@ -139,7 +147,7 @@ class ObjectDetectionTracker:
             imgsz=self.imgsz,
             tracker=self.tracker_config,
             persist=persist,
-            classes=track_classes,
+            classes=track_classes if filter_classes else None,
             device=self.device,
             verbose=False,
         )[0]

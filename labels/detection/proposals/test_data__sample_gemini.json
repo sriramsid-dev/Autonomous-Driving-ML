@@ -1,0 +1,52 @@
+{
+  "image_id": "test_data__sample_gemini",
+  "path": "test_data\\sample_gemini.jpg",
+  "size": [
+    1280,
+    720
+  ],
+  "verified": false,
+  "warning": "MODEL PROPOSALS - not ground truth. Must be reviewed before use.",
+  "conf_threshold": 0.12,
+  "imgsz": 960,
+  "models": [
+    "yolo11n.pt",
+    "yolo11s.pt"
+  ],
+  "generated": "2026-10-24T11:23:32+00:00",
+  "proposals": [
+    {
+      "box": [
+        1.1,
+        148.0,
+        455.4,
+        714.2
+      ],
+      "class_id": 0,
+      "confidence": 0.9594,
+      "model": "yolo11n.pt"
+    },
+    {
+      "box": [
+        665.5,
+        63.8,
+        1279.9,
+        714.2
+      ],
+      "class_id": 0,
+      "confidence": 0.954,
+      "model": "yolo11s.pt"
+    },
+    {
+      "box": [
+        430.2,
+        124.8,
+        856.7,
+        712.3
+      ],
+      "class_id": 0,
+      "confidence": 0.9471,
+      "model": "yolo11s.pt"
+    }
+  ]
+}
