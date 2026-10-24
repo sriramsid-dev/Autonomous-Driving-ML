@@ -1,0 +1,11 @@
+# Large binaries and generated artifacts (models are unchanged and not versioned)
+models/*.pt
+models/*.pth
+models/*.dll
+outputs/annotated_videos/
+outputs/result_images/
+outputs/audit_baseline/
+__pycache__/
+*.pyc
+notebooks/*.ipynb
+test_data*.zip

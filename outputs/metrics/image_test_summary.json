@@ -1,0 +1,256 @@
+{
+  "suite_name": "Version 1 Perception Module Static Image Test Suite",
+  "timestamp": "2026-10-12 19:52:15",
+  "hardware_device": "cpu",
+  "total_tests": 10,
+  "successful_tests": 10,
+  "failed_tests": 0,
+  "pass_rate_percent": 100.0,
+  "test_results": [
+    {
+      "test_name": "Urban Vehicle Close-Up (Waymo Jaguar)",
+      "filename": "sample_wyamo.jpg",
+      "modules_requested": "A",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 165.76,
+      "detections": {
+        "vehicles": 2,
+        "pedestrians": 0,
+        "total_objects": 2,
+        "traffic_lights": 0,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_A_object_tracking"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_sample_wyamo.jpg",
+      "tl_states": [],
+      "visual_verification_target": "Large bounding box covering the dominant vehicle (99% of frame width is expected \u2014 vehicle physically fills the image).",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Highway Road Lane Markings",
+      "filename": "highway_road.jpg",
+      "modules_requested": "C",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 171.97,
+      "detections": {
+        "vehicles": 0,
+        "pedestrians": 0,
+        "total_objects": 0,
+        "traffic_lights": 0,
+        "active_lanes": 2
+      },
+      "modules_run": [
+        "module_C_lane_detection"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_highway_road.jpg",
+      "tl_states": [],
+      "visual_verification_target": "Two ego-lane boundaries with a bounded green drive corridor between them, not bleeding onto the dirt shoulder.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Red Traffic Light Full Scene",
+      "filename": "red_tl.jpg",
+      "modules_requested": "A,B",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 290.91,
+      "detections": {
+        "vehicles": 2,
+        "pedestrians": 0,
+        "total_objects": 2,
+        "traffic_lights": 2,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_A_object_tracking",
+        "module_B_traffic_lights"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_red_tl.jpg",
+      "tl_states": [
+        "red (1.00)",
+        "unknown (0.00)"
+      ],
+      "visual_verification_target": "Traffic light detected and classified as RED.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Green Traffic Light Full Scene",
+      "filename": "green_tl.jpg",
+      "modules_requested": "B",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 60.24,
+      "detections": {
+        "vehicles": 0,
+        "pedestrians": 0,
+        "total_objects": 0,
+        "traffic_lights": 1,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_B_traffic_lights"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_green_tl.jpg",
+      "tl_states": [
+        "green (0.99)"
+      ],
+      "visual_verification_target": "Traffic light detected and classified as GREEN.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Yellow Traffic Light Full Scene",
+      "filename": "yellow_inuvik.jpg",
+      "modules_requested": "A,B",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 153.82,
+      "detections": {
+        "vehicles": 2,
+        "pedestrians": 0,
+        "total_objects": 2,
+        "traffic_lights": 2,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_A_object_tracking",
+        "module_B_traffic_lights"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_yellow_inuvik.jpg",
+      "tl_states": [
+        "yellow (0.79)",
+        "yellow (0.98)"
+      ],
+      "visual_verification_target": "Traffic light detected and classified as YELLOW.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Isolated Red Lamp Crop",
+      "filename": "tl_crop_red.jpg",
+      "modules_requested": "B",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 5.41,
+      "detections": {
+        "vehicles": 0,
+        "pedestrians": 0,
+        "total_objects": 0,
+        "traffic_lights": 1,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_B_traffic_lights"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_tl_crop_red.jpg",
+      "tl_states": [
+        "red (1.00)"
+      ],
+      "visual_verification_target": "Direct crop classified as RED.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Isolated Green Lamp Crop",
+      "filename": "tl_crop_green.jpg",
+      "modules_requested": "B",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 5.12,
+      "detections": {
+        "vehicles": 0,
+        "pedestrians": 0,
+        "total_objects": 0,
+        "traffic_lights": 1,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_B_traffic_lights"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_tl_crop_green.jpg",
+      "tl_states": [
+        "green (0.84)"
+      ],
+      "visual_verification_target": "Direct crop classified as GREEN.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Isolated Yellow Lamp Crop",
+      "filename": "tl_crop_yellow.jpg",
+      "modules_requested": "B",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 4.64,
+      "detections": {
+        "vehicles": 0,
+        "pedestrians": 0,
+        "total_objects": 0,
+        "traffic_lights": 1,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_B_traffic_lights"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_tl_crop_yellow.jpg",
+      "tl_states": [
+        "yellow (0.67)"
+      ],
+      "visual_verification_target": "Direct crop classified as YELLOW.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Indoor Group Photo (Object Detection Only)",
+      "filename": "sample_gemini.jpg",
+      "modules_requested": "A",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 67.46,
+      "detections": {
+        "vehicles": 0,
+        "pedestrians": 3,
+        "total_objects": 3,
+        "traffic_lights": 0,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_A_object_tracking"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_sample_gemini.jpg",
+      "tl_states": [],
+      "visual_verification_target": "Pedestrians detected. Not a driving scene \u2014 Module C (lanes) intentionally disabled.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    },
+    {
+      "test_name": "Driving Frame f60 (All Modules)",
+      "filename": "wyamo_f60.jpg",
+      "modules_requested": "all",
+      "status": "PASS",
+      "error": null,
+      "latency_ms": 201.9,
+      "detections": {
+        "vehicles": 1,
+        "pedestrians": 0,
+        "total_objects": 1,
+        "traffic_lights": 0,
+        "active_lanes": 0
+      },
+      "modules_run": [
+        "module_A_object_tracking",
+        "module_B_traffic_lights",
+        "module_C_lane_detection"
+      ],
+      "output_saved": "C:\\Users\\Sriram Siddhartha\\Downloads\\Antigravity_ML_project\\Version1_Pretrained\\outputs\\result_images\\test_result_wyamo_f60.jpg",
+      "tl_states": [],
+      "visual_verification_target": "Vehicle detection and lane detection on a dashcam driving frame.",
+      "visual_verification_result": "NOT VERIFIED (requires human inspection of output image)"
+    }
+  ],
+  "limitations": [
+    "1. Single-Image Tracking Limitation: ByteTrack allocates initial detection IDs on a static image. Temporal tracking continuity, trajectory projection, and MOTA metrics require sequential multi-frame video and cannot be evaluated or claimed from single images.",
+    "2. Ground-Truth Data Limitation: The local test images do not have curated ground-truth bounding box XML/JSON or lane annotation masks. Benchmark accuracy metrics (mAP@0.5, MOTA, precision, recall) are strictly omitted to prevent fabrication; empirical detection counts and latencies are reported.",
+    "3. UFLD Pretrained Domain: The Ultra-Fast Lane Detector is pretrained on the TuSimple highway benchmark. Urban crossroads, sharp 90-degree turns, or roads without painted line boundaries may exhibit reduced lane confidence or fallback gridding anchors.",
+    "4. Traffic Light Heuristic Baseline: The Version 1 classifier utilizes spatial-chrominance and HSV heuristics. While effective on standard vertical signals, severe backlight glare, unlit lamps, or horizontal configurations may produce 'unknown' or ambiguous classifications. (Deep learning fine-tuning is planned for Version 2).",
+    "5. Pretrained General Detector: YOLO11n is trained on COCO (general classes). Small, distant, or heavily occluded vehicles may fall below the detection confidence threshold (0.25)."
+  ]
+}

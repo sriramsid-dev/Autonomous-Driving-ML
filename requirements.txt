@@ -1,0 +1,13 @@
+# Perception System Version 1 (Pretrained Baseline) Dependencies
+# Python >= 3.10 recommended (Tested on Python 3.13 64-bit on Windows)
+
+torch>=2.4.0
+torchvision>=0.19.0
+ultralytics>=8.3.0
+opencv-python>=4.8.0
+lapx>=0.5.5
+numpy>=1.23.0
+matplotlib>=3.5.0
+pillow>=9.0.0
+gdown>=5.0.0
+scipy>=1.10.0
