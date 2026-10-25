@@ -310,3 +310,47 @@ both lane models, ~2.8-2.9 FPS on CPU). It exposes a defect the metrics do not
 cover: both models draw a phantom lane into the hillside beyond the road and a
 corridor that spills onto the field, because the corridor polygon spans the full
 overlapping y-range including rows above the labelled band.
+
+---
+
+## v1.8 — Module C: the corridor is built from evidence, and `--lane-model` now works
+
+Baseline `24c9cd0` and every earlier run directory are untouched. This round
+reproduces the phantom corridor seen in `outputs/runs/integrated_v16/` and fixes
+the mechanism, not the symptom.
+
+| File | Change | Why |
+|---|---|---|
+| `modules/lane_detection.py` | `paint_support_mask()`, `boundary_support()`, `close_short_gaps()`, `_corridor()`; corridor trimmed to the longest run with paint under **both** edges; minimum height, ego-band and camera-axis gates; width measured at the lowest row both edges share; `_select_ego_boundaries()` scores each boundary by its own bottom point; only the supported run that reaches the ego rows is drawn; ROI filter | the polygon used to span the full y-overlap of two edges, one of which ran through a field, with no paint or ego test (EVALUATION.md 16.1) |
+| `modules/lane_detection.py` | all constructor settings resolved at **call** time, not as import-time default arguments | `--lane-model` / `--lane-preprocess` were silently ignored, so every integrated run labelled `culane` ran `tusimple/stretch` (16.6) |
+| `config.py` | `LANE_PAINT_*`, `LANE_CORRIDOR_*`, `LANE_EGO_AXIS_TOL_FRAC` (0.0, with the 0.25 experiment recorded), `LANE_ROI_*` | the gates are explicit, measured knobs; defaults preserve the whole-frame ROI |
+| `main.py` | `PerceptionPipeline(lane_model=, lane_preprocess=)`; corridor refusal reason, support and geometry in telemetry and in `module_C` details | CLI and API selection actually applies; "no corridor" now comes with a reason instead of silence |
+| `tests/test_lane_corridor.py` | **new**, 15 checks: field spill, hillside lane, unsupported tail, missing boundary, hood trim, hood-only lane, implausible width, off-axis corridor, floating corridor, gap handling | each reproduces a real failure seen in the runs; no model weights needed |
+| `tests/test_regression.py` | `--lane-model culane` now asserts `UFLD 'culane'` and `culane_18.pth` in the output | the previous check only looked at the exit code, which is why the stale default passed |
+| `scripts/calibrate_paint_support.py` | **new** | calibrates the paint test against the 135 hand-verified GT points: 98% row support, 14/15 boundaries fully supported |
+| `scripts/eval_corridor.py` | **new** | scores corridors from the rendered overlay (corridors, ego coverage, edge support, area spill vs the verified ego lane) using only the public API, so it runs unchanged against `a4b65cb` |
+| `scripts/run_integrated.py` | **new** | reproducible integrated run per lane model, with corridor reasons and a model-comparison montage |
+| `scripts/diag_corridor.py`, `outputs/runs/lane_corridor_v17/repro_frames.py` | **new** | reproduce and trace the failing frames |
+
+Before/after on the same 27 frames, same script, code swapped with a git
+worktree at `a4b65cb`:
+
+| model | corridors | mean edge support | mean top row |
+|---|---|---|---|
+| tusimple/stretch | 13/27 -> **0/27** | 0.563 -> - | 0.543 -> - |
+| culane/stretch | 8/27 -> **2/27** | 0.824 -> **1.000** | 0.697 -> 0.776 |
+
+Boundary-error evaluation on the 13 verified frames changed because the pairing
+rule changed, not because the models did: tusimple/stretch 6/13 -> 8/13 ego
+pairs (coverage 0.363 -> 0.393, median 17.0 px unchanged), tusimple/letterbox
+6/13 -> 13/13 (coverage 0.363 -> 0.615, median 156 -> 224 px — the extra frames
+are the ones it reads badly), both culane profiles identical to the previous
+round. Full tables, the four measurement mistakes corrected on the way, and the
+remaining limitations are in `EVALUATION.md` section 16.
+
+Suites: `tests/test_tl_classifier.py` 20/20, `tests/test_lane_corridor.py`
+15/15, `tests/test_regression.py` 8/8. Integrated at 2.8-3.7 FPS on CPU.
+
+Not production-ready and not safe for vehicle control: the corridor is refused
+on most frames of this footage, and the two checkpoints still decode only one
+usable boundary in many of them.

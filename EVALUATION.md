@@ -1018,3 +1018,187 @@ python outputs/runs/lane_diag2/decode_probe.py     # argmax vs confidence-gate s
 python outputs/runs/lane_diag2/filter_trace.py     # where decoded points are dropped
 python tests/test_tl_classifier.py; python tests/test_regression.py
 ```
+
+---
+
+## 16. Module C corridor: evidence-based construction (v1.8)
+
+### 16.1 What was wrong, reproduced
+
+Frames 20 and 40 of clip F (`outputs/runs/lane_corridor_v17/repro_v16_frames/`)
+show the failure at full resolution: a green corridor across the grass on the
+right, bounded by a decoded lane that runs through the field, and a second lane
+that climbs the hillside beyond the road. Measured on those frames:
+
+| frame | left edge | right edge | corridor y | paint under the edges |
+|---|---|---|---|---|
+| F 20 | `(674, 1420)` | `(1742, 1060)` | 971..992 | left 100%, **right 35%** |
+| F 40 | `(664, 1420)` | `(1756, 1020)` | 924..989 | left 87%, right 80% |
+
+Four separate causes, all measured:
+
+1. `bottom_x` was the median x over the lower 40% of the frame, so a boundary
+   that exists only high in the frame was scored by a position that was never
+   its own bottom. The phantom in F 20 was scored `(1742, 1060)` — 380px above
+   the bottom, in the field — and used as the ego lane's right edge.
+2. The polygon spanned the full y-overlap of the pair, with no test that either
+   edge had paint under it.
+3. Nothing required the corridor to reach the ego rows: a band 971..992 on a
+   1440px frame, i.e. floating 450px above the bonnet, was published.
+4. Lane polylines were drawn in full, including the decoder's least reliable
+   samples — the top of each lane.
+
+### 16.2 The paint test, and its calibration
+
+`paint_support_mask()` (adaptive: each pixel vs the median brightness of its own
+window) was calibrated against the only pixels known to be paint — the 135
+hand-verified GT points in `labels/lane/clips_gt.json`
+(`scripts/calibrate_paint_support.py`, output in
+`outputs/runs/lane_corridor_v17/paint_support_calibration.json`):
+
+| variant | mean row support | boundaries fully supported |
+|---|---|---|
+| fixed brightness (`v>=110, s<=70`) | 97% | 13/15 |
+| **adaptive (shipped)** | **98%** | **14/15** |
+
+The one remaining miss is D02's right edge at rows 656/674/716 (distant dusk
+paint, 75% of that boundary). A negative answer therefore means "no paint
+here", not "threshold too strict".
+
+The mask is *not* a lane detector and it cannot tell white paint from a white
+fence post: on F 40 the phantom edge's 11 samples were "supported" 6 times, all
+on a utility pole and fence line. Connectivity to the ego rows — not local
+support — is what decides.
+
+### 16.3 Rules now applied before a corridor is published
+
+| # | Rule | Config | Refusal reason |
+|---|---|---|---|
+| 1 | paint under **both** edges on every published row; only the longest contiguous run survives | `LANE_PAINT_SUPPORT`, `LANE_PAINT_MAX_GAP_POINTS=1` | `no row has paint under both boundaries` |
+| 2 | height at least 12% of the frame | `LANE_CORRIDOR_MIN_ROWS_FRAC` | `supported corridor too short` |
+| 3 | lowest row within 15% of the frame bottom, and the camera axis inside the corridor at that row | `LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC`, `LANE_EGO_AXIS_TOL_FRAC` | `corridor stops N% of the frame above the bottom` |
+| 4 | plausible width **at the lowest row both edges share** | `LANE_MIN/MAX_WIDTH_FRAC` | `implausible lane width` |
+| 5 | boundaries: only the run that reaches the ego rows is drawn | — | `no paint evidence near the ego rows` |
+
+`LANE_ROI_TOP_FRAC` / `LANE_ROI_BOTTOM_FRAC` also exist as a hard region of
+interest and default to `(0.0, 1.0)` — the whole frame. The hood is handled by
+the paint test instead: on F 20 the row at y=1420 is paint and y=1400 is not, and
+the corridor is trimmed to the paint rather than cropped to a guessed bonnet
+height.
+
+### 16.4 Before / after
+
+Same frames (13 GT + 8 stills + 6 sampled video frames = 27), same script
+(`scripts/eval_corridor.py`, which measures the **rendered overlay**, so it runs
+unchanged against the old code), code swapped with
+`git worktree add ../lane_before a4b65cb`:
+
+| model | corridors before | corridors after | ego-covered after | mean edge support before -> after | mean top row before -> after |
+|---|---|---|---|---|---|
+| tusimple/stretch | 13/27 | **0/27** | 0 | 0.563 -> - | 0.543 -> - |
+| culane/stretch | 8/27 | **2/27** | 2 | 0.824 -> **1.000** | 0.697 -> 0.776 |
+
+The two surviving corridors (F01 and frame 5 of clip F) have 100% edge support
+and 0.2% area spill against the hand-verified ego lane. The 21 refused corridors
+are refused with a named reason in
+`outputs/runs/lane_corridor_v17/eval_{before,after}/corridor_eval.json`; the most
+common are "fewer than two usable boundaries" and "supported corridor too
+short". TuSimple publishing zero corridors on this set is the honest result for
+its coverage on it, not a regression introduced here: on the same 27 frames it
+decodes only one usable boundary in 9 cases, and where it decodes two, at most
+36px of supported overlap remains (needs 49-173px).
+
+### 16.5 Four measurement mistakes made and fixed during this work
+
+Recorded because each one would have made the comparison look better than it was:
+
+1. `eval_corridor.py` first scored `outputs/runs/integrated_v16/*.jpg` — those
+   are **annotated** frames with boxes and a previous green fill already drawn.
+   Fixed to use the original stills (`my_test_images/`, `test_data/`).
+2. The ego row was first tested at 0.85h and called F01 wrong; on a left-hand
+   curve the lane is left of the camera axis higher up. The test is now made at
+   the corridor's own bottom row.
+3. "Spill" charged a corridor for extending below the lowest labelled row.
+   Restricted to the rows the GT actually covers.
+4. Width was computed from two `bottom_x` values measured at different rows,
+   turning D02 (1447px) and F01 (1928px) into false "implausible width"
+   rejects. Measured at the lowest shared row, both are pairs again.
+
+### 16.6 Two real defects found on the way
+
+**`--lane-model` / `--lane-preprocess` were silently ignored.**
+`UltraFastLaneDetector.__init__` bound `model_key: str = config.LANE_MODEL`,
+evaluated at import time; `main.py` imports the module before parsing arguments,
+so every flag and every `config.LANE_MODEL = ...` assignment after import was
+overridden by the stale default. Measured:
+
+```
+requested culane/letterbox, got: tusimple stretch
+```
+
+Fixed by resolving all settings at call time, plus `lane_model=` /
+`lane_preprocess=` on `PerceptionPipeline`. `tests/test_regression.py` now
+asserts `UFLD 'culane'` and `culane_18.pth` appear in the CLI output — it
+previously only checked the exit code, which is how this passed.
+`scripts/eval_lane.py` is unaffected (it passes `model_key` explicitly), so the
+tables in 14-15 stand; earlier *integrated* runs labelled `culane` should not be
+trusted as such.
+
+### 16.7 Ego-pair / boundary-error table, after the pairing fix
+
+`_select_ego_boundaries` now scores each boundary by its own bottom point, and
+the width at the lowest shared row. On the same 13 GT frames and 135 points:
+
+| configuration | ego pairs before -> after | coverage before -> after | median before -> after | p90 before -> after |
+|---|---|---|---|---|
+| tusimple/stretch | 6/13 -> **8/13** | 0.363 -> **0.393** | 17.0 -> 17.0 px | 286 -> 283 px |
+| tusimple/letterbox | 6/13 -> **13/13** | 0.363 -> **0.615** | 156 -> **224 px** | 956 -> **468 px** |
+| culane/stretch | 3/13 -> 3/13 | 0.304 -> 0.304 | 7.4 -> 7.4 px | 19 -> 19 px |
+| culane/letterbox | 3/13 -> 3/13 | 0.104 -> 0.104 | 42.7 -> 42.7 px | 105.5 -> 105.5 px |
+
+Nothing was lost. TuSimple/stretch gains C04 and C09, letterbox gains C03-C08
+and F03 — the old 0.6h band silently dropped any boundary without points below
+60% of the frame, which is exactly the band the C frames live in (rows
+555-783 of 1080). Coverage rises; the letterbox median *worsens* (156 -> 224px)
+because the newly scored frames are the ones it reads badly. Read coverage and
+error together or the trade is invisible.
+
+### 16.8 Integrated run and suites
+
+`outputs/runs/integrated_v17/` (8 stills + 60 frames of clip F, both models,
+**2.8-3.7 FPS CPU**, per-image telemetry with the corridor reason in
+`run.json`). `lane_models_compare.jpg` shows frames 20/40/55 of clip F under
+both checkpoints: no lane in the field, no hillside line, and the one published
+corridor (culane, frame 20) sits on the ego lane and stops at the bonnet.
+
+Suites on the final tree: `test_tl_classifier.py` 20/20,
+`test_lane_corridor.py` **15/15** (new), `test_regression.py` 8/8.
+
+### 16.9 Limitations
+
+* 27 frames, 4 scenes; no rain, construction, snow or glare-dominant scene.
+* The corridor is refused on most frames. That is a coverage statement about
+  these two checkpoints on this footage, not about the corridor code.
+* `LANE_CORRIDOR_MIN_ROWS_FRAC = 0.12` has near misses that are reported as
+  such, not hidden: culane F02 145px (needs 173), sir_image2 36px (needs 49).
+* The camera-axis rule assumes the frame centre is the vehicle centreline. On
+  this footage a *correct* corridor's midpoint sits ~300px left of the axis, so
+  the rule costs some correct corridors (F frame 363). A 0.25-width slack was
+  tried and admitted a corridor covering both lanes (frame 721), so it ships at
+  0.0.
+* The paint mask can only say "bright and low-saturation"; it cannot tell paint
+  from a white pole. That is why it gates corridors through connectivity rather
+  than being trusted on its own.
+
+### 16.10 Reproduce
+
+```powershell
+python scripts/calibrate_paint_support.py         # mask vs the 135 verified points
+python tests/test_lane_corridor.py                # 15 corridor checks, no weights needed
+python scripts/eval_corridor.py --frames 6 --tag after
+git worktree add ../lane_before a4b65cb           # same script, old code
+python ../lane_before/scripts/eval_corridor.py --data-root $PWD --frames 6 --tag before
+python scripts/eval_lane.py --gt labels/lane/clips_gt.json --models tusimple culane --preprocess stretch letterbox
+python scripts/run_integrated.py --tag integrated_v17
+python tests/test_tl_classifier.py; python tests/test_regression.py
+```

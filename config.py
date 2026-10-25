@@ -152,6 +152,39 @@ LANE_TEMPORAL_SMOOTHING = os.environ.get("PERCEPTION_LANE_TEMPORAL", "1") == "1"
 LANE_MIN_WIDTH_FRAC = 0.08     # plausible ego-lane width at the bottom row
 LANE_MAX_WIDTH_FRAC = 0.75
 
+# V1-FIX: lane evidence / corridor validity (see docs/EVALUATION.md 15)
+#
+# A decoded boundary point is only drawn as a corridor edge when the pixels
+# under it actually look like road paint. The mask is calibrated against the
+# hand-verified GT points in labels/lane/clips_gt.json - it finds paint at 98%
+# of them across day, dusk, night and wet frames - so a negative answer means
+# "no paint here", not "my threshold is wrong".
+LANE_PAINT_SUPPORT = True
+LANE_PAINT_HALF_WIN = 18       # px either side of an edge point
+LANE_PAINT_MAX_GAP_POINTS = 1  # isolated misses to bridge before calling it a gap
+LANE_PAINT_LOCAL_WIN = 61      # window for the adaptive brightness reference
+LANE_PAINT_DELTA = 22          # margin above the local brightness median
+
+# A corridor is only published when it describes the lane the vehicle is IN.
+LANE_CORRIDOR_MIN_ROWS_FRAC = 0.12   # shortest publishable corridor, fraction of h
+LANE_REQUIRE_EGO_ANCHOR = True       # corridor must be the lane the camera is in
+LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC = 0.15  # lowest row may be at most this far above the frame bottom
+# Slack on the camera-axis test, as a fraction of the corridor's own bottom
+# width. Kept at 0.0 on purpose: 0.25 was tried and it admitted a corridor that
+# covered BOTH lanes of clip F frame 721 (the pair was the two far edge lines,
+# not the ego lane). On this footage the camera axis sits ~300px right of the
+# corridor midpoint even when the corridor is correct, so the strict test costs
+# some correct corridors (frame 363 among them) - a false negative is preferable
+# to a corridor that spans the whole carriageway. Raise only with a calibrated
+# camera offset.
+LANE_EGO_AXIS_TOL_FRAC = 0.0
+
+# Optional hard region of interest for lane points, as (top, bottom) fractions
+# of frame height. Default (0.0, 1.0) keeps the whole frame: the hood is handled
+# by the paint test above, which does not also throw away real nearby markings.
+LANE_ROI_TOP_FRAC = 0.0
+LANE_ROI_BOTTOM_FRAC = 1.0
+
 # Color Palette for Lane Overlays (BGR format)
 LANE_COLORS = [
     (255, 105, 65),   # Lane 0: Royal Blue

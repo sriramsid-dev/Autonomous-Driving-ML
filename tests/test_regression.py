@@ -168,6 +168,10 @@ def test_cli(ctx):
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=600)
     assert r.returncode == 0, r.stderr[-800:]
     assert out.exists()
+    # --lane-model used to be ignored because the detector bound its defaults at
+    # import time; assert the requested profile is the one that actually loaded.
+    assert "UFLD 'culane'" in r.stdout, r.stdout[-800:]
+    assert "culane_18.pth" in r.stdout, r.stdout[-800:]
 
     out2 = ctx["tmp"] / "cli_crop.jpg"
     cmd = [sys.executable, "main.py", "--image", str(ROOT / "test_data" / "tl_crop_red.jpg"),

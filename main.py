@@ -68,6 +68,8 @@ class PerceptionPipeline:
         enable_traffic_lights: bool = True,
         enable_lanes: bool = True,
         device: str = config.DEVICE,
+        lane_model: Optional[str] = None,
+        lane_preprocess: Optional[str] = None,
     ):
         print(f"\n============================================================")
         print(f" Initializing Autonomous Driving Perception Pipeline v1")
@@ -96,7 +98,13 @@ class PerceptionPipeline:
 
         # Module C
         if self.enable_lanes:
-            self.lane_detector = UltraFastLaneDetector(device=device)
+            # explicit overrides, so a caller (CLI, API, UI) can select the lane
+            # checkpoint without mutating module-level config
+            self.lane_detector = UltraFastLaneDetector(
+                device=device,
+                model_key=lane_model or config.LANE_MODEL,
+                preprocess=lane_preprocess or config.LANE_PREPROCESS,
+            )
         else:
             self.lane_detector = None
             print("[Module C] Disabled.")
@@ -133,10 +141,19 @@ class PerceptionPipeline:
         # 2. Module C: Lane Detection (Draw on clean background, with vehicle occlusion filtering)
         lanes = []
         lane_status = "Inactive"
+        lane_corridor = {"established": False, "reason": "lanes disabled"}
         if self.lane_detector is not None and self.lane_detector.is_loaded:
             lanes, _ = self.lane_detector.detect(frame_bgr, obstacle_boxes=all_object_boxes)
             annotated = self.lane_detector.annotate_frame(annotated, lanes, draw_drive_area=True)
             active_lane_count = sum(1 for l in lanes if len(l) >= 2)
+            _ld = dict(self.lane_detector.last_corridor_diagnostics or {})
+            lane_corridor = {
+                "established": bool(self.lane_detector.last_corridor_established),
+                "reason": _ld.get("reason"),
+                "support_both": _ld.get("support_both"),
+                "bottom_gap_frac": _ld.get("bottom_gap_frac"),
+                "height_frac": _ld.get("height_frac"),
+            }
             if active_lane_count >= 2 and self.lane_detector.last_corridor_established:
                 lane_status = f"{active_lane_count} Lanes (Corridor Active)"
             elif active_lane_count > 0:
@@ -208,6 +225,7 @@ class PerceptionPipeline:
             "tracked_objects": tracked_objects,
             "tl_detections": tl_detections,
             "lanes": lanes,
+            "lane_corridor": lane_corridor,
         }
         return annotated, telemetry
 
@@ -285,11 +303,20 @@ class PerceptionPipeline:
         active_lane_count = 0
         lane_time_ms = 0.0
         corridor_active = False
+        lane_corridor = {"established": False, "reason": "lanes not run"}
         if run_c:
             lanes, lane_time_ms = self.lane_detector.detect(frame_bgr, obstacle_boxes=all_object_boxes)
             annotated = self.lane_detector.annotate_frame(annotated, lanes, draw_drive_area=True)
             active_lane_count = sum(1 for l in lanes if len(l) >= 2)
             corridor_active = self.lane_detector.last_corridor_established
+            _ld = dict(self.lane_detector.last_corridor_diagnostics or {})
+            lane_corridor = {
+                "established": bool(corridor_active),
+                "reason": _ld.get("reason"),
+                "support_both": _ld.get("support_both"),
+                "bottom_gap_frac": _ld.get("bottom_gap_frac"),
+                "height_frac": _ld.get("height_frac"),
+            }
             if active_lane_count >= 2 and corridor_active:
                 lane_status = f"{active_lane_count} Lanes (Corridor Active)"
             elif active_lane_count > 0:
@@ -421,6 +448,12 @@ class PerceptionPipeline:
                 "module_C": {
                     "active_lane_count": active_lane_count,
                     "lane_point_counts": [len(l) for l in lanes],
+                    "corridor": lane_corridor,
+                    "corridor_note": (
+                        "A corridor is only published when both edges have road paint "
+                        "under them near the vehicle rows and it reaches the ego band; "
+                        "otherwise 'reason' says why it was withheld."
+                    ),
                 },
             },
             "evaluation_notes": {
@@ -947,7 +980,8 @@ def main():
         print(f" Target Device:    {args.device}")
         print("=" * 65)
 
-        pipeline = PerceptionPipeline(device=args.device)
+        pipeline = PerceptionPipeline(device=args.device, lane_model=args.lane_model,
+                                      lane_preprocess=args.lane_preprocess)
         annotated_img, telemetry = pipeline.process_image(
             image_input=img_path,
             output_image_path=args.output_image,
@@ -1023,7 +1057,8 @@ def main():
                 config.ANNOTATED_VIDEOS_DIR / f"annotated_perception_{Path(video_input).stem}.mp4"
             )
 
-            pipeline = PerceptionPipeline(device=args.device)
+            pipeline = PerceptionPipeline(device=args.device, lane_model=args.lane_model,
+                                          lane_preprocess=args.lane_preprocess)
             video_summary = pipeline.process_video(
                 video_path=video_input,
                 output_video_path=out_video_path,

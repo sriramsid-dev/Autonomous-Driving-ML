@@ -30,6 +30,103 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import config
 
 
+def paint_support_mask(
+    frame_bgr: np.ndarray,
+    local_win: Optional[int] = None,
+    delta: Optional[int] = None,
+) -> np.ndarray:
+    """
+    Boolean mask of pixels that look like road paint.
+
+    An absolute brightness cut is not usable here: 110/255 is asphalt in a
+    sunlit frame and paint under headlights at night. Each pixel is therefore
+    compared with the median brightness of its own neighbourhood, so a bright
+    marking registers on both sunlit and night frames.
+
+    Calibrated on the 135 hand-verified GT points in labels/lane/clips_gt.json
+    (wet daylight mountain road, dusk motorway, night motorway): the mask finds
+    paint under 98% of them, per boundary 14/15 fully supported. That means a
+    negative answer means "no paint here" rather than "threshold too strict",
+    which is what lets it trim phantom lane segments. See
+    scripts/calibrate_paint_support.py.
+    """
+    local_win = local_win or config.LANE_PAINT_LOCAL_WIN
+    delta = config.LANE_PAINT_DELTA if delta is None else delta
+    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
+    hue, sat, val = cv2.split(hsv)
+    val_f = val.astype(np.float32)
+    local = cv2.blur(val_f, (int(local_win), int(local_win)))
+    bright = val_f >= np.maximum(70.0, local + float(delta))
+    white = bright & (sat <= 110)
+    yellow = (hue >= 15) & (hue <= 45) & (sat >= 90) & (val_f >= 80)
+    return white | yellow
+
+
+def boundary_support(
+    mask: np.ndarray,
+    pts: Sequence[Sequence[float]],
+    half_win: Optional[int] = None,
+) -> List[bool]:
+    """
+    Per-point "is there paint under this boundary point?" using a small window
+    (5 rows tall, +-half_win wide). The window tolerates the few-pixel offset
+    between a decoded centreline and the paint it sits on.
+    """
+    half = config.LANE_PAINT_HALF_WIN if half_win is None else int(half_win)
+    h, w = mask.shape[:2]
+    out: List[bool] = []
+    for pt in pts:
+        x = int(round(float(pt[0])))
+        y = int(round(float(pt[1])))
+        y0, y1 = max(0, y - 2), min(h, y + 3)
+        x0, x1 = max(0, x - half), min(w, x + half + 1)
+        out.append(bool(mask[y0:y1, x0:x1].any()) if y1 > y0 and x1 > x0 else False)
+    return out
+
+
+def close_short_gaps(flags: Sequence[bool], max_gap: int) -> List[bool]:
+    """
+    Bridge runs of False no longer than max_gap that are flanked by True.
+
+    A single missed sample in the middle of a painted line is a sampling
+    artefact, not evidence that the paint stops (measured: on frame 20 of clip F
+    the yellow line is detected continuously but one of 27 samples lands 60px
+    off and registers nothing). Longer runs are left alone - those are where the
+    boundary genuinely leaves the paint.
+    """
+    out = list(bool(f) for f in flags)
+    if max_gap <= 0:
+        return out
+    i = 0
+    while i < len(out):
+        if out[i]:
+            i += 1
+            continue
+        j = i
+        while j < len(out) and not out[j]:
+            j += 1
+        if i > 0 and j < len(out) and (j - i) <= max_gap:
+            for k in range(i, j):
+                out[k] = True
+        i = j
+    return out
+
+
+def longest_true_run(flags: Sequence[bool]) -> Tuple[int, int]:
+    """(start, end) inclusive of the longest run of True, or (-1, -1)."""
+    best = (-1, -1)
+    start = None
+    for i, ok in enumerate(flags):
+        if ok and start is None:
+            start = i
+        if start is not None and (not ok or i == len(flags) - 1):
+            end = i if ok else i - 1
+            if end - start > best[1] - best[0]:
+                best = (start, end)
+            start = None
+    return best
+
+
 class ParsingNet(nn.Module):
     """UFLD parsing network with a ResNet-18 backbone (unchanged architecture)."""
 
@@ -156,13 +253,25 @@ class UltraFastLaneDetector:
     def __init__(
         self,
         model_path: Optional[str] = None,
-        device: str = config.DEVICE,
-        min_lane_conf: float = config.LANE_EXISTENCE_THRESHOLD,
-        min_lane_points: int = 5,
-        preprocess: str = config.LANE_PREPROCESS,
-        temporal: bool = config.LANE_TEMPORAL_SMOOTHING,
-        model_key: str = config.LANE_MODEL,
+        device: Optional[str] = None,
+        min_lane_conf: Optional[float] = None,
+        min_lane_points: Optional[int] = None,
+        preprocess: Optional[str] = None,
+        temporal: Optional[bool] = None,
+        model_key: Optional[str] = None,
     ):
+        # V1-FIX: every setting below is resolved at CALL time. Binding them as
+        # default arguments evaluated config at import, so a caller that set
+        # config.LANE_MODEL after importing this module (main.py did, from
+        # --lane-model, and --lane-preprocess with it) had its choice silently
+        # ignored and always got the tusimple/stretch profile.
+        device = device or config.DEVICE
+        min_lane_conf = (config.LANE_EXISTENCE_THRESHOLD if min_lane_conf is None
+                         else min_lane_conf)
+        min_lane_points = 5 if min_lane_points is None else min_lane_points
+        preprocess = preprocess or config.LANE_PREPROCESS
+        temporal = config.LANE_TEMPORAL_SMOOTHING if temporal is None else temporal
+        model_key = model_key or config.LANE_MODEL
         if model_key not in config.LANE_PROFILES:
             raise ValueError(f"unknown lane model profile '{model_key}'; "
                              f"choose from {sorted(config.LANE_PROFILES)}")
@@ -331,6 +440,8 @@ class UltraFastLaneDetector:
                 x, y = int(round(x)), int(round(y))
                 if not (0 <= x < w_orig and 0 <= y < h_orig):
                     continue
+                if not self._in_roi(y, h_orig):
+                    continue
                 if self._is_occluded(x, y, obstacle_boxes):
                     continue
                 mapped.append((x, y))
@@ -354,6 +465,19 @@ class UltraFastLaneDetector:
 
         inference_time_ms = (time.perf_counter() - t0) * 1000.0
         return lanes, inference_time_ms
+
+    @staticmethod
+    def _in_roi(y: int, height: int) -> bool:
+        """Optional hard region of interest (config.LANE_ROI_*_FRAC).
+
+        Default is the whole frame. This exists so an operator can exclude a hood
+        band outright; the paint test below handles the hood automatically, by
+        checking whether the pixels under a bottom-row point are actually paint
+        rather than assuming everything above the bumper is road.
+        """
+        top = config.LANE_ROI_TOP_FRAC * height
+        bottom = config.LANE_ROI_BOTTOM_FRAC * height
+        return top <= y < bottom
 
     @staticmethod
     def _is_occluded(x: int, y: int, boxes: Optional[Sequence[Sequence[float]]]) -> bool:
@@ -391,20 +515,31 @@ class UltraFastLaneDetector:
         V1-FIX: pick the pair of lanes that brackets the ego vehicle (image
         centre at the bottom row) instead of assuming slots 1 and 2.
         Returns (left, right, diagnostics).
+
+        bottom_x is the x of the boundary at ITS OWN lowest point, not the median
+        of everything in the lower 40% of the frame. The old form let a boundary
+        that exists only high in the image (a decoded line in the field, above
+        the road) be scored by a pixel position that was never its own bottom -
+        measured on frame 20 of clip F, the old code took a phantom lane ending
+        at (1764, 1020) and used it as the ego lane's right edge.
         """
         h, w = self._last_shape
-        bottom_tol = 0.6 * h
         cands = []
         for idx, pts in enumerate(lanes):
             if len(pts) < self.min_lane_points:
                 continue
-            low = [(x, y) for x, y in pts if y >= bottom_tol]
-            if not low:
+            pts_sorted = sorted(pts, key=lambda p: p[1])
+            y_bot = pts_sorted[-1][1]
+            # median over the last few points only, so one stray sample cannot
+            # define the bottom position of the whole boundary
+            band = [x for x, y in pts_sorted if y >= y_bot - 0.02 * h]
+            if not band:
                 continue
-            bx = float(np.median([x for x, _ in low]))
-            cands.append({"idx": idx, "bottom_x": bx, "pts": pts})
+            bx = float(np.median(band))
+            cands.append({"idx": idx, "bottom_x": bx, "bottom_y": y_bot, "pts": pts})
 
-        diag = {"candidates": [(c["idx"], round(c["bottom_x"])) for c in cands]}
+        diag = {"candidates": [(c["idx"], round(c["bottom_x"]), int(c["bottom_y"]))
+                              for c in cands]}
         if len(cands) < 2:
             diag["reason"] = "fewer than two usable boundaries"
             return None, None, diag
@@ -429,10 +564,19 @@ class UltraFastLaneDetector:
             l, r = cands[gaps[0][1]], cands[gaps[0][1] + 1]
             diag["fallback"] = "widest pair (centre not bracketed)"
 
+        # Width at the lowest row BOTH boundaries describe. Subtracting two
+        # bottom_x values that were measured at different rows inflates the width
+        # whenever one boundary stops early - measured on D02 and F01 that turned
+        # a real ego lane into a 1447/1928px "implausible" one.
         width = r["bottom_x"] - l["bottom_x"]
+        shared = self._common_grid(l["pts"], r["pts"])
+        if shared is not None:
+            width = float(shared[2][-1] - shared[1][-1])
+            diag["width_row"] = int(round(float(shared[0][-1])))
         min_w = config.LANE_MIN_WIDTH_FRAC * w
         max_w = config.LANE_MAX_WIDTH_FRAC * w
-        diag.update({"left_idx": l["idx"], "right_idx": r["idx"], "bottom_width_px": round(width, 1)})
+        diag.update({"left_idx": l["idx"], "right_idx": r["idx"], "bottom_width_px": round(width, 1),
+                     "left_bottom_y": int(l["bottom_y"]), "right_bottom_y": int(r["bottom_y"])})
         if not (min_w <= width <= max_w):
             diag["reason"] = f"implausible lane width {width:.0f}px (allowed {min_w:.0f}-{max_w:.0f})"
             return None, None, diag
@@ -440,11 +584,14 @@ class UltraFastLaneDetector:
         return l["pts"], r["pts"], diag
 
     @staticmethod
-    def _common_grid(left, right, samples: int = 24):
+    def _common_grid(left, right, samples: int = 60):
         """
         V1-FIX: resample both boundaries on one shared y-grid before building the
         polygon. Concatenating two independently sampled series produced
         self-intersecting fills and a spurious horizontal bottom edge.
+
+        Returns (ys, lx, rx) or None. Only the rows both boundaries actually
+        cover are interpolated, so nothing here is extrapolated.
         """
         ly = np.array([p[1] for p in left], dtype=np.float32)
         ry = np.array([p[1] for p in right], dtype=np.float32)
@@ -457,7 +604,96 @@ class UltraFastLaneDetector:
         rx = np.interp(ys, ry, np.array([p[0] for p in right], dtype=np.float32))
         if np.any(rx <= lx):  # boundaries crossed -> refuse to fill garbage
             return None
-        return np.stack([np.stack([lx, ys], axis=1), np.stack([rx, ys], axis=1)])
+        return ys, lx, rx
+
+    def _corridor(self, frame_bgr: np.ndarray, left, right):
+        """
+        Build the ego-corridor polygon, or return None plus the reason.
+
+        A corridor is a claim about the lane the vehicle is IN, so it has to
+        satisfy three things that the old version never checked:
+
+        1. Every published row has road paint under BOTH boundaries. Rows
+           without paint are trimmed, and only the longest contiguous run of
+           supported rows survives - a lane cannot be "supported" below a gap.
+           This is what removes the field/hillside polygon: on frame 20 of clip
+           F the selected right edge passed through grass.
+        2. The surviving corridor is at least LANE_CORRIDOR_MIN_ROWS_FRAC of the
+           frame tall.
+        3. The corridor reaches the part of the image where this vehicle's own
+           lane is - its lowest row is no more than
+           LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC above the frame bottom - and the
+           camera axis (centre column) lies between its two edges there. A
+           corridor floating hundreds of pixels above the bonnet is not this
+           vehicle's lane, even if its edges are locally straight.
+
+           Note this is measured after trimming, so a lane whose bottom rows sit
+           on the bonnet is trimmed up to the paint and still published; only a
+           corridor that stops high in the frame is refused.
+
+        Returns (polygon_pts_int32 or None, diagnostics).
+        """
+        h, w = frame_bgr.shape[:2]
+        grid = self._common_grid(left, right)
+        if grid is None:
+            return None, {"reason": "boundaries do not overlap or cross"}
+        ys, lx, rx = grid
+        diag = {
+            "rows": int(len(ys)),
+            "y_lo": int(round(float(ys.min()))),
+            "y_hi": int(round(float(ys.max()))),
+        }
+
+        if config.LANE_PAINT_SUPPORT:
+            mask = paint_support_mask(frame_bgr)
+            sup_l = boundary_support(mask, list(zip(lx.tolist(), ys.tolist())))
+            sup_r = boundary_support(mask, list(zip(rx.tolist(), ys.tolist())))
+            both = [a and b for a, b in zip(sup_l, sup_r)]
+            diag["support_left"] = round(float(np.mean(sup_l)), 3)
+            diag["support_right"] = round(float(np.mean(sup_r)), 3)
+            diag["support_both"] = round(float(np.mean(both)), 3)
+            both = close_short_gaps(both, config.LANE_PAINT_MAX_GAP_POINTS)
+            start, end = longest_true_run(both)
+            if start < 0:
+                diag["reason"] = "no row has paint under both boundaries"
+                return None, diag
+            if end - start + 1 < len(both):
+                diag["trimmed_rows"] = int(len(both) - (end - start + 1))
+            ys, lx, rx = ys[start:end + 1], lx[start:end + 1], rx[start:end + 1]
+            diag["y_lo"] = int(round(float(ys.min())))
+            diag["y_hi"] = int(round(float(ys.max())))
+            diag["rows_kept"] = int(len(ys))
+
+        height = float(ys.max() - ys.min())
+        diag["height_frac"] = round(height / h, 3)
+        if height < config.LANE_CORRIDOR_MIN_ROWS_FRAC * h:
+            diag["reason"] = (f"supported corridor too short ({height:.0f}px, "
+                              f"need {config.LANE_CORRIDOR_MIN_ROWS_FRAC * h:.0f}px)")
+            return None, diag
+
+        poly = np.concatenate([
+            np.stack([lx, ys], axis=1),
+            np.stack([rx, ys], axis=1)[::-1],
+        ]).astype(np.int32)
+
+        if config.LANE_REQUIRE_EGO_ANCHOR:
+            bottom_gap = (h - float(ys.max())) / h
+            diag["bottom_gap_frac"] = round(bottom_gap, 3)
+            if bottom_gap > config.LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC:
+                diag["reason"] = (f"corridor stops {bottom_gap:.0%} of the frame above the "
+                                  f"bottom, i.e. not the lane this vehicle is in")
+                return None, diag
+            centre = w * 0.5
+            width_b = float(rx[-1]) - float(lx[-1])
+            tol = config.LANE_EGO_AXIS_TOL_FRAC * max(1.0, width_b)
+            if not (float(lx[-1]) - tol < centre < float(rx[-1]) + tol):
+                diag["reason"] = ("camera axis is not inside this corridor at its bottom "
+                                  f"row (axis {centre:.0f}px, edges "
+                                  f"{lx[-1]:.0f}-{rx[-1]:.0f}px)")
+                return None, diag
+            diag["axis_offset_px"] = round(float(centre - 0.5 * (lx[-1] + rx[-1])), 1)
+
+        return poly, diag
 
     def annotate_frame(
         self,
@@ -465,21 +701,29 @@ class UltraFastLaneDetector:
         lanes: List[List[Tuple[int, int]]],
         draw_drive_area: bool = True,
     ) -> np.ndarray:
+        """
+        Draw lane boundaries and, when the evidence supports it, the ego corridor.
+
+        Only lane segments that sit on paint are drawn: a decoded line running up
+        a hillside is still a decoded line, and drawing it solid implied a
+        detection the pixels do not support. Unsupported points are reported in
+        last_corridor_diagnostics as "unsupported_frac" instead of being hidden.
+        """
         annotated = frame_bgr.copy()
         h, w = annotated.shape[:2]
         self._last_shape = (h, w)
         self.last_corridor_established = False
         self.last_corridor_diagnostics = {}
 
+        mask = paint_support_mask(annotated) if config.LANE_PAINT_SUPPORT else None
+
         if draw_drive_area:
             left, right, diag = self._select_ego_boundaries(lanes)
             self.last_corridor_diagnostics = diag
             if left is not None and right is not None:
-                grid = self._common_grid(left, right)
-                if grid is None:
-                    diag["reason"] = "boundaries do not overlap or cross"
-                else:
-                    poly_pts = np.concatenate([grid[0], grid[1][::-1]]).astype(np.int32)
+                poly_pts, cdiag = self._corridor(annotated, left, right)
+                diag.update(cdiag)
+                if poly_pts is not None:
                     overlay = annotated.copy()
                     cv2.fillPoly(overlay, [poly_pts], (0, 180, 0))
                     cv2.addWeighted(overlay, 0.25, annotated, 0.75, 0, annotated)
@@ -490,15 +734,79 @@ class UltraFastLaneDetector:
             if len(pts) < 2:
                 continue
             color = self.lane_colors[l_idx % len(self.lane_colors)]
-            cv2.polylines(
-                annotated,
-                [np.array(pts, dtype=np.int32)],
-                isClosed=False,
-                color=color,
-                thickness=3,
-                lineType=cv2.LINE_AA,
-            )
-            for pt in pts:
-                cv2.circle(annotated, pt, 3, (255, 255, 255), -1, lineType=cv2.LINE_AA)
+            if mask is None:
+                segments, unsupported, why = [pts], 0, "paint test disabled"
+            else:
+                support = boundary_support(mask, pts)
+                unsupported = int(sum(1 for ok in support if not ok))
+                segments, why = self._evidence_segment(pts, support, h)
+                self.last_corridor_diagnostics.setdefault("lane_support", {})[l_idx] = {
+                    "points": len(pts),
+                    "supported": len(pts) - unsupported,
+                }
+            self.last_corridor_diagnostics.setdefault("lane_draw", {})[l_idx] = why
+            for seg in segments:
+                if len(seg) < 2:
+                    continue
+                cv2.polylines(
+                    annotated,
+                    [np.array(seg, dtype=np.int32)],
+                    isClosed=False,
+                    color=color,
+                    thickness=3,
+                    lineType=cv2.LINE_AA,
+                )
+                for pt in seg:
+                    cv2.circle(annotated, pt, 3, (255, 255, 255), -1, lineType=cv2.LINE_AA)
+            if unsupported:
+                self.last_corridor_diagnostics.setdefault("unsupported_frac", {})[l_idx] = round(
+                    unsupported / float(len(pts)), 3)
 
         return annotated
+
+    @staticmethod
+    def _evidence_segment(
+        pts: Sequence[Tuple[int, int]],
+        support: Sequence[bool],
+        height: int,
+        min_points: int = 2,
+    ) -> Tuple[List[List[Tuple[int, int]]], str]:
+        """
+        The stretch of a boundary that is both on paint and connected to the
+        ego rows.
+
+        Two things were wrong with drawing every decoded point:
+
+        * the top of a lane is where the decoder extrapolates least reliably, and
+          on clip F it ran up a hillside;
+        * the paint test cannot tell white paint from a white fence post or a
+          utility pole, so a short bright string in a field can pass locally.
+
+        Connectivity decides the second case: a lane on the road surface always
+        reaches the bottom of a forward-facing frame, so only the supported run
+        that contains the lowest supported point inside the ego band is drawn.
+        Everything above a gap, and everything that never comes near the vehicle,
+        is left out - and the reason is recorded, not silently dropped.
+        """
+        band_top = height * (1.0 - config.LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC)
+        closed = close_short_gaps(support, config.LANE_PAINT_MAX_GAP_POINTS)
+        runs: List[Tuple[int, int]] = []
+        start = None
+        for i, ok in enumerate(closed):
+            if ok and start is None:
+                start = i
+            if start is not None and (not ok or i == len(closed) - 1):
+                runs.append((start, i if ok else i - 1))
+                start = None
+        # A lane this vehicle is in has paint somewhere in the ego band. The run
+        # drawn is the longest such run: a single supported sample at the very
+        # bottom is usually the decoder row landing a few pixels off the paint,
+        # and it must not shadow the 25-point stretch directly above it.
+        candidates = [r for r in runs if pts[r[1]][1] >= band_top]
+        if not candidates:
+            return [], "no paint evidence near the ego rows"
+        s, e = max(candidates, key=lambda r: r[1] - r[0])
+        run = list(pts[s:e + 1])
+        if len(run) < min_points:
+            return [], "supported run too short to draw"
+        return [run], "drawn from the ego rows upward"

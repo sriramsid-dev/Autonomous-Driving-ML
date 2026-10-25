@@ -221,9 +221,32 @@ python scripts/eval_lane.py --gt labels/lane/clips_gt.json \
 ```
 
 On those 13 frames, median boundary error: `culane/stretch` **7.4 px** covering 3/13 frames;
-`tusimple/stretch` 17.0 px covering 6/13. Neither is selected - the profiles trade coverage
-against accuracy, and the full table, the two evaluator defects that were fixed and the
-remaining corridor defect are in `EVALUATION.md` 15.
+`tusimple/stretch` 17.0 px covering 6/13 (the table in `EVALUATION.md` 16.7 supersedes 15,
+because the ego-pair rule changed). Neither is selected - the profiles trade coverage
+against accuracy.
+
+### The drive corridor is only drawn when the pixels support it
+
+A decoded lane is a model output, not a measurement of paint. The green corridor is now
+published only when **both** edges have road paint under them on every row it covers, when
+it is at least 12% of the frame tall, and when it reaches the rows this vehicle is in;
+otherwise nothing is drawn and the reason is reported in the HUD and telemetry
+(`lane_corridor.reason`). Boundaries themselves are drawn only up to the point they stay
+on paint, so a lane that runs up a bank or through a field is simply not shown.
+
+```powershell
+python scripts/calibrate_paint_support.py    # the paint test vs the 135 verified points
+python tests/test_lane_corridor.py           # 15 corridor checks, no model weights needed
+python scripts/eval_corridor.py --frames 6 --tag after
+python scripts/run_integrated.py --tag integrated_v17
+```
+
+On the 27 frames scored, `culane/stretch` publishes 2 corridors (100% edge support, 0.2%
+area spill vs the verified ego lane) and `tusimple/stretch` publishes none; before this
+change the same frames produced 21 corridors of which half had no paint under one edge.
+**`--lane-model` / `--lane-preprocess` were silently ignored before this change** (import-time
+defaults), so earlier runs labelled `culane` inside the integrated pipeline were really
+`tusimple/stretch`. Details and the before/after tables: `EVALUATION.md` 16.
 
 A React + Vite / FastAPI frontend over the real pipeline is **planned, not built**: see
 [docs/FRONTEND_PLAN.md](docs/FRONTEND_PLAN.md).
