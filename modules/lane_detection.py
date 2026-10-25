@@ -309,6 +309,13 @@ class UltraFastLaneDetector:
 
         t0 = time.perf_counter()
         h_orig, w_orig = frame_bgr.shape[:2]
+        # V1-FIX: record the frame shape here, not only in annotate_frame().
+        # _select_ego_boundaries() reads _last_shape to split left/right at the
+        # image centre; a caller that runs detect() first (scripts/eval_lane.py)
+        # used to get the 1280x720 default on a 1920x1080 frame, i.e. a centre of
+        # x=640 instead of x=960, and a bottom band starting at y=432 instead of
+        # y=648 -- which changes which boundaries qualify as the ego pair.
+        self._last_shape = (h_orig, w_orig)
         tensor, mapper = self._preprocess(frame_bgr)
 
         with torch.no_grad():

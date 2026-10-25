@@ -1,6 +1,6 @@
 {
   "system_version": "Version 1 (Pretrained Baseline)",
-  "timestamp": "2026-10-25 17:38:47",
+  "timestamp": "2026-10-25 19:14:55",
   "hardware_device": "cpu",
   "dataset_audit": {
     "waymo_tfrecords_accessible": false,
@@ -51,27 +51,27 @@
   },
   "unit_test_results": {},
   "video_pipeline_summary": {
-    "frames_processed": 100,
-    "total_processing_time_seconds": 23.88,
-    "average_fps": 4.19,
-    "latency_p50_ms": 232.4,
-    "latency_p90_ms": 260.9,
-    "latency_p99_ms": 294.6,
+    "frames_processed": 60,
+    "total_processing_time_seconds": 21.11,
+    "average_fps": 2.84,
+    "latency_p50_ms": 344.2,
+    "latency_p90_ms": 368.3,
+    "latency_p99_ms": 510.0,
     "total_detections_by_class": {
-      "car": 163
+      "truck": 2
     },
-    "unique_tracking_ids": 2,
-    "mean_track_lifetime_frames": 81.5,
-    "max_track_lifetime_frames": 100,
+    "unique_tracking_ids": 0,
+    "mean_track_lifetime_frames": 0.0,
+    "max_track_lifetime_frames": 0,
     "traffic_light_states_detected": {
       "red": 0,
       "yellow": 0,
       "green": 0,
-      "unknown": 0
+      "unknown": 1
     },
-    "lane_detection_visibility_rate": 0.55,
-    "wall_clock_time_seconds": 31.86,
-    "output_video_path": "outputs/runs/lane_v2/C_integrated.mp4",
-    "video_resolution": "1920x1080"
+    "lane_detection_visibility_rate": 1.0,
+    "wall_clock_time_seconds": 25.63,
+    "output_video_path": "outputs/runs/integrated_v16/F_culane.mp4",
+    "video_resolution": "2560x1440"
   }
 }

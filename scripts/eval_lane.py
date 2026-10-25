@@ -56,34 +56,63 @@ def run(model_key, preprocess):
     gt = json.loads(GT.read_text(encoding="utf-8"))
     rows_out, errors, misses = [], [], 0
     latencies = []
+    ego_frames = 0
     for item in gt["images"]:
         frame = cv2.imread(str(ROOT / item["path"]))
         if frame is None:
             continue
+        # Reset the temporal filter between independent frames: blending one
+        # scene with the next is not something a per-frame evaluation wants.
+        det.reset()
         lanes, ms = det.detect(frame)
         latencies.append(ms)
-        left, right, _ = det._select_ego_boundaries(lanes)
-        per_image = {"path": item["path"], "n_lanes": sum(1 for l in lanes if l), "rows": []}
+        left, right, diag = det._select_ego_boundaries(lanes)
+        if left is not None and right is not None:
+            ego_frames += 1
+        # "best" = the closest decoded boundary at this row, ignoring ego
+        # selection, so a model that sees the paint but picks the wrong pair is
+        # distinguishable from a model that never decoded the line at all.
+        per_image = {"path": item["path"], "n_lanes": sum(1 for l in lanes if l),
+                     "ego_pair": left is not None and right is not None,
+                     "ego_reason": diag.get("reason") or diag.get("fallback") or "pair",
+                     "rows": []}
         for b in item["boundaries"]:
             for r in b["rows"]:
                 xs = x_at_row(left if b["side"] == "left" else right, r["y"])
+                cand = [x_at_row(l, r["y"]) for l in lanes]
+                cand = [c for c in cand if c is not None]
+                best = min((abs(c - r["x"]) for c in cand), default=None)
+                best_x = None
+                if best is not None:
+                    best_x = round(min(cand, key=lambda c: abs(c - r["x"])), 1)
                 if xs is None:
                     misses += 1
-                    per_image["rows"].append({**r, "model_x": None, "error": None})
+                    per_image["rows"].append({**r, "model_x": None, "error": None,
+                                              "best_x": best_x,
+                                              "best_error": None if best is None else round(best, 1)})
                     continue
                 err = abs(xs - r["x"])
                 errors.append(err)
-                per_image["rows"].append({**r, "model_x": round(xs, 1), "error": round(err, 1)})
+                per_image["rows"].append({**r, "model_x": round(xs, 1), "error": round(err, 1),
+                                          "best_x": best_x,
+                                          "best_error": None if best is None else round(best, 1)})
         rows_out.append(per_image)
 
     n_pts = sum(len(b["rows"]) for i in gt["images"] for b in i["boundaries"])
     covered = len(errors)
+    best_errs = [r["best_error"] for i in rows_out for r in i["rows"]
+                 if r["best_error"] is not None]
     return {
         "model": model_key,
         "preprocess": preprocess,
+        "n_frames": len(rows_out),
+        "ego_pair_frames": ego_frames,
         "n_labelled_points": n_pts,
         "covered": covered,
         "coverage": round(covered / n_pts, 3) if n_pts else None,
+        "best_n": len(best_errs),
+        "best_mae_px": round(float(np.mean(best_errs)), 1) if best_errs else None,
+        "best_median_px": round(float(np.median(best_errs)), 1) if best_errs else None,
         "mae_px": round(float(np.mean(errors)), 1) if errors else None,
         "median_px": round(float(np.median(errors)), 1) if errors else None,
         "p90_px": round(float(np.percentile(errors, 90)), 1) if errors else None,
@@ -154,9 +183,12 @@ def main():
             print(f"{r['model']}/{r['preprocess']}: LOAD FAILED {r['error']}")
             continue
         print(f"\n== {r['model']} / {r['preprocess']} ==")
+        print(f"   ego pair on {r['ego_pair_frames']}/{r['n_frames']} frames")
         print(f"   coverage {r['covered']}/{r['n_labelled_points']} = {r['coverage']}")
-        print(f"   |error| mean {r['mae_px']} px, median {r['median_px']} px, "
+        print(f"   selected: mean {r['mae_px']} px, median {r['median_px']} px, "
               f"p90 {r['p90_px']} px, max {r['max_px']} px")
+        print(f"   closest decoded lane (ignores ego pick): mean {r['best_mae_px']} px, "
+              f"median {r['best_median_px']} px on {r['best_n']} rows")
         print(f"   inference {r['mean_inference_ms']} ms (CPU)")
         for img in r["images"]:
             line = " ".join(f"{row['y']}:{row['model_x']}({row['error']})" for row in img["rows"])

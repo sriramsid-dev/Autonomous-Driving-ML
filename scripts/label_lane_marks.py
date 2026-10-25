@@ -31,7 +31,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 FRAMES = ROOT / "test_data" / "lane_clips" / "frames"
-OUT = ROOT / "outputs" / "runs" / "lane_v2" / "overlays"
+OUT = ROOT / "outputs" / "runs" / "lane_v3" / "overlays"
 
 # Seeds: (frame, side, colour, seed_row, seed_x_hint)
 #   seed_row is a row where the marking is known to be present and unoccluded.
@@ -61,6 +61,23 @@ SEEDS = [
     ("C07", "right", "yellow", 795, (380, 950), 470, 815, 625),
     ("C08", "right", "yellow", 795, (380, 950), 470, 815, 628),
     ("C09", "right", "yellow", 795, (380, 950), 470, 815, 620),
+    # Round 2 (2026-10-25), clips F and G. US right-hand traffic, so in F the
+    # double yellow centre line is ego's LEFT boundary and the white edge line
+    # its RIGHT. F is 2560x1440; the road ends by y=1420 (bonnet below).
+    # G is 1280x720 at night: the road band is only y=300..465 -- below that the
+    # dashboard's glossy reflection would otherwise be traced as white paint.
+    ("F01", "left", "yellow", 1350, (500, 1150), 950, 1420, 700),
+    ("F01", "right", "white", 1350, (1000, 1450), 1000, 1420, 1290),
+    ("F02", "left", "yellow", 1350, (600, 1250), 1000, 1420, 790),
+    ("F02", "right", "white", 1350, (950, 1450), 1050, 1420, 1150),
+    ("F03", "left", "yellow", 1350, (500, 1250), 1000, 1420, 770),
+    ("F03", "right", "white", 1350, (1050, 1450), 1050, 1420, 1330),
+    ("G01", "left", "white", 430, (150, 520), 330, 465, 390),
+    ("G01", "right", "white", 430, (520, 900), 330, 465, 700),
+    ("G02", "left", "white", 430, (150, 520), 330, 465, 390),
+    ("G02", "right", "white", 440, (520, 900), 330, 465, 690),
+    ("G04", "left", "white", 440, (150, 600), 340, 465, 350),
+    ("G04", "right", "white", 440, (560, 950), 340, 465, 720),
 ]
 
 ROW_STEP = 6           # scan every 6th row

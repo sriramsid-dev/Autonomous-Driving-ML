@@ -199,9 +199,34 @@ regions labelled by hand in `scripts/build_tl_v3_gt.py`, scored once after v1.5 
 Result: 7/9 vehicle signals correct, **0 wrong**, 2 abstentions, and a state published on only
 4 of 29 unlit / not-a-light / ambiguous crops (v1.0 and v1.1 publish on 26 of 29).
 
-Measured results, failure examples, the contamination history and the proposed (not yet
-downloaded) lane-evaluation clips are in [EVALUATION.md](EVALUATION.md) sections 9-12 -
-including what does *not* work.
+Measured results, failure examples and the contamination history are in [EVALUATION.md](EVALUATION.md)
+sections 9-12, and the lane work in sections 13-15 - including what does *not* work.
+
+### Lane evaluation (scripts/)
+
+Lane accuracy is measured against **135 hand-verified painted-line points on 13 frames from four
+CC-licensed clips** (wet Irish mountain road, dusk Slovenian motorway, daytime US two-lane
+highway, night US interstate). Clips are fetched only for clips whose poster frame has already
+been inspected, and the videos are git-ignored while their licences and attribution stay in
+`test_data/lane_clips/sources.json`:
+
+```powershell
+python scripts/fetch_lane_clips.py        # ~315 MB total; clips F and G needed approval
+python scripts/probe_lane_clip.py F_us33_west_virginia.webm   # contact sheet, no labelling
+python scripts/extract_lane_frames.py
+python scripts/label_lane_marks.py --out labels/lane/clips_draft2.json   # traces + overlays
+python scripts/build_lane_clip_gt.py      # publishes only overlay-verified boundaries
+python scripts/eval_lane.py --gt labels/lane/clips_gt.json \
+    --models tusimple culane --preprocess stretch letterbox --montage
+```
+
+On those 13 frames, median boundary error: `culane/stretch` **7.4 px** covering 3/13 frames;
+`tusimple/stretch` 17.0 px covering 6/13. Neither is selected - the profiles trade coverage
+against accuracy, and the full table, the two evaluator defects that were fixed and the
+remaining corridor defect are in `EVALUATION.md` 15.
+
+A React + Vite / FastAPI frontend over the real pipeline is **planned, not built**: see
+[docs/FRONTEND_PLAN.md](docs/FRONTEND_PLAN.md).
 
 ### Step 3: Run Full Static Image Test Suite
 Executes multi-module testing across all local curated images and saves a summary report:

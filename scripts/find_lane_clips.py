@@ -60,14 +60,21 @@ def main() -> int:
     session = requests.Session()
     session.headers.update({"User-Agent": "perception-eval-script/1.0 (local research)"})
 
-    titles = []
-    for q in QUERIES:
-        data = api(session, {"action": "query", "list": "search", "srsearch": q,
-                             "srnamespace": "6", "srlimit": "20"})
-        hits = [h["title"] for h in data.get("query", {}).get("search", [])]
-        print(f"{q!r}: {len(hits)} hits")
-        titles += hits
-        time.sleep(2.0)
+    # --titles "File:A.webm" "File:B.webm" screens named files only (no search),
+    # so a shortlist from any source can be poster-checked without downloading it.
+    named = len(sys.argv) > 2 and sys.argv[1] == "--titles"
+    if named:
+        titles = list(dict.fromkeys(sys.argv[2:]))
+        print(f"screening {len(titles)} named file(s)")
+    else:
+        titles = []
+        for q in QUERIES:
+            data = api(session, {"action": "query", "list": "search", "srsearch": q,
+                                 "srnamespace": "6", "srlimit": "20"})
+            hits = [h["title"] for h in data.get("query", {}).get("search", [])]
+            print(f"{q!r}: {len(hits)} hits")
+            titles += hits
+            time.sleep(2.0)
     titles = list(dict.fromkeys(titles))
 
     cands = []

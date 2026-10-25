@@ -16,3 +16,4 @@ test_data/lane_clips/*.webm
 test_data/lane_clips/frames/*.jpg
 test_data/lane_clips/frames/
 outputs/runs/**/*.mp4
+test_data/lane_clips/posters/

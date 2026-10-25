@@ -256,3 +256,57 @@ tusimple/letterbox 0.385, 224.6 px, ego pair 7/8; culane/stretch and
 culane/letterbox **0.000 coverage and 0/8 ego pairs**. No configuration selected:
 the one with the most ego pairs has 200 px errors, and the CULane profiles
 produce no prediction at all.
+
+## v1.7 — two evaluator defects, two more clips, 13 verified frames
+
+Files touched and why:
+
+* `modules/lane_detection.py` — `detect()` now records `_last_shape`. It was set
+  only by `annotate_frame()`, so `scripts/eval_lane.py` split left/right at the
+  default 1280x720 centre (x=640) on 1920x1080 frames instead of x=960, and used
+  a bottom band starting at y=432 instead of y=648. Measured effect on the same
+  8 frames: tusimple/stretch ego pairs 5/8 -> **3/8**, letterbox 7/8 -> **2/8**.
+  The §14 table was an artefact of this bug and is superseded in `EVALUATION.md`
+  15.1.
+* `scripts/eval_lane.py` — `reset()` between frames (the temporal filter was
+  blending one scene into the next), plus two new measures: ego-pair frames and
+  closest-decoded-lane error. The second separates "never decoded the paint"
+  from "decoded it but picked the wrong pair".
+* `scripts/fetch_lane_clips.py` — clips F (US 33, CC BY 3.0) and G (I-235 OKC,
+  CC BY-SA 4.0) added, both approved before download; 136.8 MB.
+* `scripts/find_lane_clips.py` — `--titles` so a named shortlist can be
+  poster-screened without downloading the videos.
+* `scripts/probe_lane_clip.py` — new: reports frames/fps/duration and writes a
+  contact sheet, so a clip is inspected before any labelling.
+* `scripts/label_lane_marks.py` — round-2 seeds for F and G. The night frames
+  are cropped to y=300..465 because below that the dashboard's glossy
+  reflection reads as white paint.
+* `scripts/build_lane_clip_gt.py` — round 2 side assignment (US right-hand
+  traffic: double yellow is ego's LEFT, white edge its RIGHT) and per-frame
+  `unavailable` reasons.
+* `labels/lane/clips_gt.json` — expanded from 8 frames / 9 boundaries / 65
+  points to **13 frames / 15 boundaries / 135 points**. Refused rather than
+  guessed: F02/F03 right (guardrail), G01/G02 left (dashed divider too sparse),
+  F04 entirely (centre line in shadow), G03 entirely (gore/merge, ambiguous).
+* Diagnostic scripts under `outputs/runs/lane_diag2/` — they load no labels and
+  write only to that directory.
+
+Measured on 13 identical frames and 135 points, median / coverage:
+
+| configuration | ego pairs | coverage | median | p90 | max |
+|---|---|---|---|---|---|
+| tusimple/stretch | 6/13 | 0.363 | 17.0 px | 286 px | 400 px |
+| tusimple/letterbox | 6/13 | 0.363 | 156.0 px | 956 px | 1552 px |
+| culane/stretch | 3/13 | 0.304 | **7.4 px** | 19 px | 37 px |
+| culane/letterbox | 3/13 | 0.104 | 42.7 px | 105.5 px | 142 px |
+
+No configuration selected: CULane is 3-6x more accurate where it fires but covers
+3 frames against TuSimple's 6. `min_lane_points` was tested at 3 and 5; lowering
+it gained no coverage and doubled the error (13.0 px vs 7.4 px median), so it is
+unchanged.
+
+Integrated run in `outputs/runs/integrated_v16/` (8 images + 60 frames of clip F,
+both lane models, ~2.8-2.9 FPS on CPU). It exposes a defect the metrics do not
+cover: both models draw a phantom lane into the hillside beyond the road and a
+corridor that spills onto the field, because the corridor polygon spans the full
+overlapping y-range including rows above the labelled band.

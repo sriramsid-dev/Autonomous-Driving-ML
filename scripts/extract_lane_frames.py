@@ -1,5 +1,5 @@
 """
-Extract the frames used for lane evaluation from the three approved clips.
+Extract the frames used for lane evaluation from the approved clips.
 
     python scripts/extract_lane_frames.py
 
@@ -43,6 +43,17 @@ PICKS = [
     ("E02", "E_night_motorway.webm", ("time", 55.0)),
     ("E03", "E_night_motorway.webm", ("time", 95.0)),
     ("E04", "E_night_motorway.webm", ("time", 130.0)),
+    # Round 2 (approved 2026-10-25): F = daytime US highway (straight, curves,
+    # low sun / shadow), G = night urban interstate. Both posters were inspected
+    # before download; E above stays excluded as an overhead shot.
+    ("F01", "F_us33_west_virginia.webm", ("frame", 164)),
+    ("F02", "F_us33_west_virginia.webm", ("frame", 982)),
+    ("F03", "F_us33_west_virginia.webm", ("frame", 1145)),
+    ("F04", "F_us33_west_virginia.webm", ("frame", 1309)),
+    ("G01", "G_i235_okc_night.webm", ("frame", 0)),
+    ("G02", "G_i235_okc_night.webm", ("frame", 2273)),
+    ("G03", "G_i235_okc_night.webm", ("frame", 2557)),
+    ("G04", "G_i235_okc_night.webm", ("frame", 2841)),
 ]
 
 

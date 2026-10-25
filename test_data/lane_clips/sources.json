@@ -24,6 +24,30 @@
   "bytes": 62635277
  },
  {
+  "id": "F",
+  "file": "F_us33_west_virginia.webm",
+  "commons_title": "File:US 33 in West Virginia 1-ftOd1hgDi5c.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:US_33_in_West_Virginia_1-ftOd1hgDi5c.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/US_33_in_West_Virginia_1-ftOd1hgDi5c.webm",
+  "license": "CC BY 3.0",
+  "author": "Andy Arthur",
+  "expected_bytes": 71500000,
+  "note": "daytime US rural highway, yellow centre line + white edge line, curve ahead, 2560x1440",
+  "bytes": 71523022
+ },
+ {
+  "id": "G",
+  "file": "G_i235_okc_night.webm",
+  "commons_title": "File:I-235 North OKC Full Timelapse.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:I-235_North_OKC_Full_Timelapse.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/I-235_North_OKC_Full_Timelapse.webm",
+  "license": "CC BY-SA 4.0",
+  "author": "TheDoctorWho",
+  "expected_bytes": 65300000,
+  "note": "night urban interstate drive, white edge and lane lines under lights, timelapse spacing, 1280x720",
+  "bytes": 65269387
+ },
+ {
   "id": "E",
   "file": "E_night_motorway.webm",
   "commons_title": "File:Cars driving at night.webm",

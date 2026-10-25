@@ -855,3 +855,166 @@ python scripts/eval_lane.py --montage               # original 11-point photo se
 * `D02.png` through the pipeline: 4 vehicles, 0 traffic lights, 2 lanes.
 * `tests/test_tl_classifier.py` 20/20 and `tests/test_regression.py` 8/8 pass
   after the lane changes.
+
+---
+
+## 15. Lane round 2: two eval defects fixed, four clips, 13 verified frames
+
+### 15.1 Two defects in the *evaluator* (not the model)
+
+| # | defect | evidence | effect |
+|---|---|---|---|
+| 1 | `_last_shape` was set only by `annotate_frame()`, which `eval_lane.py` never calls | `modules/lane_detection.py` | ego split used the default 1280x720 on 1920x1080 frames: centre **x=640 instead of 960**, bottom band from **y=432 instead of 648** |
+| 2 | one `LaneTemporalFilter` was reused across independent still frames | `scripts/eval_lane.py` | EMA blended one scene's lane into the next |
+
+Defect 1 is fixed in the module: `detect()` now records the frame shape, so any
+caller gets the correct centre and bottom band. Defect 2 is fixed in the
+evaluator, which now calls `reset()` per frame. The evaluator also reports two
+new quantities: **ego-pair frames** and **closest-decoded-lane error**, so a
+model that *sees* the paint but picks the wrong pair is distinguishable from one
+that never decoded the line.
+
+**§14's table is superseded.** Re-measured on the identical 8 frames:
+
+| configuration | ego pairs | coverage | selected median | p90 | max |
+|---|---|---|---|---|---|
+| tusimple / stretch | 5/8 → **3/8** | 0.477 → **0.415** | 26.2 → **25.5 px** | 302 → 320 px | 400 px |
+| tusimple / letterbox | 7/8 → **2/8** | 0.385 → **0.246** | 236 → **362 px** | 275 → 736 px | 830 px |
+| culane / stretch | 0/8 | 0.000 | -- | -- | -- |
+| culane / letterbox | 0/8 | 0.000 | -- | -- | -- |
+
+The old ego-pair rates were artefacts of the wrong centre.
+
+### 15.2 Two more clips (user-approved, 136.8 MB)
+
+| clip | licence | size | what the poster showed before download |
+|---|---|---|---|
+| [US 33, West Virginia](https://commons.wikimedia.org/wiki/File:US_33_in_West_Virginia_1-ftOd1hgDi5c.webm) | CC BY 3.0, Andy Arthur | 71.5 MB, 2560x1440, 60 s | forward dashcam, painted double yellow centre + white edge line, curve ahead |
+| [I-235 North OKC](https://commons.wikimedia.org/wiki/File:I-235_North_OKC_Full_Timelapse.webm) | CC BY-SA 4.0, TheDoctorWho | 65.3 MB, 1280x720, 125 s | forward night drive, solid white edge line under street lighting |
+
+Both were screened with `scripts/find_lane_clips.py --titles`, which fetches
+only the poster frame, so the download happened after the first frame was
+inspected. Attribution is recorded in `test_data/lane_clips/sources.json`; the
+videos themselves are git-ignored.
+
+### 15.3 What was labelled, and what was refused
+
+13 frames, 15 boundaries, 135 points. Every point was checked on a zoomed
+overlay (`outputs/runs/lane_v3/verify*.jpg`), and anything that landed on
+something other than paint was dropped:
+
+| frame | published | refused, with reason |
+|---|---|---|
+| C03-C09 | left (yellow centre dashes) | right: unpainted verge |
+| D02 | left (divider), right (edge line) | -- |
+| F01 | left (double yellow), right (white edge) | -- |
+| F02 | left (double yellow) | **right: trace followed the guardrail** |
+| F03 | left (double yellow) | **right: trace followed the guardrail** |
+| G01, G02 | right (solid white edge) | **left: dashed divider too sparse to verify** |
+| F04 | nothing | **centre line in deep shadow; the yellow test finds no paint** |
+| G03 | nothing | **gore/merge area: the ego boundary is genuinely ambiguous** |
+
+Frames from clips C and G therefore contribute one boundary each, so an ego
+*pair* cannot be formed there from ground truth at all.
+
+### 15.4 Four configurations, identical 13 frames
+
+| configuration | ego pairs | coverage | median | p90 | max | closest-lane median | CPU inference |
+|---|---|---|---|---|---|---|---|
+| tusimple / stretch | **6/13** | **0.363** | 17.0 px | 286 px | 400 px | 33.0 px | 159 ms |
+| tusimple / letterbox | 6/13 | 0.363 | 156.0 px | 956 px | 1552 px | 237.0 px | 154 ms |
+| **culane / stretch** | 3/13 | 0.304 | **7.4 px** | **19 px** | **37 px** | **11.0 px** | 119 ms |
+| culane / letterbox | 3/13 | 0.104 | 42.7 px | 105.5 px | 142 px | 102.0 px | 110 ms |
+
+Per frame, culane/stretch: F01 25/31 rows, median 8 px; F02 10/11, median 4 px;
+G01 6/6, median 6 px; everything from clips C and D and F03 and G02: no output.
+Per frame, tusimple/stretch: C03 6/6 median 40; C08 4/7 median 21; D02 17/19
+median 46 **max 400**; F02 11/11 median 14; G01 6/6 median 7; G02 5/7 median 20;
+F01 0/31 and F03 0/15 (no lane published at all).
+
+**No configuration is selected.** This is a coverage/accuracy trade, not a
+ranking: CULane is *three to six times more accurate* wherever it fires, but it
+fires on 3 of 13 frames against TuSimple's 6, and TuSimple carries one 400 px
+frame (D02) that a median of 17 px hides.
+
+### 15.5 Why each configuration fails, measured
+
+**TuSimple/stretch misses or drifts because of the image domain and the near
+field, not the decoder.**
+
+* The confidence gate rejects **0%** of row anchors on every frame
+  (`outputs/runs/lane_diag2/decode_probe.py`), so `LANE_EXISTENCE_THRESHOLD`
+  is not involved. The model's own argmax says "no lane" for **73-98%** of
+  anchors on the clip frames.
+* TuSimple's row anchors run to y=284 of 288, i.e. the bottom of the frame. In
+  this dashcam the bottom of the frame is the car's own **dashboard**. The
+  overlays (`outputs/runs/lane_diag2/lanes_tusimple_stretch.jpg`) show a
+  phantom lane running down onto the dash and bonnet. That phantom is a
+  candidate for ego selection, which is how a 400 px error appears on D02.
+* Where the paint is unambiguous it is often accurate: closest-lane median
+  33 px, and 6-10 px on D02's bottom rows. The error is distribution, not bias.
+
+**CULane/stretch publishes nothing because the scene is out of domain — and
+that changed with clip F.**
+
+* On the rural C frames its own argmax returns "no lane" for **90-92%** of
+  anchors; the few points it does emit lie on the right verge and **5 of 6 are
+  removed by the lateral-teleport filter**, leaving fewer than `min_lane_points`
+  (`outputs/runs/lane_diag2/filter_trace.py`).
+* Centre-crop preprocessing (the reference CULane test transform) moves it from
+  0/8 to 1/8 ego pairs at 448 px error: **preprocessing is not the cause**.
+* The checkpoint is healthy: on `test_data/highway_road.jpg` it activates 58% of
+  anchors. It simply had never seen a US two-lane highway in this set until F
+  was added — where it now returns both boundaries at a **7.4 px median**.
+
+**`min_lane_points = 5` is applied unchanged to both profiles** — 9% of
+TuSimple's 56 anchors but 28% of CULane's 18. On round 1's eight frames this
+looked like it was costing CULane (gate 3 gave it 1 frame / 10 points). On the
+expanded 13 frames the opposite is true and it is **not adopted**:
+
+| gate | culane/stretch ego | coverage | median | max |
+|---|---|---|---|---|
+| 3 | 3/13 | 41/135 | 13.0 px | 188 px |
+| 5 | 3/13 | 41/135 | **7.4 px** | **37 px** |
+
+No coverage is gained and the error more than doubles. Measurement overturned
+the intuition the smaller set suggested.
+
+### 15.6 Integrated pipeline, and what it exposes
+
+Images (8) plus 60 frames of clip F, both lane models, in
+`outputs/runs/integrated_v16/`:
+
+* tusimple 2.81 FPS, culane 2.84 FPS on CPU (single run; machine load varies, so
+  no speed claim beyond "both are ~3 FPS on this hardware").
+* `outputs/runs/integrated_v16/lane_models_compare.jpg` shows both models
+  drawing a **phantom lane up into the hillside** beyond the road, and a green
+  corridor that **spills across the right-hand field**. The corridor polygon is
+  built over the full overlapping y-range of the two boundaries, which includes
+  those upper rows, so a small error on the labelled lower rows coexists with a
+  visibly wrong corridor. The metrics do not cover the upper half of the frame;
+  this is the clearest remaining defect in Module C.
+
+### 15.7 Limitations
+
+13 frames from 4 clips: wet daylight mountain road, dusk motorway, late
+afternoon US two-lane highway, night urban interstate. No rain, no construction,
+no snow, no glare-dominant scene. 135 points, and clips C and G contribute one
+boundary per frame, so ego-pair checks there cannot succeed by construction.
+Trace uncertainty ~5 px. No confidence interval is claimed on 13 frames, and
+"culane is more accurate" must always be read together with its 3/13 coverage.
+
+### 15.8 Reproduce
+
+```powershell
+python scripts/fetch_lane_clips.py                 # 315.5 MB total; F and G were approved
+python scripts/probe_lane_clip.py F_us33_west_virginia.webm G_i235_okc_night.webm
+python scripts/extract_lane_frames.py
+python scripts/label_lane_marks.py --out labels/lane/clips_draft2.json
+python scripts/build_lane_clip_gt.py
+python scripts/eval_lane.py --gt labels/lane/clips_gt.json --models tusimple culane --preprocess stretch letterbox --montage
+python outputs/runs/lane_diag2/diag.py             # the four diagnostic conditions
+python outputs/runs/lane_diag2/decode_probe.py     # argmax vs confidence-gate split
+python outputs/runs/lane_diag2/filter_trace.py     # where decoded points are dropped
+python tests/test_tl_classifier.py; python tests/test_regression.py
+```

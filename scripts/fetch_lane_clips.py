@@ -1,21 +1,26 @@
 """
-Fetch the two small, freely licensed driving clips used for lane evaluation.
+Fetch the small, freely licensed driving clips used for lane evaluation.
 
-    python scripts/fetch_lane_clips.py          # download (~114 MB)
+    python scripts/fetch_lane_clips.py          # download what is missing
     python scripts/fetch_lane_clips.py --check  # report licence/size, download nothing
 
-Both are Wikimedia Commons files with direct download routes and stated
-licences. Originals are git-ignored (test_data/lane_clips/*.webm); the
-recorded metadata in sources.json is committed so attribution travels with any
-frames extracted from them.
+Wikimedia Commons files with direct download routes and stated licences.
+Originals are git-ignored (test_data/lane_clips/*.webm); the recorded metadata
+in sources.json is committed so attribution travels with any frames extracted
+from them.
 
-Clip C (Conor Pass, Dingle Peninsula)   2.5 MB, 1920x1080, CC BY-SA 4.0
+Clip C (Conor Pass, Dingle Peninsula)    2.5 MB, 1920x1080, CC BY-SA 4.0
 Clip D (Driving from Ljubljana to Kranj) 62.6 MB, 1920x1080, CC BY 3.0, dusk motorway
-Clip E (Cars driving at night)         113.6 MB, 1920x1080, CC BY 3.0, night motorway
+Clip E (Cars driving at night)          113.6 MB, 1920x1080, CC BY 3.0 -- EXCLUDED:
+                                        overhead freeway shot, no ego lane (EVALUATION.md 13)
+Clip F (US 33, West Virginia)            71.5 MB, 2560x1440, CC BY 3.0, daytime US highway
+Clip G (I-235 North OKC, timelapse)      65.3 MB, 1280x720, CC BY-SA 4.0, night urban interstate
 
-The clips were screened first with `scripts/find_lane_clips.py`, which fetches
-only each candidate's poster frame. No other dataset is downloaded and nothing
-here is trained.
+Every clip was screened first with `scripts/find_lane_clips.py --titles`, which
+fetches only the candidate's poster frame, so the video download happens only
+after the first frame has been inspected for forward-facing view and painted
+markings. F and G were approved by the user on 2026-10-25. No other dataset is
+downloaded and nothing here is trained.
 """
 
 import json
@@ -57,6 +62,28 @@ CLIPS = [
         "author": "see Commons file page",
         "expected_bytes": 62_600_000,
         "note": "motorway at dusk, dashed lane lines, 1920x1080",
+    },
+    {
+        "id": "F",
+        "file": "F_us33_west_virginia.webm",
+        "commons_title": "File:US 33 in West Virginia 1-ftOd1hgDi5c.webm",
+        "page": "https://commons.wikimedia.org/wiki/File:US_33_in_West_Virginia_1-ftOd1hgDi5c.webm",
+        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/US_33_in_West_Virginia_1-ftOd1hgDi5c.webm",
+        "license": "CC BY 3.0",
+        "author": "Andy Arthur",
+        "expected_bytes": 71_500_000,
+        "note": "daytime US rural highway, yellow centre line + white edge line, curve ahead, 2560x1440",
+    },
+    {
+        "id": "G",
+        "file": "G_i235_okc_night.webm",
+        "commons_title": "File:I-235 North OKC Full Timelapse.webm",
+        "page": "https://commons.wikimedia.org/wiki/File:I-235_North_OKC_Full_Timelapse.webm",
+        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/I-235_North_OKC_Full_Timelapse.webm",
+        "license": "CC BY-SA 4.0",
+        "author": "TheDoctorWho",
+        "expected_bytes": 65_300_000,
+        "note": "night urban interstate drive, white edge and lane lines under lights, timelapse spacing, 1280x720",
     },
     {
         "id": "E",
