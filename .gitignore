@@ -12,3 +12,6 @@ test_data*.zip
 outputs/runs/*.jpg
 test_data/tl_v2/*.jpg
 test_data/tl_v3/*.jpg
+test_data/lane_clips/*.webm
+test_data/lane_clips/frames/*.jpg
+test_data/lane_clips/frames/

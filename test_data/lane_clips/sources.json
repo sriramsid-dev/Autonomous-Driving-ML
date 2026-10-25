@@ -1,0 +1,26 @@
+[
+ {
+  "id": "A",
+  "file": "A_dashcam_film.webm",
+  "commons_title": "File:Dashcam film.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:Dashcam_film.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Dashcam_film.webm",
+  "license": "CC BY-SA 3.0",
+  "author": "Frukko",
+  "expected_bytes": 76440000,
+  "note": "dashcam test drive, day and night, 720x480",
+  "bytes": 80151485
+ },
+ {
+  "id": "B",
+  "file": "B_persian_gulf_drive.webm",
+  "commons_title": "File:Iran, drive along the persian gulf.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:Iran,_drive_along_the_persian_gulf.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Iran%2C%20drive%20along%20the%20persian%20gulf.webm",
+  "license": "CC BY 3.0",
+  "author": "see Commons file page",
+  "expected_bytes": 38310000,
+  "note": "drive along the Persian Gulf coast, 1280x720",
+  "bytes": 40174312
+ }
+]

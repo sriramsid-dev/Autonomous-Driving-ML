@@ -694,3 +694,64 @@ culane/stretch 49.5 px but no ego pair on the curve).
 The FPS difference between the two runs of the same clip is machine load, not a
 code change: the classifier edit adds one contour pass per candidate. No speed
 claim is made.
+
+---
+
+## 13. Lane clips A and B: downloaded, inspected, rejected as lane ground truth
+
+Approved clips A (`Dashcam film.webm`, CC BY-SA 3.0) and B (`Iran, drive along
+the Persian Gulf.webm`, CC BY 3.0) were downloaded with
+`scripts/fetch_lane_clips.py`: 120.3 MB total, metadata and attribution in
+`test_data/lane_clips/sources.json`, originals git-ignored. No other dataset was
+downloaded and nothing was trained.
+
+**Neither clip can carry ego-lane ground truth.**
+
+* **A** is a real dashcam (windscreen view, bonnet and wiper visible, timestamp
+  burned in) of a winter drive. Sampling **48 frames across the whole 209 s**
+  rather than a handful shows the same scene throughout: snow-and-gravel roads
+  whose edges are snow banks, ploughed ridges and gravel, with **no painted lane
+  line in any frame**. Labelling the snow-bank edge would measure road-edge
+  following, not lane-marking detection, and would silently corrupt comparison
+  with the paint-based labels.
+* **B** is **aerial drone footage** along the Makran coast. There is no ego lane
+  and no forward-facing vehicle view, so it is unusable for any ego-lane metric.
+
+Evidence: `outputs/runs/lane_v2/scan_A_48.jpg` (48 frames of A),
+`probe_A.jpg`, `probe_B.jpg`, and `FINDINGS.md`.
+
+### 13.1 What A does establish, without labels
+
+A is the first real *moving* forward-facing driving video in the project, which
+makes it useful for checks that need no lane labels:
+
+* 100 frames through the full pipeline: 29.35 s, **3.48 FPS** on CPU, tracks
+  persisted, no crash, no tracker state leaking between sources.
+* **False lane detections on an unmarked road.** The module reports "2 Lanes"
+  and from frame ~94 "Corridor Active", filling a corridor across the whole
+  carriageway (`A_integrated_frames.jpg`), where no painted line exists. This is
+  a qualitative observation and no false-positive *rate* is claimed: the clip has
+  no lane ground truth to compute one against.
+
+### 13.2 Consequence for the four-configuration comparison
+
+Not run. Steps 3-6 of the brief (select 10-15 frames, label, compare
+tusimple/culane x stretch/letterbox, report coverage / ego-pair rate / MAE /
+max error) all require frames in which the boundary to be labelled exists.
+Rather than substitute a different dataset unasked, the lane numbers stand as
+of v1.4: tusimple/stretch 72.9 px MAE at full coverage over 11 verified points
+on 2 photographs; culane/stretch 49.5 px but no ego pair on the curve, and zero
+coverage under letterbox. No configuration is selected.
+
+A replacement must be (a) filmed from a vehicle, forward-facing, (b) clearly
+showing painted lane markings, (c) small and freely licensed. That requires a
+new download and therefore approval.
+
+### 13.3 Verification run after the lane work
+
+| check | result |
+|---|---|
+| `python tests/test_tl_classifier.py` | 20/20 |
+| `python tests/test_regression.py` | 8/8 |
+| integrated, clip A, 100 frames | completed, 3.48 FPS; false corridor reported above |
+| baseline `24c9cd0` and earlier runs | untouched; new output only in `outputs/runs/lane_v2/` |
