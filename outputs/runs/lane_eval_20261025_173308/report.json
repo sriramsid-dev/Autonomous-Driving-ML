@@ -1,0 +1,1814 @@
+{
+  "generated": "2026-10-25T17:33:45",
+  "data": "labels\\lane\\clips_gt.json",
+  "results": [
+    {
+      "model": "tusimple",
+      "preprocess": "stretch",
+      "n_labelled_points": 65,
+      "covered": 31,
+      "coverage": 0.477,
+      "mae_px": 94.5,
+      "median_px": 26.2,
+      "p90_px": 302.0,
+      "max_px": 400.0,
+      "mean_inference_ms": 172.3,
+      "images": [
+        {
+          "path": "test_data/lane_clips/frames/C03.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 602,
+              "model_x": 683.5,
+              "error": 81.5
+            },
+            {
+              "y": 579,
+              "x": 602,
+              "model_x": 677.3,
+              "error": 75.3
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": 671.2,
+              "error": 65.2
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": 622.0,
+              "error": 0.0
+            },
+            {
+              "y": 753,
+              "x": 630,
+              "model_x": 619.0,
+              "error": 11.0
+            },
+            {
+              "y": 771,
+              "x": 628,
+              "model_x": 614.0,
+              "error": 14.0
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C04.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 585,
+              "x": 609,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 603,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 741,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C05.png",
+          "n_lanes": 1,
+          "rows": [
+            {
+              "y": 567,
+              "x": 609,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 573,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 591,
+              "x": 611,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 609,
+              "x": 614,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 747,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 765,
+              "x": 634,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 783,
+              "x": 641,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C06.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 555,
+              "x": 600,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 561,
+              "x": 600,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 604,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C07.png",
+          "n_lanes": 1,
+          "rows": [
+            {
+              "y": 561,
+              "x": 604,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C08.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 608,
+              "model_x": 640.7,
+              "error": 32.7
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": 638.6,
+              "error": 30.6
+            },
+            {
+              "y": 585,
+              "x": 610,
+              "model_x": 632.4,
+              "error": 22.4
+            },
+            {
+              "y": 603,
+              "x": 612,
+              "model_x": 622.0,
+              "error": 10.0
+            },
+            {
+              "y": 741,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 633,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C09.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": 634.2,
+              "error": 26.2
+            },
+            {
+              "y": 573,
+              "x": 608,
+              "model_x": 629.0,
+              "error": 21.0
+            },
+            {
+              "y": 597,
+              "x": 612,
+              "model_x": 624.0,
+              "error": 12.0
+            },
+            {
+              "y": 615,
+              "x": 616,
+              "model_x": 622.0,
+              "error": 6.0
+            },
+            {
+              "y": 753,
+              "x": 631,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/D02.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 524,
+              "x": 568,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 710,
+              "x": 569,
+              "model_x": 854.0,
+              "error": 285.0
+            },
+            {
+              "y": 734,
+              "x": 540,
+              "model_x": 814.0,
+              "error": 274.0
+            },
+            {
+              "y": 986,
+              "x": 546,
+              "model_x": 540.0,
+              "error": 6.0
+            },
+            {
+              "y": 1004,
+              "x": 518,
+              "model_x": 516.0,
+              "error": 2.0
+            },
+            {
+              "y": 1022,
+              "x": 492,
+              "model_x": 494.0,
+              "error": 2.0
+            },
+            {
+              "y": 1040,
+              "x": 465,
+              "model_x": 475.0,
+              "error": 10.0
+            },
+            {
+              "y": 584,
+              "x": 1618,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 656,
+              "x": 1624,
+              "model_x": 1224.0,
+              "error": 400.0
+            },
+            {
+              "y": 674,
+              "x": 1616,
+              "model_x": 1231.0,
+              "error": 385.0
+            },
+            {
+              "y": 716,
+              "x": 1617,
+              "model_x": 1270.0,
+              "error": 347.0
+            },
+            {
+              "y": 734,
+              "x": 1586,
+              "model_x": 1284.0,
+              "error": 302.0
+            },
+            {
+              "y": 752,
+              "x": 1586,
+              "model_x": 1296.0,
+              "error": 290.0
+            },
+            {
+              "y": 950,
+              "x": 1596,
+              "model_x": 1536.0,
+              "error": 60.0
+            },
+            {
+              "y": 968,
+              "x": 1626,
+              "model_x": 1610.0,
+              "error": 16.0
+            },
+            {
+              "y": 986,
+              "x": 1658,
+              "model_x": 1644.0,
+              "error": 14.0
+            },
+            {
+              "y": 1004,
+              "x": 1690,
+              "model_x": 1673.0,
+              "error": 17.0
+            },
+            {
+              "y": 1022,
+              "x": 1726,
+              "model_x": 1672.0,
+              "error": 54.0
+            },
+            {
+              "y": 1040,
+              "x": 1762,
+              "model_x": 1706.0,
+              "error": 56.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "tusimple",
+      "preprocess": "letterbox",
+      "n_labelled_points": 65,
+      "covered": 25,
+      "coverage": 0.385,
+      "mae_px": 224.6,
+      "median_px": 236.0,
+      "p90_px": 275.0,
+      "max_px": 285.0,
+      "mean_inference_ms": 146.7,
+      "images": [
+        {
+          "path": "test_data/lane_clips/frames/C03.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 602,
+              "model_x": 848.0,
+              "error": 246.0
+            },
+            {
+              "y": 579,
+              "x": 602,
+              "model_x": 851.0,
+              "error": 249.0
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": 851.0,
+              "error": 245.0
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C04.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 606,
+              "model_x": 841.0,
+              "error": 235.0
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": 838.0,
+              "error": 230.0
+            },
+            {
+              "y": 585,
+              "x": 609,
+              "model_x": 840.0,
+              "error": 231.0
+            },
+            {
+              "y": 603,
+              "x": 610,
+              "model_x": 840.0,
+              "error": 230.0
+            },
+            {
+              "y": 741,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C05.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 567,
+              "x": 609,
+              "model_x": 776.0,
+              "error": 167.0
+            },
+            {
+              "y": 573,
+              "x": 610,
+              "model_x": 776.0,
+              "error": 166.0
+            },
+            {
+              "y": 591,
+              "x": 611,
+              "model_x": 779.0,
+              "error": 168.0
+            },
+            {
+              "y": 609,
+              "x": 614,
+              "model_x": 780.0,
+              "error": 166.0
+            },
+            {
+              "y": 747,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 765,
+              "x": 634,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 783,
+              "x": 641,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C06.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 555,
+              "x": 600,
+              "model_x": 885.0,
+              "error": 285.0
+            },
+            {
+              "y": 561,
+              "x": 600,
+              "model_x": 885.0,
+              "error": 285.0
+            },
+            {
+              "y": 579,
+              "x": 604,
+              "model_x": 881.0,
+              "error": 277.0
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": 878.0,
+              "error": 272.0
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C07.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 604,
+              "model_x": 847.0,
+              "error": 243.0
+            },
+            {
+              "y": 579,
+              "x": 606,
+              "model_x": 845.0,
+              "error": 239.0
+            },
+            {
+              "y": 597,
+              "x": 608,
+              "model_x": 844.0,
+              "error": 236.0
+            },
+            {
+              "y": 735,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C08.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 561,
+              "x": 608,
+              "model_x": 854.0,
+              "error": 246.0
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": 850.0,
+              "error": 242.0
+            },
+            {
+              "y": 585,
+              "x": 610,
+              "model_x": 851.0,
+              "error": 241.0
+            },
+            {
+              "y": 603,
+              "x": 612,
+              "model_x": 846.0,
+              "error": 234.0
+            },
+            {
+              "y": 741,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 633,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C09.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": 769.0,
+              "error": 161.0
+            },
+            {
+              "y": 573,
+              "x": 608,
+              "model_x": 769.0,
+              "error": 161.0
+            },
+            {
+              "y": 597,
+              "x": 612,
+              "model_x": 773.0,
+              "error": 161.0
+            },
+            {
+              "y": 615,
+              "x": 616,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 631,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/D02.png",
+          "n_lanes": 2,
+          "rows": [
+            {
+              "y": 524,
+              "x": 568,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 710,
+              "x": 569,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 734,
+              "x": 540,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 986,
+              "x": 546,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1004,
+              "x": 518,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1022,
+              "x": 492,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1040,
+              "x": 465,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 584,
+              "x": 1618,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 656,
+              "x": 1624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 674,
+              "x": 1616,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 716,
+              "x": 1617,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 734,
+              "x": 1586,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 752,
+              "x": 1586,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 950,
+              "x": 1596,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 968,
+              "x": 1626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 986,
+              "x": 1658,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1004,
+              "x": 1690,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1022,
+              "x": 1726,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1040,
+              "x": 1762,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "culane",
+      "preprocess": "stretch",
+      "n_labelled_points": 65,
+      "covered": 0,
+      "coverage": 0.0,
+      "mae_px": null,
+      "median_px": null,
+      "p90_px": null,
+      "max_px": null,
+      "mean_inference_ms": 118.8,
+      "images": [
+        {
+          "path": "test_data/lane_clips/frames/C03.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 602,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 602,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C04.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 585,
+              "x": 609,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 603,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 741,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C05.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 567,
+              "x": 609,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 573,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 591,
+              "x": 611,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 609,
+              "x": 614,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 747,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 765,
+              "x": 634,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 783,
+              "x": 641,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C06.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 555,
+              "x": 600,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 561,
+              "x": 600,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 604,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C07.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 604,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C08.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 585,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 603,
+              "x": 612,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 741,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 633,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C09.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 573,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 612,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 615,
+              "x": 616,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 631,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/D02.png",
+          "n_lanes": 1,
+          "rows": [
+            {
+              "y": 524,
+              "x": 568,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 710,
+              "x": 569,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 734,
+              "x": 540,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 986,
+              "x": 546,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1004,
+              "x": 518,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1022,
+              "x": 492,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1040,
+              "x": 465,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 584,
+              "x": 1618,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 656,
+              "x": 1624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 674,
+              "x": 1616,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 716,
+              "x": 1617,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 734,
+              "x": 1586,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 752,
+              "x": 1586,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 950,
+              "x": 1596,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 968,
+              "x": 1626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 986,
+              "x": 1658,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1004,
+              "x": 1690,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1022,
+              "x": 1726,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1040,
+              "x": 1762,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "culane",
+      "preprocess": "letterbox",
+      "n_labelled_points": 65,
+      "covered": 0,
+      "coverage": 0.0,
+      "mae_px": null,
+      "median_px": null,
+      "p90_px": null,
+      "max_px": null,
+      "mean_inference_ms": 122.6,
+      "images": [
+        {
+          "path": "test_data/lane_clips/frames/C03.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 602,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 602,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C04.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 585,
+              "x": 609,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 603,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 741,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C05.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 567,
+              "x": 609,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 573,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 591,
+              "x": 611,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 609,
+              "x": 614,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 747,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 765,
+              "x": 634,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 783,
+              "x": 641,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C06.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 555,
+              "x": 600,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 561,
+              "x": 600,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 604,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 622,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C07.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 604,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 579,
+              "x": 606,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 735,
+              "x": 624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 632,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 630,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C08.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 561,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 585,
+              "x": 610,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 603,
+              "x": 612,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 741,
+              "x": 628,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 759,
+              "x": 633,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 777,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/C09.png",
+          "n_lanes": 0,
+          "rows": [
+            {
+              "y": 567,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 573,
+              "x": 608,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 597,
+              "x": 612,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 615,
+              "x": 616,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 753,
+              "x": 631,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 771,
+              "x": 636,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        },
+        {
+          "path": "test_data/lane_clips/frames/D02.png",
+          "n_lanes": 1,
+          "rows": [
+            {
+              "y": 524,
+              "x": 568,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 710,
+              "x": 569,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 734,
+              "x": 540,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 986,
+              "x": 546,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1004,
+              "x": 518,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1022,
+              "x": 492,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1040,
+              "x": 465,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 584,
+              "x": 1618,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 656,
+              "x": 1624,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 674,
+              "x": 1616,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 716,
+              "x": 1617,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 734,
+              "x": 1586,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 752,
+              "x": 1586,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 950,
+              "x": 1596,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 968,
+              "x": 1626,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 986,
+              "x": 1658,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1004,
+              "x": 1690,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1022,
+              "x": 1726,
+              "model_x": null,
+              "error": null
+            },
+            {
+              "y": 1040,
+              "x": 1762,
+              "model_x": null,
+              "error": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

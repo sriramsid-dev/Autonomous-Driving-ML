@@ -15,3 +15,4 @@ test_data/tl_v3/*.jpg
 test_data/lane_clips/*.webm
 test_data/lane_clips/frames/*.jpg
 test_data/lane_clips/frames/
+outputs/runs/**/*.mp4

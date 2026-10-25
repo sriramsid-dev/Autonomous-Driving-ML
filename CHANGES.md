@@ -223,3 +223,36 @@ its current 9/9 is post-hoc and is not quoted anywhere as a held-out estimate.
 No yellow-accuracy figure beyond "3/3 amber crops in v3, from 2 sources". No
 mAP, MOTA or ID-switch number. Two unlit cream heads and one hanging basket
 beside a yellow plate are still published as amber.
+
+## v1.6 — lane evaluation on validated clips
+
+The two clips approved in the previous round were both unusable, so this round
+found replacements by screening **poster frames only** (no video downloaded),
+then labelled and measured.
+
+* `scripts/find_lane_clips.py` — Commons search, poster-frame download, candidate
+  metadata. This is how the replacement clips were chosen without spending
+  bandwidth on clips that turned out to be drone shots.
+* `scripts/fetch_lane_clips.py` — now fetches C (Conor Pass, CC BY-SA 4.0,
+  2.5 MB) and D (Ljubljana to Kranj, CC BY 3.0, 62.6 MB); A and B are recorded as
+  rejected in the docstring.
+* `scripts/extract_lane_frames.py` — the exact 15 frames (10 C/D, 4 extra C, 4 E)
+  by frame index or timestamp; clip E's timestamps are used because its webm
+  demuxer reports a bogus 1000 fps.
+* `scripts/label_lane_marks.py` — seeded paint tracer for white lane paint (row
+  median ridge, so dusk-grey paint is not rejected by an absolute S/V test) and
+  for yellow centre lines (hue), with an overlay per frame.
+* `scripts/build_lane_clip_gt.py` — publishes only the traces that passed the
+  overlay check: 8 frames, 9 boundaries, 65 points (`labels/lane/clips_gt.json`).
+  Traces onto guardrails, road signs, lamp posts and chevron hatching discarded.
+* `scripts/eval_lane.py` — `--gt` so the clip set is evaluated without touching
+  the original 11-point photo set.
+* `EVALUATION.md` 13-14 — why A/B were rejected, and the four-configuration
+  result.
+
+Measured, on the same 8 frames and 65 points for every configuration: tusimple/
+stretch coverage 0.477, MAE 94.5 px, median 26.2 px, max 400 px, ego pair 5/8;
+tusimple/letterbox 0.385, 224.6 px, ego pair 7/8; culane/stretch and
+culane/letterbox **0.000 coverage and 0/8 ego pairs**. No configuration selected:
+the one with the most ego pairs has 200 px errors, and the CULane profiles
+produce no prediction at all.

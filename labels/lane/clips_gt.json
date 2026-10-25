@@ -1,0 +1,462 @@
+{
+ "provenance": {
+  "labelled_by": "coding agent: seeded paint trace (scripts/label_lane_marks.py) plus visual check of the drawn overlay",
+  "labelled_on": "2026-10-25",
+  "method": "a seed row is scanned for paint runs of the right colour, the trace walks up and down from there, a quadratic is fitted and every surviving point is drawn back onto the frame. The lane model is never loaded by the labeller.",
+  "coordinate_system": "original frame pixels (x, y), origin top-left; x is the centre of the paint run",
+  "uncertainty_px": 5,
+  "clips": "test_data/lane_clips: C = Conor Pass (CC BY-SA 4.0), D = Ljubljana to Kranj (CC BY 3.0)",
+  "why_few_frames": "10 frames were extracted and traced, 13 in total including four extra C frames; only the 8 below survived the overlay check. Traces that followed a guardrail, a road sign, a lamp post or the chevron hatching were discarded, and frame C01 was dropped because its trace covered only 12 rows.",
+  "limitations": "8 frames from 2 clips, one wet daylight mountain road and one dusk motorway. No night, no rain, no construction. The C clip contributes one boundary per frame, so ego-pair checks there must fail by construction and are reported separately."
+ },
+ "images": [
+  {
+   "path": "test_data/lane_clips/frames/C03.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 561,
+       "x": 602
+      },
+      {
+       "y": 579,
+       "x": 602
+      },
+      {
+       "y": 597,
+       "x": 606
+      },
+      {
+       "y": 735,
+       "x": 622
+      },
+      {
+       "y": 753,
+       "x": 630
+      },
+      {
+       "y": 771,
+       "x": 628
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/C04.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 561,
+       "x": 606
+      },
+      {
+       "y": 567,
+       "x": 608
+      },
+      {
+       "y": 585,
+       "x": 609
+      },
+      {
+       "y": 603,
+       "x": 610
+      },
+      {
+       "y": 741,
+       "x": 626
+      },
+      {
+       "y": 759,
+       "x": 632
+      },
+      {
+       "y": 777,
+       "x": 630
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/C05.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 567,
+       "x": 609
+      },
+      {
+       "y": 573,
+       "x": 610
+      },
+      {
+       "y": 591,
+       "x": 611
+      },
+      {
+       "y": 609,
+       "x": 614
+      },
+      {
+       "y": 747,
+       "x": 630
+      },
+      {
+       "y": 765,
+       "x": 634
+      },
+      {
+       "y": 783,
+       "x": 641
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/C06.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 555,
+       "x": 600
+      },
+      {
+       "y": 561,
+       "x": 600
+      },
+      {
+       "y": 579,
+       "x": 604
+      },
+      {
+       "y": 597,
+       "x": 606
+      },
+      {
+       "y": 735,
+       "x": 622
+      },
+      {
+       "y": 753,
+       "x": 626
+      },
+      {
+       "y": 771,
+       "x": 624
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/C07.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 561,
+       "x": 604
+      },
+      {
+       "y": 579,
+       "x": 606
+      },
+      {
+       "y": 597,
+       "x": 608
+      },
+      {
+       "y": 735,
+       "x": 624
+      },
+      {
+       "y": 753,
+       "x": 632
+      },
+      {
+       "y": 771,
+       "x": 630
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/C08.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 561,
+       "x": 608
+      },
+      {
+       "y": 567,
+       "x": 608
+      },
+      {
+       "y": 585,
+       "x": 610
+      },
+      {
+       "y": 603,
+       "x": 612
+      },
+      {
+       "y": 741,
+       "x": 628
+      },
+      {
+       "y": 759,
+       "x": 633
+      },
+      {
+       "y": 777,
+       "x": 636
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/C09.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "C_conor_pass",
+   "scene": "wet single-track mountain road, ego keeps the yellow centre line on its left",
+   "condition": "day, overcast, wet surface",
+   "layout": "left-hand curve then right-hand curve",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "yellow_centre_line",
+     "rows": [
+      {
+       "y": 567,
+       "x": 608
+      },
+      {
+       "y": 573,
+       "x": 608
+      },
+      {
+       "y": 597,
+       "x": 612
+      },
+      {
+       "y": 615,
+       "x": 616
+      },
+      {
+       "y": 753,
+       "x": 631
+      },
+      {
+       "y": 771,
+       "x": 636
+      }
+     ]
+    }
+   ],
+   "unavailable": [
+    "right"
+   ],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  },
+  {
+   "path": "test_data/lane_clips/frames/D02.png",
+   "size": [
+    1920,
+    1080
+   ],
+   "clip": "D_ljubljana_kranj",
+   "scene": "motorway, ego in the right-hand lane",
+   "condition": "dusk, low sun behind, dark asphalt",
+   "layout": "straight with a slight right-hand bend",
+   "boundaries": [
+    {
+     "side": "left",
+     "kind": "white_lane_paint",
+     "rows": [
+      {
+       "y": 524,
+       "x": 568
+      },
+      {
+       "y": 710,
+       "x": 569
+      },
+      {
+       "y": 734,
+       "x": 540
+      },
+      {
+       "y": 986,
+       "x": 546
+      },
+      {
+       "y": 1004,
+       "x": 518
+      },
+      {
+       "y": 1022,
+       "x": 492
+      },
+      {
+       "y": 1040,
+       "x": 465
+      }
+     ]
+    },
+    {
+     "side": "right",
+     "kind": "white_lane_paint",
+     "rows": [
+      {
+       "y": 584,
+       "x": 1618
+      },
+      {
+       "y": 656,
+       "x": 1624
+      },
+      {
+       "y": 674,
+       "x": 1616
+      },
+      {
+       "y": 716,
+       "x": 1617
+      },
+      {
+       "y": 734,
+       "x": 1586
+      },
+      {
+       "y": 752,
+       "x": 1586
+      },
+      {
+       "y": 950,
+       "x": 1596
+      },
+      {
+       "y": 968,
+       "x": 1626
+      },
+      {
+       "y": 986,
+       "x": 1658
+      },
+      {
+       "y": 1004,
+       "x": 1690
+      },
+      {
+       "y": 1022,
+       "x": 1726
+      },
+      {
+       "y": 1040,
+       "x": 1762
+      }
+     ]
+    }
+   ],
+   "unavailable": [],
+   "verified_by": "overlay of the traced points on the frame (outputs/runs/lane_v2/overlays/)"
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+{
+ "frames": 8,
+ "boundaries": 9,
+ "labelled_points": 65,
+ "clips": {
+  "C_conor_pass": "CC BY-SA 4.0, 2.5 MB, 1920x1080, 8.6 s, day, wet, mountain road",
+  "D_ljubljana_kranj": "CC BY 3.0, 62.6 MB, 1920x1080, 82.1 s, dusk motorway"
+ },
+ "configs": [
+  {
+   "config": "tusimple/stretch",
+   "ego_pair": "5/8",
+   "coverage": 0.477,
+   "mae_px": 94.5,
+   "median_px": 26.2,
+   "p90_px": 302.0,
+   "max_px": 400.0,
+   "mean_ms": 172.3
+  },
+  {
+   "config": "tusimple/letterbox",
+   "ego_pair": "7/8",
+   "coverage": 0.385,
+   "mae_px": 224.6,
+   "median_px": 236.0,
+   "p90_px": 275.0,
+   "max_px": 285.0,
+   "mean_ms": 146.7
+  },
+  {
+   "config": "culane/stretch",
+   "ego_pair": "0/8",
+   "coverage": 0.0,
+   "mae_px": null,
+   "median_px": null,
+   "p90_px": null,
+   "max_px": null,
+   "mean_ms": 118.8
+  },
+  {
+   "config": "culane/letterbox",
+   "ego_pair": "0/8",
+   "coverage": 0.0,
+   "mae_px": null,
+   "median_px": null,
+   "p90_px": null,
+   "max_px": null,
+   "mean_ms": 122.6
+  }
+ ],
+ "note": "identical 8 frames and 65 labelled points for every configuration; no configuration is selected"
+}

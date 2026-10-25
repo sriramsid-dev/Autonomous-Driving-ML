@@ -755,3 +755,103 @@ new download and therefore approval.
 | `python tests/test_regression.py` | 8/8 |
 | integrated, clip A, 100 frames | completed, 3.48 FPS; false corridor reported above |
 | baseline `24c9cd0` and earlier runs | untouched; new output only in `outputs/runs/lane_v2/` |
+
+---
+
+## 14. Lane evaluation on the replacement clips (C and D)
+
+Clips downloaded with `scripts/fetch_lane_clips.py`: **C** Conor Pass
+(CC BY-SA 4.0, 2.5 MB, 1920x1080, 8.6 s) and **D** Ljubljana to Kranj
+(CC BY 3.0, 62.6 MB, 1920x1080, 82.1 s), 178.8 MB with the night clip.
+Attribution in `test_data/lane_clips/sources.json`. Clip **E** (Cars driving at
+night, CC BY 3.0) was downloaded but **excluded**: it is an overhead view of a
+freeway, not an ego view, so it has no ego lane to label.
+
+### 14.1 Frames and labels
+
+10 frames were extracted (`scripts/extract_lane_frames.py`) and traced
+(`scripts/label_lane_marks.py`); four more C frames were added later, and **8
+survived the overlay check** (`labels/lane/clips_gt.json`, 9 boundaries, 65
+points). Traces that followed a guardrail, a road sign, a lamp post or the
+chevron hatching were discarded, as was C01 whose trace covered only 12 rows.
+Nothing was invented for an unpainted or occluded boundary.
+
+Side assignment is not a guess. The camera sits at frame centre, so the ego lane
+must contain centre x. In the C frames the dashed yellow line sits at x~620,
+left of centre, with road continuing to its right, so it is the ego lane's
+**left** boundary - the opposite reading would put the camera outside its own
+lane. In D02 the dashed divider (x~465) and solid edge line (x~1700) bracket
+centre, so left and right are exactly as labelled. The C frames contribute one
+boundary each, so an ego *pair* cannot be formed on them from ground truth; pair
+rate below is measured from the model's own output, which is independent of GT.
+
+### 14.2 All four configurations on identical frames
+
+| configuration | ego pair found | point coverage | MAE | median | p90 | max | mean inference |
+|---|---|---|---|---|---|---|---|
+| **tusimple / stretch** | 5/8 | 31/65 = **0.477** | 94.5 px | **26.2 px** | 302 px | 400 px | 172 ms |
+| tusimple / letterbox | **7/8** | 25/65 = 0.385 | 224.6 px | 236.0 px | 275 px | 285 px | 147 ms |
+| culane / stretch | 0/8 | 0/65 = **0.000** | - | - | - | - | 119 ms |
+| culane / letterbox | 0/8 | 0/65 = 0.000 | - | - | - | - | 123 ms |
+
+Per frame, tusimple/stretch: C03 41.2 px, C04 no boundary at the labelled rows,
+C05 no boundary, C06 no lane at all, C07 no boundary, C08 23.9 px, C09 16.3 px,
+D02 **148.2 px**. tusimple/letterbox: every C frame 161-280 px and D02 no
+boundary at all.
+
+**No configuration is selected, and MAE alone must not be used to pick one.**
+The two behaviours are mirror images of the same trap:
+
+* letterbox produces *more* ego pairs (7/8 vs 5/8) but its boundaries sit
+  161-280 px from the paint. It is confidently drawing the wrong thing, so its
+  higher pair rate is worthless.
+* CULane produces **no ego pair on any of the 8 frames**, under either
+  preprocessing. Its 3-lane urban prior does not fit a single-track mountain
+  road or this motorway framing, so coverage is zero and the missing MAE is not
+  a good score - it is the absence of any prediction.
+* tusimple/stretch is the only configuration with both usable coverage and a
+  26 px median, and even it fails on D02 by 148 px mean (it locks onto a
+  different lane at the bottom of the frame) and misses 4 of the 8 C frames.
+
+### 14.3 Failures retained
+
+* **D02, tusimple/stretch, 148 px mean**: the two lowest rows are near the
+  bottom edge where the lane model extrapolates past its anchor points; the
+  fitted boundary drifts toward the neighbouring lane. Max error 400 px.
+* **C06, no lane at all**: the yellow centre line is one dashed line on a wet
+  road; the detector reports zero lanes.
+* **C04, C05, C07, no boundary at the labelled rows**: lanes are found but they
+  do not reach the rows where the paint exists.
+* **culane/letterbox, 0/8**: no ego pair anywhere.
+
+### 14.4 Limitations
+
+8 frames from 2 clips: one wet daylight mountain road and one dusk motorway.
+No night, no rain, no construction, no multi-lane urban scene. 65 labelled
+points against 6-19 points per frame means a handful of frames dominate; a
+single bad frame (D02) moves the tusimple/stretch MAE from 26 px to 94 px, and
+the median (26.2 px) is the more honest summary of that configuration. The
+uncertainty on the trace is about 5 px, an order of magnitude smaller than the
+errors being reported, but no confidence interval is claimed on 8 frames.
+
+### 14.5 Reproduce
+
+```powershell
+python scripts/fetch_lane_clips.py                  # 178.8 MB, needs approval rerun
+python scripts/extract_lane_frames.py
+python scripts/label_lane_marks.py                  # traces + overlays to inspect
+python scripts/build_lane_clip_gt.py
+python scripts/eval_lane.py --gt labels/lane/clips_gt.json --models tusimple culane --preprocess stretch letterbox --montage
+python scripts/eval_lane.py --montage               # original 11-point photo set, unchanged
+```
+
+### 14.6 Integrated pipeline after the lane work
+
+* clip C, 100 frames: 31.86 s, **4.19 FPS**, tracks persisted, no crash.
+* inspecting the annotated frames (`outputs/runs/lane_v2/C_integrated_frames.jpg`):
+  the corridor is reported active and drawn as a wedge that does **not** follow
+  the yellow centre line - the drawn boundary runs to the right of the paint.
+  This is the same failure the numbers report, seen directly.
+* `D02.png` through the pipeline: 4 vehicles, 0 traffic lights, 2 lanes.
+* `tests/test_tl_classifier.py` 20/20 and `tests/test_regression.py` 8/8 pass
+  after the lane changes.

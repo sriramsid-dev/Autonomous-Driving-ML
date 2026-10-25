@@ -9,10 +9,13 @@ licences. Originals are git-ignored (test_data/lane_clips/*.webm); the
 recorded metadata in sources.json is committed so attribution travels with any
 frames extracted from them.
 
-Clip A (Dashcam film.webm)     76 MB, 3:29, 720x480,  CC BY-SA 3.0, author Frukko
-Clip B (Iran, drive along the Persian Gulf.webm)   38 MB, 0:59, 1280x720, CC BY 3.0
+Clip C (Conor Pass, Dingle Peninsula)   2.5 MB, 1920x1080, CC BY-SA 4.0
+Clip D (Driving from Ljubljana to Kranj) 62.6 MB, 1920x1080, CC BY 3.0, dusk motorway
+Clip E (Cars driving at night)         113.6 MB, 1920x1080, CC BY 3.0, night motorway
 
-No other dataset is downloaded, and nothing here is trained.
+The clips were screened first with `scripts/find_lane_clips.py`, which fetches
+only each candidate's poster frame. No other dataset is downloaded and nothing
+here is trained.
 """
 
 import json
@@ -24,28 +27,47 @@ import requests
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "test_data" / "lane_clips"
 
+# Round 1 (clips A and B) was downloaded, inspected frame by frame and rejected:
+# A is a winter drive with no painted lane line anywhere (48 frames sampled
+# across all 209 s) and B is aerial drone footage with no ego lane. See
+# EVALUATION.md 13. Their URLs are in the git history of this file.
+#
+# The clips below were chosen from scripts/find_lane_clips.py by inspecting each
+# candidate's poster frame first, so the video download only happens for clips
+# whose first frame already shows painted markings from a forward-facing car.
 CLIPS = [
     {
-        "id": "A",
-        "file": "A_dashcam_film.webm",
-        "commons_title": "File:Dashcam film.webm",
-        "page": "https://commons.wikimedia.org/wiki/File:Dashcam_film.webm",
-        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Dashcam_film.webm",
-        "license": "CC BY-SA 3.0",
-        "author": "Frukko",
-        "expected_bytes": 76_440_000,
-        "note": "dashcam test drive, day and night, 720x480",
+        "id": "C",
+        "file": "C_conor_pass.webm",
+        "commons_title": "File:Conor Pass-1012864, Dingle Peninsula, Co. Kerry, Ireland.webm",
+        "page": "https://commons.wikimedia.org/wiki/File:Conor_Pass-1012864,_Dingle_Peninsula,_Co._Kerry,_Ireland.webm",
+        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Conor_Pass-1012864,_Dingle_Peninsula,_Co._Kerry,_Ireland.webm",
+        "license": "CC BY-SA 4.0",
+        "author": "see Commons file page",
+        "expected_bytes": 2_500_000,
+        "note": "wet coastal mountain road, painted centre and edge lines, 1920x1080",
     },
     {
-        "id": "B",
-        "file": "B_persian_gulf_drive.webm",
-        "commons_title": "File:Iran, drive along the persian gulf.webm",
-        "page": "https://commons.wikimedia.org/wiki/File:Iran,_drive_along_the_persian_gulf.webm",
-        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Iran%2C%20drive%20along%20the%20persian%20gulf.webm",
+        "id": "D",
+        "file": "D_ljubljana_kranj.webm",
+        "commons_title": "File:Driving from Ljubljana to Kranj.webm",
+        "page": "https://commons.wikimedia.org/wiki/File:Driving_from_Ljubljana_to_Kranj.webm",
+        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Driving_from_Ljubljana_to_Kranj.webm",
         "license": "CC BY 3.0",
         "author": "see Commons file page",
-        "expected_bytes": 38_310_000,
-        "note": "drive along the Persian Gulf coast, 1280x720",
+        "expected_bytes": 62_600_000,
+        "note": "motorway at dusk, dashed lane lines, 1920x1080",
+    },
+    {
+        "id": "E",
+        "file": "E_night_motorway.webm",
+        "commons_title": "File:Cars driving at night.webm",
+        "page": "https://commons.wikimedia.org/wiki/File:Cars_driving_at_night.webm",
+        "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cars_driving_at_night.webm",
+        "license": "CC BY 3.0",
+        "author": "see Commons file page",
+        "expected_bytes": 113_600_000,
+        "note": "night motorway in rain, markings lit by headlights, 1920x1080",
     },
 ]
 

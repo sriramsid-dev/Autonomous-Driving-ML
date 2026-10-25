@@ -180,6 +180,7 @@ to review in LabelImg or CVAT.
 python scripts/eval_lane.py --models tusimple culane --preprocess stretch letterbox --montage
 python scripts/eval_traffic_lights.py --compare          # dev + v2 + v3, v1.5 vs v1.1 vs v1.0
 python scripts/eval_traffic_lights.py --set v3 --compare # the untouched set only
+python scripts/eval_lane.py --gt labels/lane/clips_gt.json --models tusimple culane --preprocess stretch letterbox --montage  # 8 clip frames
 python tests/test_tl_classifier.py                      # 20 checks
 python tests/test_regression.py                         # 8 checks
 ```

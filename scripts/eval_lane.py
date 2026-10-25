@@ -30,7 +30,7 @@ sys.path.insert(0, str(ROOT))
 
 from modules.lane_detection import UltraFastLaneDetector  # noqa: E402
 
-GT = ROOT / "labels" / "lane" / "gt.json"
+GT = ROOT / "labels" / "lane" / "gt.json"   # override with --gt
 
 
 def x_at_row(points, y, tol=12):
@@ -136,7 +136,13 @@ def main():
     ap.add_argument("--models", nargs="+", default=["tusimple", "culane"])
     ap.add_argument("--preprocess", nargs="+", default=["stretch"])
     ap.add_argument("--montage", action="store_true")
+    ap.add_argument("--gt", default=None,
+                    help="ground-truth file (default labels/lane/gt.json; "
+                         "use labels/lane/clips_gt.json for the clip frames)")
     args = ap.parse_args()
+    global GT
+    if args.gt:
+        GT = Path(args.gt) if Path(args.gt).is_absolute() else ROOT / args.gt
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = ROOT / "outputs" / "runs" / f"lane_eval_{stamp}"

@@ -1,26 +1,38 @@
 [
  {
-  "id": "A",
-  "file": "A_dashcam_film.webm",
-  "commons_title": "File:Dashcam film.webm",
-  "page": "https://commons.wikimedia.org/wiki/File:Dashcam_film.webm",
-  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Dashcam_film.webm",
-  "license": "CC BY-SA 3.0",
-  "author": "Frukko",
-  "expected_bytes": 76440000,
-  "note": "dashcam test drive, day and night, 720x480",
-  "bytes": 80151485
+  "id": "C",
+  "file": "C_conor_pass.webm",
+  "commons_title": "File:Conor Pass-1012864, Dingle Peninsula, Co. Kerry, Ireland.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:Conor_Pass-1012864,_Dingle_Peninsula,_Co._Kerry,_Ireland.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Conor_Pass-1012864,_Dingle_Peninsula,_Co._Kerry,_Ireland.webm",
+  "license": "CC BY-SA 4.0",
+  "author": "see Commons file page",
+  "expected_bytes": 2500000,
+  "note": "wet coastal mountain road, painted centre and edge lines, 1920x1080",
+  "bytes": 2536580
  },
  {
-  "id": "B",
-  "file": "B_persian_gulf_drive.webm",
-  "commons_title": "File:Iran, drive along the persian gulf.webm",
-  "page": "https://commons.wikimedia.org/wiki/File:Iran,_drive_along_the_persian_gulf.webm",
-  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Iran%2C%20drive%20along%20the%20persian%20gulf.webm",
+  "id": "D",
+  "file": "D_ljubljana_kranj.webm",
+  "commons_title": "File:Driving from Ljubljana to Kranj.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:Driving_from_Ljubljana_to_Kranj.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Driving_from_Ljubljana_to_Kranj.webm",
   "license": "CC BY 3.0",
   "author": "see Commons file page",
-  "expected_bytes": 38310000,
-  "note": "drive along the Persian Gulf coast, 1280x720",
-  "bytes": 40174312
+  "expected_bytes": 62600000,
+  "note": "motorway at dusk, dashed lane lines, 1920x1080",
+  "bytes": 62635277
+ },
+ {
+  "id": "E",
+  "file": "E_night_motorway.webm",
+  "commons_title": "File:Cars driving at night.webm",
+  "page": "https://commons.wikimedia.org/wiki/File:Cars_driving_at_night.webm",
+  "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cars_driving_at_night.webm",
+  "license": "CC BY 3.0",
+  "author": "see Commons file page",
+  "expected_bytes": 113600000,
+  "note": "night motorway in rain, markings lit by headlights, 1920x1080",
+  "bytes": 113584348
  }
 ]
