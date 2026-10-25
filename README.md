@@ -70,10 +70,11 @@ A perception research prototype built entirely with **pretrained models**—requ
 
 ### Module B: Traffic Light Detection and State Classification
 - **Localization:** Pretrained YOLO11n specifically targeting COCO class 9 (`traffic light`).
-- **Classification Method:** **Spatial-Chrominance / HSV Heuristic Baseline Classifier**.
-  - *Compliance Note:* As instructed by project requirements, this module is strictly designated as a deterministic baseline and **not** claimed to be a fine-tuned machine learning classifier.
-  - *Heuristic Priors:* Exploits physical traffic casing geometry (Red in top 35%, Yellow in middle 30%, Green in bottom 35%) paired with calibrated HSV chromaticity masks.
-  - *Rejection Safeguard:* Small, distant, or blurry crops (< 80 px area) and low-saturation or ambiguous lamps automatically return state **`unknown`**.
+- **Classification Method:** **Per-region emission evidence (v1.5)** - a deterministic baseline, **not** a trained classifier.
+  - *Compliance Note:* As instructed by project requirements, this module stays a heuristic baseline; no model was trained or fine-tuned for it.
+  - *Scoring:* every per-state chromatic component is scored as `chroma x bezel contrast x bezel darkness x compactness`. A lit lamp is a compact disc inside a dark bezel; housing paint is a crescent, strip or frame, and is discounted by the compactness term rather than by a colour threshold.
+  - *Why not the largest region:* choosing the biggest chromatic blob is what made the cream housing win over the green lamp (v1.3); v1.4-v1.5 score regions by emission evidence and shape instead.
+  - *Rejection Safeguard:* a state is published only if it clears an absolute evidence floor **and** beats the runner-up state by 1.6x. Unlit lenses, dim paint, competing lamps, tiny crops (< 80 px area) and unresolved cases return **`unknown`**; over the v3 set this abstains on 25 of 29 unlit / not-a-light / ambiguous crops.
 
 ### Module C: Lane Detection (Ultra-Fast Lane Detection)
 - **Model:** ParsingNet architecture from the ECCV 2020 paper *"Ultra Fast Structure-aware Deep Lane Detection"*.
@@ -177,9 +178,10 @@ to review in LabelImg or CVAT.
 ### Step 2c: Lanes, traffic lights and regression
 ```powershell
 python scripts/eval_lane.py --models tusimple culane --preprocess stretch letterbox --montage
-python scripts/eval_traffic_lights.py --compare          # dev + held-out, v1.4 vs v1.1 vs v1.0
-python tests/test_tl_classifier.py
-python tests/test_regression.py
+python scripts/eval_traffic_lights.py --compare          # dev + v2 + v3, v1.5 vs v1.1 vs v1.0
+python scripts/eval_traffic_lights.py --set v3 --compare # the untouched set only
+python tests/test_tl_classifier.py                      # 20 checks
+python tests/test_regression.py                         # 8 checks
 ```
 Lane boundary error is measured against 11 points traced from the paint itself
 (`labels/lane/gt.json`); the earlier hand-read labels are withdrawn because their right-boundary
@@ -189,8 +191,16 @@ photographs fetched after the classifier was frozen - `scripts/fetch_tl_v2.py` r
 (6.6 MB). `--lane-model` selects between the TuSimple and CULane checkpoints (both official,
 free); the CULane profile needs `models/culane_18.pth`, everything else runs without it.
 
-Measured results, failure examples and the contamination caveat on the held-out set are in
-[EVALUATION.md](EVALUATION.md) sections 9-11 - including what does *not* work.
+**v2 is no longer held out.** Those crops were inspected while fixing the amber-paint bug, so
+their current score is post-hoc and is not quoted as an estimate. The untouched set is now **v3**:
+11 further CC-licensed photographs (7.3 MB, `scripts/fetch_tl_v3.py`), 38 detector-proposed
+regions labelled by hand in `scripts/build_tl_v3_gt.py`, scored once after v1.5 was frozen.
+Result: 7/9 vehicle signals correct, **0 wrong**, 2 abstentions, and a state published on only
+4 of 29 unlit / not-a-light / ambiguous crops (v1.0 and v1.1 publish on 26 of 29).
+
+Measured results, failure examples, the contamination history and the proposed (not yet
+downloaded) lane-evaluation clips are in [EVALUATION.md](EVALUATION.md) sections 9-12 -
+including what does *not* work.
 
 ### Step 3: Run Full Static Image Test Suite
 Executes multi-module testing across all local curated images and saves a summary report:

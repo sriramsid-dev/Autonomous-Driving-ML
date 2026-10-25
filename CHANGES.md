@@ -147,3 +147,79 @@ paint, two missed night signals.
   the data. Crops are adaptations of CC BY-SA / CC BY / CC0 works.
 * No training was run. The only downloads this round were 6.6 MB of photographs.
 * Passing tests still mean "behaved as specified", never "detected correctly".
+
+## v1.5 — amber paint is not an amber lamp (shape evidence)
+
+Scope: the two `sir_image2` reports the previous round left open. No model was
+retrained, no dataset was downloaded beyond 7.3 MB of CC photographs, and every
+constant that changed has the measurement that justified it written next to it.
+
+### The defect, and where it actually lived
+
+v1.4 fixed *which region* may be called a lamp (chroma x bezel contrast x bezel
+darkness) but not *what shape* a lamp is. On `sir_image2` the three distant
+signal heads are all showing green, yet the winning "amber" regions were:
+
+| box | winning amber region | circularity | the lit green lamp in the same box |
+|---|---|---|---|
+| 1 | 6.4:1 sliver along the housing edge | 0.249 | 0.880 |
+| 2 | cream frame round the unlit red lens | 0.140 | 0.733 |
+| 4 | paint strip down the housing | 0.116 | 0.882 |
+
+Across the 24 true lit lamps in the dev and v2 crop sets, circularity has a
+median of 0.75. A lamp is a disc; housing paint is a crescent, strip or frame.
+`_score()` now multiplies by a **compactness** term
+(`TL_COMPACT_FLOOR + (1-floor) * min(1, circ / TL_COMPACT_FULL)`, floor 0.25,
+full at 0.60). It is weighted, never a hard gate: a genuinely tiny lamp has an
+unreliable perimeter, so it is discounted rather than rejected, and any
+better-shaped same-state candidate in the same crop still wins on score.
+
+### A second fix that the measurement rejected
+
+With box 2 the remaining competitor is not paint but the **unlit red lens**
+(ring contrast 0.15 against the lit lamp's 0.54), because the evidence curve
+saturates at contrast 0.15. Raising `TL_RING_FULL_CONTRAST` looked like the
+right answer; simulating 0.30 / 0.40 / 0.50 showed it **loses real lamps**
+(dev 9 -> 8 -> 7 correct, v2 9 -> 8), since true lit lamps in these sets reach
+down to contrast 0.33. Rejected. Box 2 therefore still abstains, which is the
+honest outcome for a 23x48 px crop holding one lit lamp beside one unlit lens.
+
+### Measured outcome
+
+**`sir_image2` (integrated):** boxes 1 and 4 now GREEN (were amber at v1.3,
+unknown at v1.4); box 2 abstains. No green head is published as amber.
+
+**New untouched set v3** — 11 further CC photographs (`scripts/fetch_tl_v3.py`,
+7.3 MB, attribution in `test_data/tl_v3/sources.json`), 38 detector-proposed
+regions labelled **by hand** (`scripts/build_tl_v3_gt.py`), materialised after
+v1.5 was frozen and scored in a **single** run:
+
+| set | v1.5 closed-set | wrong | abstain | unlit abstain | not-a-light abstain | ambiguous abstain |
+|---|---|---|---|---|---|---|
+| v3, n=9 signals | 7/9 (0.778) | **0** | 2 | 7/9 | 15/16 | 3/4 |
+
+For comparison on the same untouched crops, v1.1 and v1.0 both score 8/9 with
+**1 wrong** and no abstentions at all, and publish a state on 26 of the 29
+unlit / not-a-light / ambiguous crops (v1.5: 4 of 29). The older classifiers win
+the easy nine-signal count and lose every negative.
+
+**v2 is no longer held out.** It was inspected while fixing the amber bug, so
+its current 9/9 is post-hoc and is not quoted anywhere as a held-out estimate.
+
+### Files
+
+| file | why |
+|---|---|
+| `modules/traffic_light_classification.py` | circularity in `_candidates`, compactness in `_score`, `circularity` in `last_debug` |
+| `config.py` | `TL_COMPACT_FLOOR`, `TL_COMPACT_FULL` with the measured justification |
+| `tests/test_tl_classifier.py` | 6 new checks -> 20 total: paint stripe, paint frame round a lens, busy background, two heads one lit, lens cut by the edge, real `sir_image2` regression |
+| `scripts/eval_traffic_lights.py` | `v3` set registered; note records that v2 is burned |
+| `scripts/fetch_tl_v3.py` | reproducible acquisition of the untouched set, no API query needed |
+| `scripts/make_tl_v3_proposals.py` | detector proposes regions; labels stay manual |
+| `scripts/build_tl_v3_gt.py` | the hand-assigned labels, in reviewable form |
+| `labels/traffic_lights/v3/` | crops, `gt.json`, proposals and contact sheet |
+
+### Not claimed
+No yellow-accuracy figure beyond "3/3 amber crops in v3, from 2 sources". No
+mAP, MOTA or ID-switch number. Two unlit cream heads and one hanging basket
+beside a yellow plate are still published as amber.

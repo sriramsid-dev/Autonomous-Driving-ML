@@ -1,31 +1,62 @@
 {
   "system_version": "Version 1 (Pretrained Baseline)",
-  "timestamp": "2026-10-24 19:46:09",
+  "timestamp": "2026-10-25 16:33:03",
   "hardware_device": "cpu",
   "dataset_audit": {
     "waymo_tfrecords_accessible": false,
     "waymo_ground_truth_accessible": false,
-    "local_driving_videos_found": [],
     "local_test_images_found": [
-      "highway_road.jpg (Straight Highway Lane Markings)",
-      "sample_wyamo.jpg (Urban Multi-vehicle driving scene)",
-      "test_tl/red_tl.jpg (Real Red Stoplight)",
-      "test_tl/green_tl.jpg (Real Green Traffic Signal)",
-      "test_tl/yellow_inuvik.jpg (Real Amber Traffic Signal)",
-      "test_tl/tl_crop_red.jpg (Isolated Red Lamp)",
-      "test_tl/tl_crop_yellow.jpg (Isolated Amber Lamp)",
-      "test_tl/tl_crop_green.jpg (Isolated Green Lamp)"
+      "my_test_images/sir_image.jpg",
+      "my_test_images/sir_image10.jpeg",
+      "my_test_images/sir_image2.jpg",
+      "my_test_images/sir_image3.jpg",
+      "my_test_images/sir_image4.jpeg",
+      "my_test_images/sir_image5.jpeg",
+      "my_test_images/sir_image6.jpeg",
+      "my_test_images/sir_image7.jpeg",
+      "my_test_images/sir_image8.jpeg",
+      "my_test_images/sir_image9.jpeg",
+      "test_data/green_tl.jpg",
+      "test_data/highway_road.jpg",
+      "test_data/red_tl.jpg",
+      "test_data/sample_gemini.jpg",
+      "test_data/sample_wyamo.jpg",
+      "test_data/tl_crop_green.jpg",
+      "test_data/tl_crop_red.jpg",
+      "test_data/tl_crop_yellow.jpg",
+      "test_data/wyamo_f10.jpg",
+      "test_data/wyamo_f120.jpg",
+      "test_data/wyamo_f200.jpg",
+      "test_data/wyamo_f300.jpg",
+      "test_data/wyamo_f330.jpg",
+      "test_data/wyamo_f60.jpg",
+      "test_data/yellow_inuvik.jpg"
     ],
-    "evaluation_strategy": "Because raw Waymo TFRecords and ground-truth bounding box/track labels are not stored locally in this workspace (they reside on Google Cloud / Google Drive as described in 'Waymo Open Dataset.pptx'), formal mAP@0.5 and MOTA are evaluated via rigorous unit test cases with ground-truth test vectors, while video inference is evaluated using empirical tracking continuity and detection distribution statistics."
+    "labelled_sets": {
+      "labels/detection/gt": "bounding boxes (verified-proposal tier): car/person/truck",
+      "labels/traffic_lights/gt.json": "39 dev crops with state labels",
+      "labels/traffic_lights/v2/gt.json": "18 held-out crops with state labels",
+      "labels/lane/gt.json": "11 ego-left boundary points on 2 photographs"
+    },
+    "metrics_with_labels": [
+      "object detection mAP@0.5 / precision / recall  (scripts/eval_detection.py)",
+      "traffic-light confusion, precision, recall, abstention  (scripts/eval_traffic_lights.py)",
+      "lane boundary pixel error  (scripts/eval_lane.py)"
+    ],
+    "metrics_without_labels": [
+      "MOTA, IDF1, ID switches: no ground-truth track annotations exist in this project",
+      "long-tail classes (bus, bicycle, motorcycle): zero labelled instances"
+    ],
+    "evaluation_strategy": "Every metric in EVALUATION.md comes from one of the scripts above on a committed label file, and each result records its label provenance. Unlabelled footage is reported through inspection only, never as accuracy."
   },
   "unit_test_results": {},
   "video_pipeline_summary": {
     "frames_processed": 120,
-    "total_processing_time_seconds": 25.92,
-    "average_fps": 4.63,
-    "latency_p50_ms": 206.5,
-    "latency_p90_ms": 242.1,
-    "latency_p99_ms": 282.9,
+    "total_processing_time_seconds": 32.58,
+    "average_fps": 3.68,
+    "latency_p50_ms": 267.0,
+    "latency_p90_ms": 285.2,
+    "latency_p99_ms": 307.8,
     "total_detections_by_class": {
       "car": 187,
       "truck": 43,
@@ -42,8 +73,8 @@
       "unknown": 0
     },
     "lane_detection_visibility_rate": 0.15,
-    "wall_clock_time_seconds": 27.2,
-    "output_video_path": "outputs/runs/integrated_v14/video_120f.mp4",
+    "wall_clock_time_seconds": 33.93,
+    "output_video_path": "outputs/runs/integrated_v15/video.mp4",
     "video_resolution": "480x848"
   }
 }

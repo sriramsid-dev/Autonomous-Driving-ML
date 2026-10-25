@@ -3,7 +3,7 @@ Traffic-light state evaluation on manually labelled real crops.
 
     python scripts/eval_traffic_lights.py                    # v1.4 on dev + held-out
     python scripts/eval_traffic_lights.py --compare          # v1.4 / v1.1 / v1.0
-    python scripts/eval_traffic_lights.py --set v2 --compare  # held-out only
+    python scripts/eval_traffic_lights.py --set v3 --compare  # untouched set only
 
 Two sets, never mixed:
 
@@ -15,6 +15,10 @@ Two sets, never mixed:
            photographs fetched after v1.4 was frozen. Never used to pick a
            threshold. This is the only number that speaks to generalisation,
            and it is n=9 vehicle signals - far too small for an accuracy claim.
+
+  v3       labels/traffic_lights/v3/gt.json  38 regions from 11 further Commons
+           photographs, labelled by hand after v1.5 was frozen and scored once.
+           n=9 vehicle signals - small, and reported with that caveat.
 
 Crops are single frames, so temporal voting is off (classify() is called without
 a key). "unknown" is scored as an abstention, not as a wrong answer, and the
@@ -37,6 +41,7 @@ sys.path.insert(0, str(ROOT))
 SETS = {
     "dev": ROOT / "labels" / "traffic_lights" / "gt.json",
     "v2": ROOT / "labels" / "traffic_lights" / "v2" / "gt.json",
+    "v3": ROOT / "labels" / "traffic_lights" / "v3" / "gt.json",
 }
 VEHICLE = ("red", "yellow", "green")
 STATES = ["red", "yellow", "green", "unknown"]
@@ -61,7 +66,7 @@ def load_from_git(commit: str, module_rel: str, name: str):
 def classifiers(which):
     from modules.traffic_light_classification import TrafficLightClassifier
 
-    out = [("v1.4 per-state bezel contrast", TrafficLightClassifier())]
+    out = [("v1.5 chroma x bezel x compactness", TrafficLightClassifier())]
     if "v11" in which:
         out.append(("v1.1 global-mask circular hue", load_from_git(
             "6c79bbe", "modules/traffic_light_classification.py", "tl_v11")))
@@ -205,7 +210,10 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({
         "generated": datetime.now().isoformat(timespec="seconds"),
-        "note": "dev = tuning set, v2 = held-out. unknown is scored as abstention.",
+        "note": ("dev = tuning set; v2 = held out when v1.4 was frozen, but later inspected "
+                 "while fixing the amber-paint bug, so v2 is no longer an untouched estimate; "
+                 "v3 = materialised after v1.5 was frozen and scored in a single run. "
+                 "unknown is scored as abstention."),
         "results": results,
     }, indent=2), encoding="utf-8")
     print(f"\nreport: {out}")

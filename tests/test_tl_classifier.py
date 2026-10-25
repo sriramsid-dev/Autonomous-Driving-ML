@@ -234,6 +234,90 @@ def test_v2_amber():
         assert state != "red", f"v2 crop {idx} (amber) -> {state}"
 
 
+@check("amber paint stripe beside a lit green lamp is not read as amber")
+def test_paint_stripe():
+    # sir_image2 shape: a thin strip of cream/amber paint runs down the housing
+    # edge next to the lit lamp. The strip is chromatic, round-clipped and has a
+    # bright surround, so only its non-disc shape distinguishes it.
+    clf = TrafficLightClassifier()
+    img = glow_variant(body=CREAM, lamp=GREEN)
+    h, w = img.shape[:2]
+    cv2.fillPoly(img, [np.array([[w - 12, int(h * 0.06)], [w - 4, int(h * 0.06)],
+                                 [w - 4, int(h * 0.94)], [w - 13, int(h * 0.90)]], np.int32)],
+                 (110, 200, 240))
+    state, conf = clf.classify(cv2.GaussianBlur(img, (0, 0), 1.2))
+    assert state != "yellow", f"paint strip won: {state} ({conf:.2f})"
+
+
+@check("amber frame around an unlit lens does not outrank a lit green lamp")
+def test_paint_frame_around_lens():
+    # The other sir_image2 shape: cream paint forms a horseshoe around the dark
+    # red lens, which is compact enough to fool an aspect-ratio test.
+    clf = TrafficLightClassifier()
+    h, w = 260, 110
+    img = np.full((h, w, 3), (90, 95, 100), np.uint8)
+    cv2.rectangle(img, (12, 8), (w - 12, h - 8), CREAM, -1)
+    r = 26
+    cv2.circle(img, (w // 2, int(h * 0.22)), r, DARK, -1)          # unlit red lens
+    cv2.circle(img, (w // 2, int(h * 0.22)), r, (110, 200, 240), 3)  # amber ring
+    cv2.circle(img, (w // 2, int(h * 0.74)), r, DARK, -1)
+    cv2.circle(img, (w // 2, int(h * 0.74)), int(r * 0.84), GREEN, -1)   # lit green
+    cv2.circle(img, (w // 2, int(h * 0.74)), int(r * 0.38), GLOW, -1)
+    state, conf = clf.classify(cv2.GaussianBlur(img, (0, 0), 1.5))
+    assert state != "yellow", f"paint ring won: {state} ({conf:.2f})"
+
+
+@check("busy street background does not inject a false state")
+def test_busy_background():
+    clf = TrafficLightClassifier()
+    rng = np.random.default_rng(3)
+    img = glow_variant(body=CREAM, lamp=GREEN, bg=(70, 74, 78))
+    h, w = img.shape[:2]
+    # Clutter: parked cars, shop signs and warm lights next to the head.
+    for _ in range(90):
+        x, y = int(rng.integers(0, w - 10)), int(rng.integers(0, h - 10))
+        col = [(40, 60, 190), (60, 180, 210), (200, 200, 195), (30, 90, 50)][int(rng.integers(0, 4))]
+        cv2.rectangle(img, (x, y), (x + int(rng.integers(3, 12)), y + int(rng.integers(3, 12))), col, -1)
+    state, conf = clf.classify(cv2.GaussianBlur(img, (0, 0), 1.3))
+    assert state in ("green", "unknown"), f"busy background produced {state} ({conf:.2f})"
+
+
+@check("two heads, one lit: the lit state wins")
+def test_two_heads_one_lit():
+    clf = TrafficLightClassifier()
+    a = housing(h=240, w=100, lit=())                 # unlit head
+    b = glow_variant(h=240, w=100, lamp=GREEN)        # lit head
+    img = np.hstack([a, b])
+    state, _ = clf.classify(img)
+    assert state == "green", f"{state}"
+
+
+@check("lens cut by the crop edge is never reported as amber")
+def test_lens_cut_by_edge():
+    clf = TrafficLightClassifier()
+    img = glow_variant(lamp=GREEN)
+    h = img.shape[0]
+    for keep in (0.62, 0.76, 0.88):
+        cut = img[int(h * (1.0 - keep)):].copy()
+        state, conf = clf.classify(cut)
+        assert state in ("green", "unknown"), f"cut {keep}: {state} ({conf:.2f})"
+
+
+@check("sir_image2 real crops: paint is not published as amber")
+def test_sir2_paint_regression():
+    clf = TrafficLightClassifier()
+    img = cv2.imread(str(ROOT / "my_test_images/sir_image2.jpg"))
+    if img is None:
+        return  # optional sample, not shipped in every checkout
+    # YOLO boxes 1, 2 and 4 on this frame: three distant signal heads showing
+    # green. Before v1.5 each was reported amber (a paint sliver, a paint frame
+    # round the unlit red lens, and a paint strip).
+    for box in ((110, 63, 133, 112), (380, 55, 403, 103), (238, 58, 262, 109)):
+        crop = img[box[1]:box[3], box[0]:box[2]]
+        state, conf = clf.classify(crop)
+        assert state != "yellow", f"box {box}: paint published as amber ({conf:.2f})"
+
+
 def main():
     failures = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failures)}/{len(RESULTS)} checks passed")

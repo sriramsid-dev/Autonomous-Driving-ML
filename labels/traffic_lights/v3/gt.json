@@ -1,0 +1,585 @@
+{
+ "set": "v3",
+ "description": "11 Wikimedia Commons photographs (CC BY / CC BY-SA / CC0 / public domain, attribution in test_data/tl_v3/sources.json), 38 detector-proposed regions, labels assigned by hand from the contact sheet and zoomed crops. No threshold in config.py was chosen using this set: it was materialised after v1.5 was frozen and scored in a single run.",
+ "labelling": "manual, by eye; detector proposals only located the regions",
+ "counts": {
+  "green": 4,
+  "not_a_traffic_light": 16,
+  "yellow": 3,
+  "unlit": 9,
+  "ambiguous": 4,
+  "red": 2
+ },
+ "samples": [
+  {
+   "index": 0,
+   "key": "02.0",
+   "image": "02_Traffic_Light__Vienna_jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/02_0.jpg",
+   "box": [
+    1008.0,
+    400.0,
+    1185.0,
+    767.0
+   ],
+   "det_conf": 0.931,
+   "label": "green",
+   "note": "pedestrian go figure lit; upper lens unlit"
+  },
+  {
+   "index": 1,
+   "key": "02.1",
+   "image": "02_Traffic_Light__Vienna_jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/02_1.jpg",
+   "box": [
+    1230.0,
+    400.0,
+    1405.0,
+    790.0
+   ],
+   "det_conf": 0.709,
+   "label": "not_a_traffic_light",
+   "note": "blank pole/mount"
+  },
+  {
+   "index": 2,
+   "key": "02.2",
+   "image": "02_Traffic_Light__Vienna_jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/02_2.jpg",
+   "box": [
+    299.0,
+    1034.0,
+    398.0,
+    1124.0
+   ],
+   "det_conf": 0.676,
+   "label": "not_a_traffic_light",
+   "note": "pedestrian push-button box"
+  },
+  {
+   "index": 0,
+   "key": "03.0",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_0.jpg",
+   "box": [
+    189.0,
+    1066.0,
+    351.0,
+    1486.0
+   ],
+   "det_conf": 0.889,
+   "label": "yellow",
+   "note": "bicycle signal; amber glyph lit, upper and lower lenses dark"
+  },
+  {
+   "index": 1,
+   "key": "03.1",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_1.jpg",
+   "box": [
+    1653.0,
+    298.0,
+    1835.0,
+    835.0
+   ],
+   "det_conf": 0.826,
+   "label": "unlit",
+   "note": "housing edge, no lens"
+  },
+  {
+   "index": 2,
+   "key": "03.2",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_2.jpg",
+   "box": [
+    1113.0,
+    1154.0,
+    1187.0,
+    1301.0
+   ],
+   "det_conf": 0.768,
+   "label": "ambiguous",
+   "note": "red pedestrian figure lit AND amber countdown lit"
+  },
+  {
+   "index": 3,
+   "key": "03.3",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_3.jpg",
+   "box": [
+    1110.0,
+    923.0,
+    1175.0,
+    1086.0
+   ],
+   "det_conf": 0.624,
+   "label": "unlit",
+   "note": "dark housing, no lens visible"
+  },
+  {
+   "index": 4,
+   "key": "03.4",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_4.jpg",
+   "box": [
+    689.0,
+    1243.0,
+    748.0,
+    1406.0
+   ],
+   "det_conf": 0.624,
+   "label": "yellow",
+   "note": "bicycle signal; amber glyph lit"
+  },
+  {
+   "index": 5,
+   "key": "03.5",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_5.jpg",
+   "box": [
+    1307.0,
+    350.0,
+    1476.0,
+    828.0
+   ],
+   "det_conf": 0.604,
+   "label": "unlit",
+   "note": "dark housing, lenses unlit"
+  },
+  {
+   "index": 6,
+   "key": "03.6",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_6.jpg",
+   "box": [
+    383.0,
+    1236.0,
+    406.0,
+    1291.0
+   ],
+   "det_conf": 0.266,
+   "label": "unlit",
+   "note": "dark housing, lenses unlit"
+  },
+  {
+   "index": 7,
+   "key": "03.7",
+   "image": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+   "crop": "labels/traffic_lights/v3/crops/03_7.jpg",
+   "box": [
+    1331.0,
+    880.0,
+    1510.0,
+    1235.0
+   ],
+   "det_conf": 0.257,
+   "label": "not_a_traffic_light",
+   "note": "pole with a white strip"
+  },
+  {
+   "index": 0,
+   "key": "04.0",
+   "image": "04_Yellow_traffic_signal__9722336142__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/04_0.jpg",
+   "box": [
+    732.0,
+    196.0,
+    1191.0,
+    914.0
+   ],
+   "det_conf": 0.575,
+   "label": "unlit",
+   "note": "three-lamp head, all lenses unlit"
+  },
+  {
+   "index": 1,
+   "key": "04.1",
+   "image": "04_Yellow_traffic_signal__9722336142__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/04_1.jpg",
+   "box": [
+    747.0,
+    510.0,
+    1354.0,
+    1387.0
+   ],
+   "det_conf": 0.55,
+   "label": "unlit",
+   "note": "head seen from above, all lenses unlit"
+  },
+  {
+   "index": 2,
+   "key": "04.2",
+   "image": "04_Yellow_traffic_signal__9722336142__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/04_2.jpg",
+   "box": [
+    291.0,
+    3.0,
+    802.0,
+    728.0
+   ],
+   "det_conf": 0.373,
+   "label": "unlit",
+   "note": "head seen from the side, all lenses unlit"
+  },
+  {
+   "index": 3,
+   "key": "04.3",
+   "image": "04_Yellow_traffic_signal__9722336142__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/04_3.jpg",
+   "box": [
+    664.0,
+    0.0,
+    1112.0,
+    694.0
+   ],
+   "det_conf": 0.366,
+   "label": "yellow",
+   "note": "lower amber lens lit and textured; upper lens dark red, unlit"
+  },
+  {
+   "index": 0,
+   "key": "06.0",
+   "image": "06_Traffic_Lights__NYC__6239701931__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/06_0.jpg",
+   "box": [
+    807.0,
+    1947.0,
+    907.0,
+    2203.0
+   ],
+   "det_conf": 0.578,
+   "label": "not_a_traffic_light",
+   "note": "NYC yellow backplate edge"
+  },
+  {
+   "index": 1,
+   "key": "06.1",
+   "image": "06_Traffic_Lights__NYC__6239701931__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/06_1.jpg",
+   "box": [
+    655.0,
+    1977.0,
+    779.0,
+    2214.0
+   ],
+   "det_conf": 0.541,
+   "label": "green",
+   "note": "NYC head cropped to the backplate; green emitting at the lower edge"
+  },
+  {
+   "index": 2,
+   "key": "06.2",
+   "image": "06_Traffic_Lights__NYC__6239701931__jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/06_2.jpg",
+   "box": [
+    654.0,
+    1945.0,
+    907.0,
+    2219.0
+   ],
+   "det_conf": 0.287,
+   "label": "not_a_traffic_light",
+   "note": "NYC yellow backplate"
+  },
+  {
+   "index": 0,
+   "key": "07.0",
+   "image": "07_Traffic_light_red_and_yellow_Drammen__2_.jpg",
+   "crop": "labels/traffic_lights/v3/crops/07_0.jpg",
+   "box": [
+    796.0,
+    224.0,
+    1636.0,
+    1678.0
+   ],
+   "det_conf": 0.363,
+   "label": "ambiguous",
+   "note": "red lamp and amber lamp both clearly emitting"
+  },
+  {
+   "index": 0,
+   "key": "08.0",
+   "image": "08_Northernmost_traffic_light_in_North_Amer.jpg",
+   "crop": "labels/traffic_lights/v3/crops/08_0.jpg",
+   "box": [
+    1029.0,
+    425.0,
+    1045.0,
+    470.0
+   ],
+   "det_conf": 0.793,
+   "label": "ambiguous",
+   "note": "16x45 px head, 4 aspects, every band bright - state not verifiable"
+  },
+  {
+   "index": 1,
+   "key": "08.1",
+   "image": "08_Northernmost_traffic_light_in_North_Amer.jpg",
+   "crop": "labels/traffic_lights/v3/crops/08_1.jpg",
+   "box": [
+    512.0,
+    269.0,
+    538.0,
+    337.0
+   ],
+   "det_conf": 0.792,
+   "label": "not_a_traffic_light",
+   "note": "yellow pole/backplate"
+  },
+  {
+   "index": 2,
+   "key": "08.2",
+   "image": "08_Northernmost_traffic_light_in_North_Amer.jpg",
+   "crop": "labels/traffic_lights/v3/crops/08_2.jpg",
+   "box": [
+    368.0,
+    546.0,
+    391.0,
+    602.0
+   ],
+   "det_conf": 0.598,
+   "label": "unlit",
+   "note": "yellow head, lenses dark"
+  },
+  {
+   "index": 3,
+   "key": "08.3",
+   "image": "08_Northernmost_traffic_light_in_North_Amer.jpg",
+   "crop": "labels/traffic_lights/v3/crops/08_3.jpg",
+   "box": [
+    101.0,
+    554.0,
+    165.0,
+    591.0
+   ],
+   "det_conf": 0.437,
+   "label": "not_a_traffic_light",
+   "note": "back of a yellow head with a bracket"
+  },
+  {
+   "index": 4,
+   "key": "08.4",
+   "image": "08_Northernmost_traffic_light_in_North_Amer.jpg",
+   "crop": "labels/traffic_lights/v3/crops/08_4.jpg",
+   "box": [
+    1552.0,
+    595.0,
+    1583.0,
+    648.0
+   ],
+   "det_conf": 0.272,
+   "label": "not_a_traffic_light",
+   "note": "hanging basket beside a yellow plate"
+  },
+  {
+   "index": 0,
+   "key": "09.0",
+   "image": "09_Traffic_light_Banyakan_Ngawi_jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/09_0.jpg",
+   "box": [
+    1288.0,
+    286.0,
+    1365.0,
+    500.0
+   ],
+   "det_conf": 0.668,
+   "label": "red",
+   "note": "top red lamp lit with a white core; lower lens dark"
+  },
+  {
+   "index": 1,
+   "key": "09.1",
+   "image": "09_Traffic_light_Banyakan_Ngawi_jpg.jpg",
+   "crop": "labels/traffic_lights/v3/crops/09_1.jpg",
+   "box": [
+    1365.0,
+    365.0,
+    1442.0,
+    499.0
+   ],
+   "det_conf": 0.228,
+   "label": "not_a_traffic_light",
+   "note": "pole with a specular speck"
+  },
+  {
+   "index": 0,
+   "key": "10.0",
+   "image": "10_Traffic_light_at_US319_and_East_Ivan_fro.jpg",
+   "crop": "labels/traffic_lights/v3/crops/10_0.jpg",
+   "box": [
+    1511.0,
+    570.0,
+    1546.0,
+    607.0
+   ],
+   "det_conf": 0.323,
+   "label": "not_a_traffic_light",
+   "note": "back of a head against the sky"
+  },
+  {
+   "index": 1,
+   "key": "10.1",
+   "image": "10_Traffic_light_at_US319_and_East_Ivan_fro.jpg",
+   "crop": "labels/traffic_lights/v3/crops/10_1.jpg",
+   "box": [
+    388.0,
+    212.0,
+    552.0,
+    275.0
+   ],
+   "det_conf": 0.321,
+   "label": "not_a_traffic_light",
+   "note": "back of a horizontal head"
+  },
+  {
+   "index": 2,
+   "key": "10.2",
+   "image": "10_Traffic_light_at_US319_and_East_Ivan_fro.jpg",
+   "crop": "labels/traffic_lights/v3/crops/10_2.jpg",
+   "box": [
+    1458.0,
+    593.0,
+    1490.0,
+    625.0
+   ],
+   "det_conf": 0.296,
+   "label": "not_a_traffic_light",
+   "note": "back of a head"
+  },
+  {
+   "index": 3,
+   "key": "10.3",
+   "image": "10_Traffic_light_at_US319_and_East_Ivan_fro.jpg",
+   "crop": "labels/traffic_lights/v3/crops/10_3.jpg",
+   "box": [
+    1604.0,
+    669.0,
+    1649.0,
+    756.0
+   ],
+   "det_conf": 0.282,
+   "label": "not_a_traffic_light",
+   "note": "back/side of a head"
+  },
+  {
+   "index": 4,
+   "key": "10.4",
+   "image": "10_Traffic_light_at_US319_and_East_Ivan_fro.jpg",
+   "crop": "labels/traffic_lights/v3/crops/10_4.jpg",
+   "box": [
+    251.0,
+    622.0,
+    281.0,
+    649.0
+   ],
+   "det_conf": 0.208,
+   "label": "not_a_traffic_light",
+   "note": "back of a head"
+  },
+  {
+   "index": 0,
+   "key": "11.0",
+   "image": "11_Traffic_light_with_a_green_sign__Kiev__j.jpg",
+   "crop": "labels/traffic_lights/v3/crops/11_0.jpg",
+   "box": [
+    259.0,
+    834.0,
+    652.0,
+    1758.0
+   ],
+   "det_conf": 0.834,
+   "label": "red",
+   "note": "top red lamp lit; middle and lower lenses dark"
+  },
+  {
+   "index": 1,
+   "key": "11.1",
+   "image": "11_Traffic_light_with_a_green_sign__Kiev__j.jpg",
+   "crop": "labels/traffic_lights/v3/crops/11_1.jpg",
+   "box": [
+    471.0,
+    1771.0,
+    719.0,
+    2281.0
+   ],
+   "det_conf": 0.491,
+   "label": "unlit",
+   "note": "dark housing, lens unlit"
+  },
+  {
+   "index": 2,
+   "key": "11.2",
+   "image": "11_Traffic_light_with_a_green_sign__Kiev__j.jpg",
+   "crop": "labels/traffic_lights/v3/crops/11_2.jpg",
+   "box": [
+    63.0,
+    1743.0,
+    388.0,
+    2011.0
+   ],
+   "det_conf": 0.406,
+   "label": "not_a_traffic_light",
+   "note": "back of a housing"
+  },
+  {
+   "index": 3,
+   "key": "11.3",
+   "image": "11_Traffic_light_with_a_green_sign__Kiev__j.jpg",
+   "crop": "labels/traffic_lights/v3/crops/11_3.jpg",
+   "box": [
+    475.0,
+    1772.0,
+    707.0,
+    2038.0
+   ],
+   "det_conf": 0.224,
+   "label": "not_a_traffic_light",
+   "note": "back of a housing"
+  },
+  {
+   "index": 0,
+   "key": "12.0",
+   "image": "12_Traffic_at_Night_in_Valparaiso__IN_JPG.jpg",
+   "crop": "labels/traffic_lights/v3/crops/12_0.jpg",
+   "box": [
+    1108.0,
+    288.0,
+    1145.0,
+    386.0
+   ],
+   "det_conf": 0.518,
+   "label": "green",
+   "note": "night, rain on the lens; green lamp lit"
+  },
+  {
+   "index": 1,
+   "key": "12.1",
+   "image": "12_Traffic_at_Night_in_Valparaiso__IN_JPG.jpg",
+   "crop": "labels/traffic_lights/v3/crops/12_1.jpg",
+   "box": [
+    1311.0,
+    564.0,
+    1333.0,
+    599.0
+   ],
+   "det_conf": 0.297,
+   "label": "ambiguous",
+   "note": "night, rain, defocused amber-orange blob - state not verifiable"
+  },
+  {
+   "index": 2,
+   "key": "12.2",
+   "image": "12_Traffic_at_Night_in_Valparaiso__IN_JPG.jpg",
+   "crop": "labels/traffic_lights/v3/crops/12_2.jpg",
+   "box": [
+    906.0,
+    265.0,
+    942.0,
+    358.0
+   ],
+   "det_conf": 0.297,
+   "label": "green",
+   "note": "night, rain on the lens; green lamp lit"
+  }
+ ]
+}

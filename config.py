@@ -71,6 +71,15 @@ TL_RING_MIN_EVIDENCE = 0.10    # below this the region is flat paint / dark lens
 TL_BODY_AREA_FRAC = 0.25       # in a structural crop a region this large is the body
 TL_BODY_PENALTY = 0.35
 TL_BEZEL_FLOOR = 0.40          # weight kept by a blob whose surround is not dark
+# Shape evidence, added in v1.5 after the sir_image2 false-ambers: the winning
+# "amber" regions there were a 6.4:1 sliver along the housing edge, the cream
+# frame round the unlit red lens, and a paint strip down the housing -- all
+# crescents (circularity 0.12-0.25) while the lit green lamp in the same box
+# measured 0.73-0.88. Across the 24 true lit lamps in the dev and v2 crop sets
+# circularity has a median of 0.75. Weighted, never a hard gate: a tiny lamp's
+# perimeter is unreliable, so it is discounted instead of rejected.
+TL_COMPACT_FLOOR = 0.25        # weight of a completely non-disc-shaped region
+TL_COMPACT_FULL = 0.60         # circularity at which full weight is reached
 TL_COMPETITOR_MIN_AREA_FRAC = 0.015
 TL_YELLOW_MIN_CONTRAST = 0.35  # amber must clear the lamp-on-bezel bar...
 TL_YELLOW_MIN_BEZEL = 0.55     # ...inside a genuinely dark surround...

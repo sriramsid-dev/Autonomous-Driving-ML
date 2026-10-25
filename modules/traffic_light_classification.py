@@ -171,12 +171,24 @@ class TrafficLightClassifier:
                 contrast = float(np.percentile(v[filled], 80) - np.median(v[ring]))
                 bezel_dark = float((v[ring] < 0.6 * np.median(v[filled])).mean())
 
+                # Compactness: a lamp is a filled disc (circularity ~0.6-0.9);
+                # housing paint is a crescent, strip or frame round a lens
+                # (~0.08-0.25). Measured on sir_image2: the three false amber
+                # regions scored circ 0.12-0.25 while the lit green lamp in the
+                # same box scored 0.73-0.88.
+                contours, _ = cv2.findContours(
+                    filled.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                perimeter = sum(cv2.arcLength(c, True) for c in contours)
+                circularity = (float(4.0 * np.pi * filled_area / (perimeter ** 2))
+                               if perimeter > 0 else 0.0)
+
                 out.append({
                     "state": state,
                     "area_frac": area_frac,
                     "chroma": chroma,
                     "contrast": contrast,
                     "bezel_dark": bezel_dark,
+                    "circularity": min(1.0, circularity),
                     "bbox": (int(stats[i, cv2.CC_STAT_LEFT]), int(stats[i, cv2.CC_STAT_TOP]),
                              int(stats[i, cv2.CC_STAT_WIDTH]), int(stats[i, cv2.CC_STAT_HEIGHT])),
                     "cx": float(cents[i][0]),
@@ -203,7 +215,14 @@ class TrafficLightClassifier:
             return 0.0
         floor = config.TL_BEZEL_FLOOR
         bezel = floor + (1.0 - floor) * cand["bezel_dark"]
-        score = cand["chroma"] * evidence * bezel
+        # A disc is a lamp; a crescent or strip is paint. Weighted, not gated: a
+        # tiny genuine lamp has an unreliable perimeter, so it is discounted
+        # rather than rejected, and any better-shaped same-state candidate in
+        # the same crop still wins on score.
+        compact = config.TL_COMPACT_FLOOR + (1.0 - config.TL_COMPACT_FLOOR) * min(
+            1.0, cand.get("circularity", 1.0) / config.TL_COMPACT_FULL
+        )
+        score = cand["chroma"] * evidence * bezel * compact
         if structural and cand["area_frac"] > config.TL_BODY_AREA_FRAC:
             score *= config.TL_BODY_PENALTY
         return score
@@ -254,6 +273,7 @@ class TrafficLightClassifier:
             "chroma": round(best["chroma"], 2),
             "contrast": round(best["contrast"], 2),
             "bezel_dark": round(best["bezel_dark"], 2),
+            "circularity": round(best.get("circularity", 0.0), 2),
         })
 
         if best_score < config.TL_MIN_LAMP_SCORE:

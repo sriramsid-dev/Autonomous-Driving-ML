@@ -563,3 +563,134 @@ annotations, so no MOTA, IDF1 or ID-switch figure is reported for any version.
 * `tests/test_tl_classifier.py` — 14 checks.
 * `utils/evaluation.py` — the false "mAP and MOTA are evaluated via rigorous unit
   test cases" claim is deleted at the source.
+
+---
+
+## 12. v1.5 — shape evidence, and a genuinely untouched set (v3)
+
+### 12.1 What the `sir_image2` failure actually was
+
+Re-running the detector on the frame gives 9 boxes, of which 3 sit on the
+signal heads (all showing green) and 6 on the amber-painted housing and lamp
+panels. Inspecting the winning regions inside the three head crops:
+
+* box 1: the amber winner was a **6.4:1 sliver** of paint along the housing
+  edge (circularity 0.249); the lit lamp in the same box measured 0.880.
+* box 2: a **cream frame around the unlit red lens** (circularity 0.140);
+  lamp 0.733.
+* box 4: a **paint strip** down the housing (circularity 0.116); lamp 0.882.
+
+So the cause was neither box placement nor a cropped lens: the boxes were
+right, the lens was intact, and the failure was that the scorer had no notion
+of *shape*. An illuminated lamp is a compact disc; housing paint is a thin
+crescent or strip.
+
+### 12.2 The change
+
+`_candidates()` now measures each component's circularity (from the hole-filled
+component, so a blown-out core does not split it) and `_score()` multiplies by
+
+    compact = TL_COMPACT_FLOOR + (1 - TL_COMPACT_FLOOR) * min(1, circ / TL_COMPACT_FULL)
+
+with floor 0.25 at full weight from 0.60. Measured distribution: the 24 true lit
+lamps in the dev and v2 sets have a median circularity of 0.75 (24th pct 0.53);
+the three false ambers above sit at 0.12-0.25.
+
+It is a weight, not a gate, deliberately: dev crop 24 is a real red lamp at
+circularity 0.18 (area 1.6% of a tiny crop) whose sibling candidate in the same
+crop scores higher and still wins, so discounting rather than rejecting keeps
+it. No threshold in this change was chosen on v3.
+
+**Rejected alternative.** The remaining competitor in box 2 is the *unlit red
+lens*, not paint, because the evidence curve saturates at `TL_RING_FULL_CONTRAST
+= 0.15`. Simulated at 0.30 / 0.40 / 0.50: dev 9 / 8 / 7 correct, v2 9 / 9 / 8.
+True lamps in these sets reach down to contrast 0.33, so tightening the curve
+trades real detections for one ambiguous crop. Not adopted; box 2 abstains.
+
+### 12.3 Result on the untouched set (v3)
+
+Acquisition: `scripts/fetch_tl_v3.py` -> 11 Wikimedia Commons photographs,
+7.3 MB, licences CC BY / CC BY-SA / CC0 / public domain, attribution in
+`test_data/tl_v3/sources.json`. Proposals: `scripts/make_tl_v3_proposals.py`
+(detector at 1280 px) produced 38 regions; labels were assigned **by eye** in
+`scripts/build_tl_v3_gt.py` from the contact sheet and zoomed crops, and the
+model was scored **once**:
+
+| truth | n | correct | wrong | abstained |
+|---|---|---|---|---|
+| red | 2 | 2 | 0 | 0 |
+| yellow | 3 | 3 | 0 | 0 |
+| green | 4 | 2 | 0 | 2 |
+| **vehicle signals** | **9** | **7 (0.778 closed-set)** | **0** | **2 (0.222)** |
+
+| non-signal crop type | n | abstained by v1.5 | v1.1 | v1.0 |
+|---|---|---|---|---|
+| unlit signal | 9 | 7 | 3 | 5 |
+| not a traffic light | 16 | 15 | 9 | 9 |
+| ambiguous (two states lit / unresolvable) | 4 | 3 | 0 | 0 |
+
+Confusion matrix (rows = truth, cols = red / yellow / green / unknown):
+red 2,0,0,0 · yellow 0,3,0,0 · green 0,0,2,2.
+
+v1.1 and v1.0 score 8/9 on the same nine signals with 1 wrong answer and zero
+abstentions, while publishing a colour on 26 of the 29 negative crops. v1.5
+publishes 4. For a state that would gate a vehicle, that trade is the point.
+
+**Power warning.** n = 9. 7/9 has a Wilson 95% interval of roughly [0.45, 0.94].
+The amber result is 3/3 crops from 2 sources and is not evidence of amber
+reliability.
+
+### 12.4 Failure examples retained in the report
+
+1. `02.0` green pedestrian-go figure → **unknown (0.10)**: a lit *symbol*, not a
+   solid disc, is discounted by the new shape term.
+2. `06.1` head cropped to the NYC backplate, green emitting at the lower edge →
+   **unknown (0.07)**: too little of the lamp survives the box.
+3. `04.0`, `04.1` unlit cream/amber heads → **yellow (0.37, 0.38)**: the known
+   amber-paint ambiguity, unchanged by this round.
+4. `08.4` a hanging basket beside a yellow plate → **yellow (0.42)**.
+5. `03.2` red pedestrian figure lit together with an amber countdown → **red**;
+   labelled ambiguous, so counted as a negative that was not abstained.
+
+### 12.5 Lane evaluation: proposal, awaiting approval
+
+The parked-car clip has no lane markings (verified again this round: the
+annotated frames show anchors on bare tarmac), so it cannot be lane ground
+truth. Four small, freely licensed, forward-facing candidates were located. All
+are Wikimedia Commons files with direct download links and stated licences;
+**none has been downloaded yet**.
+
+| # | clip | licence | size | dur / res | fits |
+|---|---|---|---|---|---|
+| A | [Dashcam film.webm](https://commons.wikimedia.org/wiki/File:Dashcam_film.webm) | CC BY-SA 3.0 | 76 MB | 3:29, 720x480 | explicitly a dashcam test drive; day+night |
+| B | [Iran, drive along the Persian Gulf.webm](https://commons.wikimedia.org/wiki/File:Iran,_drive_along_the_persian_gulf.webm) | CC BY 3.0 | 38 MB | 0:59, 1280x720 | small, 720p driving shot |
+| C | [Street traffic.webm](https://commons.wikimedia.org/wiki/File:Street_traffic.webm) | CC BY 3.0 | 25 MB | 0:35, 1920x1080 | urban, high resolution |
+| D | [Cars driving at night.webm](https://commons.wikimedia.org/wiki/File:Cars_driving_at_night.webm) | CC BY 3.0 | 108 MB | 2:40, 1920x1080 | night highway curve; camera orientation unconfirmed |
+
+Proposed plan, if approved: download **A + B** (114 MB total, well under the
+1 GB the earlier rounds stayed within), confirm lane markings are visible, then
+label **10-15 frames** across both (straight, curve, day, plus night from A) in
+the existing `labels/lane/gt.json` per-row format, and run
+`scripts/eval_lane.py` with tusimple/stretch, tusimple/letterbox,
+culane/stretch and culane/letterbox on exactly those frames. Reporting:
+per-row coverage, ego-pair found/not-found, boundary MAE on rows where both
+boundaries exist, and the failure cases. No model will be selected on MAE alone
+when its coverage is lower, and no training is proposed at this stage.
+
+Until that approval, no lane number changes in this document: the v1.4 result
+stands (tusimple/stretch 72.9 px MAE at full coverage over 11 verified points;
+culane/stretch 49.5 px but no ego pair on the curve).
+
+### 12.6 Verification run this round
+
+| check | result |
+|---|---|
+| `python tests/test_tl_classifier.py` | **20/20** |
+| `python tests/test_regression.py` | **8/8** (module init, image + video paths, tracker reset, CLI options, harness) |
+| integrated, 8 images | all processed; `sir_image2` no head published as amber |
+| integrated, 120-frame clip | 33.9 s wall, **3.68 FPS** (earlier run of the same clip: 4.63 FPS) |
+| runs preserved | `outputs/runs/integrated_v14/` untouched, new output in `outputs/runs/integrated_v15/` |
+
+The FPS difference between the two runs of the same clip is machine load, not a
+code change: the classifier edit adds one contour pass per candidate. No speed
+claim is made.

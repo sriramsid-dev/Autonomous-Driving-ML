@@ -1,0 +1,101 @@
+[
+ {
+  "file": "02_Traffic_Light__Vienna_jpg.jpg",
+  "title": "Traffic Light, Vienna.jpg",
+  "author": "<a href=\"//commons.wikimedia.org/wiki/User:Jsamwrites\" title",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_Light,_Vienna.jpg",
+  "bytes": 571054,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "03_Traffic_lights_at_Manchester_St__Christc.jpg",
+  "title": "Traffic lights at Manchester St, Christchurch, New Zealand 04.jpg",
+  "author": "<a rel=\"mw:WikiLink\" href=\"https://commons.wikimedia.org/wik",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_lights_at_Manchester_St,_Christchurch,_New_Zealand_04.jpg",
+  "bytes": 1034105,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "04_Yellow_traffic_signal__9722336142__jpg.jpg",
+  "title": "Yellow traffic signal (9722336142).jpg",
+  "author": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.fl",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Yellow_traffic_signal_(9722336142).jpg",
+  "bytes": 1165042,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "05_Rebiechowo_traffic_lights_by_night___pan.jpg",
+  "title": "Rebiechowo traffic lights by night - panoramio.jpg",
+  "author": "<a rel=\"nofollow\" class=\"external text\" href=\"https://web.ar",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Rebiechowo_traffic_lights_by_night_-_panoramio.jpg",
+  "bytes": 396292,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "06_Traffic_Lights__NYC__6239701931__jpg.jpg",
+  "title": "Traffic Lights, NYC (6239701931).jpg",
+  "author": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.fl",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_Lights,_NYC_(6239701931).jpg",
+  "bytes": 644716,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "07_Traffic_light_red_and_yellow_Drammen__2_.jpg",
+  "title": "Traffic light red and yellow Drammen (2).jpg",
+  "author": "<a href=\"//commons.wikimedia.org/wiki/User:Peulle\" title=\"Us",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_light_red_and_yellow_Drammen_(2).jpg",
+  "bytes": 590726,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "08_Northernmost_traffic_light_in_North_Amer.jpg",
+  "title": "Northernmost traffic light in North America, Inuvik, NT.jpg",
+  "author": "<a href=\"//commons.wikimedia.org/wiki/User:Daniel_Case\" titl",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Northernmost_traffic_light_in_North_America,_Inuvik,_NT.jpg",
+  "bytes": 319322,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "09_Traffic_light_Banyakan_Ngawi_jpg.jpg",
+  "title": "Traffic light Banyakan Ngawi.jpg",
+  "author": "<a href=\"//commons.wikimedia.org/wiki/User:YT_Arty\" title=\"U",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_light_Banyakan_Ngawi.jpg",
+  "bytes": 718279,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "10_Traffic_light_at_US319_and_East_Ivan_fro.jpg",
+  "title": "Traffic light at US319 and East Ivan from East Ivan under construction.jpg",
+  "author": "<a href=\"//commons.wikimedia.org/wiki/User:The_Bushranger\" t",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_light_at_US319_and_East_Ivan_from_East_Ivan_under_construction.jpg",
+  "bytes": 687661,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "11_Traffic_light_with_a_green_sign__Kiev__j.jpg",
+  "title": "Traffic light with a green sign (Kiev).jpg",
+  "author": "<a href=\"//commons.wikimedia.org/wiki/User:Mercury13\" title=",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_light_with_a_green_sign_(Kiev).jpg",
+  "bytes": 522242,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ },
+ {
+  "file": "12_Traffic_at_Night_in_Valparaiso__IN_JPG.jpg",
+  "title": "Traffic at Night in Valparaiso, IN.JPG",
+  "author": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Danp",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Traffic_at_Night_in_Valparaiso,_IN.JPG",
+  "bytes": 606241,
+  "note": "crop verification: labels in labels/traffic_lights/v3/gt.json"
+ }
+]
