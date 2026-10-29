@@ -29,6 +29,11 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 import config
 
+# Fewest rows two boundaries must share before a corridor can be sampled at all.
+# Below this the two polylines barely meet and interpolating between them would
+# invent the span, so the pair is refused for lack of overlap.
+COMMON_GRID_MIN_ROWS = 40
+
 
 def paint_support_mask(
     frame_bgr: np.ndarray,
@@ -584,6 +589,13 @@ class UltraFastLaneDetector:
         return l["pts"], r["pts"], diag
 
     @staticmethod
+    def _shared_span(left, right) -> Tuple[float, float]:
+        """Rows covered by BOTH boundary polylines, ignoring paint entirely."""
+        ly = [p[1] for p in left]
+        ry = [p[1] for p in right]
+        return max(min(ly), min(ry)), min(max(ly), max(ry))
+
+    @staticmethod
     def _common_grid(left, right, samples: int = 60):
         """
         V1-FIX: resample both boundaries on one shared y-grid before building the
@@ -597,7 +609,7 @@ class UltraFastLaneDetector:
         ry = np.array([p[1] for p in right], dtype=np.float32)
         y_lo = max(ly.min(), ry.min())
         y_hi = min(ly.max(), ry.max())
-        if y_hi - y_lo < 40:
+        if y_hi - y_lo < COMMON_GRID_MIN_ROWS:
             return None
         ys = np.linspace(y_lo, y_hi, samples)
         lx = np.interp(ys, ly, np.array([p[0] for p in left], dtype=np.float32))
@@ -619,7 +631,10 @@ class UltraFastLaneDetector:
            This is what removes the field/hillside polygon: on frame 20 of clip
            F the selected right edge passed through grass.
         2. The surviving corridor is at least LANE_CORRIDOR_MIN_ROWS_FRAC of the
-           frame tall.
+           frame tall, AND the two decoded boundaries overlap over at least that
+           much before trimming. Trimming can only shorten the span, so a pair
+           that never shares enough rows is refused as insufficient overlap
+           instead of being blamed on the paint test.
         3. The corridor reaches the part of the image where this vehicle's own
            lane is - its lowest row is no more than
            LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC above the frame bottom - and the
@@ -634,14 +649,32 @@ class UltraFastLaneDetector:
         Returns (polygon_pts_int32 or None, diagnostics).
         """
         h, w = frame_bgr.shape[:2]
+        # How many rows the two DECODED boundaries cover together, measured
+        # before any paint trimming. This is the ceiling on corridor height, so
+        # it is what distinguishes "the model never saw both edges over a long
+        # enough stretch" from "the paint test cut the span short".
+        span = self._shared_span(left, right)
+        overlap = max(0.0, span[1] - span[0])
+        need = config.LANE_CORRIDOR_MIN_ROWS_FRAC * h
         grid = self._common_grid(left, right)
         if grid is None:
-            return None, {"reason": "boundaries do not overlap or cross"}
+            # Either the edges are disjoint/crossed, or they share too few rows.
+            # Only the second case is an overlap shortfall worth naming; the
+            # first keeps the wording it always had.
+            if overlap <= 0 or overlap >= COMMON_GRID_MIN_ROWS:
+                return None, {"reason": "boundaries do not overlap or cross",
+                              "overlap_rows": int(round(overlap))}
+            return None, {
+                "reason": (f"boundaries share only {overlap:.0f} rows "
+                           f"(need {COMMON_GRID_MIN_ROWS:.0f} to sample one)"),
+                "overlap_rows": int(round(overlap)),
+            }
         ys, lx, rx = grid
         diag = {
             "rows": int(len(ys)),
             "y_lo": int(round(float(ys.min()))),
             "y_hi": int(round(float(ys.max()))),
+            "overlap_rows": int(round(overlap)),
         }
 
         if config.LANE_PAINT_SUPPORT:
@@ -666,9 +699,16 @@ class UltraFastLaneDetector:
 
         height = float(ys.max() - ys.min())
         diag["height_frac"] = round(height / h, 3)
-        if height < config.LANE_CORRIDOR_MIN_ROWS_FRAC * h:
-            diag["reason"] = (f"supported corridor too short ({height:.0f}px, "
-                              f"need {config.LANE_CORRIDOR_MIN_ROWS_FRAC * h:.0f}px)")
+        if height < need:
+            if overlap < need:
+                # Even with perfect paint neither edge reaches high enough for
+                # the two to share the required rows: this is a coverage limit
+                # of the checkpoint, not a paint-filter effect.
+                diag["reason"] = (f"boundaries share only {overlap:.0f} rows "
+                                  f"(need {need:.0f} for a corridor)")
+            else:
+                diag["reason"] = (f"supported corridor too short ({height:.0f}px, "
+                                  f"need {need:.0f}px)")
             return None, diag
 
         poly = np.concatenate([

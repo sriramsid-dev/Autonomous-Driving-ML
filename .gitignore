@@ -17,3 +17,36 @@ test_data/lane_clips/frames/*.jpg
 test_data/lane_clips/frames/
 outputs/runs/**/*.mp4
 test_data/lane_clips/posters/
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+secrets*
+
+# Python and local environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local logs and temporary files
+*.log
+*.pid
+
+# Generated evaluation outputs
+outputs/metrics/
+outputs/runs/
+outputs/api_*
+outputs/infer_probe.json
+outputs/job_probe.json
+outputs/sse_probe.txt
+
+# Large pretrained model checkpoints
+*.pt
+*.pth
+
+# Large local video datasets
+test_data/lane_clips/

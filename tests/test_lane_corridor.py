@@ -14,6 +14,8 @@ Cases, each named after the real failure it reproduces:
   field spill          frame 20/40 of clip F - right edge in the grass
   hillside lane        frame 20 of clip F - left edge up the bank
   unsupported tail     a boundary that keeps going after the paint stops
+  overlap-limited       two edges that only co-exist over a few rows
+  paint-shortened       ample overlap, but the paint only covers part of it
   missing boundary     only one side decoded
   hood phantom         bottom rows on the dark bonnet, not the road
   implausible width    two edges far wider apart than any lane
@@ -178,6 +180,76 @@ def test_unsupported_tail():
     assert diag.get("trimmed_rows", 0) > 0, diag
 
 
+@check("overlap-limited: refusal names the overlap, not the paint test")
+def test_overlap_limited():
+    # The right edge appears only in the bottom 52 rows, and the paint covers
+    # every one of them. Nothing is trimmed: the two edges simply never share
+    # the 58 rows a corridor needs. That is a checkpoint coverage limit, so the
+    # reason must not claim the paint filter shorted the corridor.
+    frame = base_frame()
+    left = left_pts()
+    right = [(int(x), int(y)) for x, y in zip(np.linspace(340, 448, 6),
+                                              np.linspace(400, 452, 6))]
+    draw_paint(frame, left)
+    draw_paint(frame, right)
+    det = detector()
+    ok, diag = corridor_of(det, frame, [left, right])
+    assert not ok, diag
+    reason = diag.get("reason") or ""
+    assert "share only" in reason and "need" in reason, diag
+    assert "supported corridor too short" not in reason, diag
+    assert diag["overlap_rows"] == 52, diag
+    assert "trimmed_rows" not in diag, diag     # the paint did not cut anything
+
+
+@check("paint-shortened: refusal still names the paint trim")
+def test_paint_shortened():
+    # Both edges span 202 rows, so overlap is ample; only the bottom 37 rows
+    # carry paint. Here the trim really is the binding constraint, and the
+    # reason has to keep saying so.
+    frame = base_frame()
+    left = left_pts()
+    right = right_pts()
+    draw_paint(frame, [(int(x), int(y)) for x, y in zip(np.linspace(215, 196, 6),
+                                                        np.linspace(415, 452, 6))])
+    draw_paint(frame, [(int(x), int(y)) for x, y in zip(np.linspace(425, 448, 6),
+                                                        np.linspace(415, 452, 6))])
+    det = detector()
+    ok, diag = corridor_of(det, frame, [left, right])
+    assert not ok, diag
+    reason = diag.get("reason") or ""
+    assert "supported corridor too short" in reason, diag
+    assert "share only" not in reason, diag
+    assert diag["overlap_rows"] > config.LANE_CORRIDOR_MIN_ROWS_FRAC * H, diag
+    assert diag.get("trimmed_rows", 0) > 0, diag
+
+
+@check("too little shared span is named before any sampling")
+def test_tiny_overlap():
+    # 12 shared rows is under the 40 needed to interpolate a grid at all; the
+    # old code reported this as "do not overlap or cross", which hid the fact
+    # that both boundaries exist and merely co-exist over too short a stretch.
+    frame = base_frame()
+    left = left_pts()
+    right = [(int(x), int(y)) for x, y in zip(np.linspace(430, 448, 6),
+                                              np.linspace(440, 452, 6))]
+    det = detector()
+    ok, diag = corridor_of(det, frame, [left, right])
+    assert not ok, diag
+    reason = diag.get("reason") or ""
+    assert "share only 12 rows" in reason, diag
+    assert "do not overlap or cross" not in reason, diag
+    assert diag["overlap_rows"] == 12, diag
+    # Edges that are genuinely disjoint are a different failure and keep the
+    # wording they always had.
+    far = [(int(x), int(y)) for x, y in zip(np.linspace(430, 448, 6),
+                                            np.linspace(120, 200, 6))]
+    ok2, diag2 = corridor_of(det, frame, [left, far])
+    assert not ok2, diag2
+    assert "do not overlap or cross" in (diag2.get("reason") or ""), diag2
+    assert diag2["overlap_rows"] == 0, diag2
+
+
 @check("missing boundary: one side is not a corridor")
 def test_missing_boundary():
     frame = base_frame()
@@ -305,7 +377,8 @@ def main() -> int:
           f"max_bottom_gap={config.LANE_CORRIDOR_MAX_BOTTOM_GAP_FRAC} "
           f"min_rows={config.LANE_CORRIDOR_MIN_ROWS_FRAC}")
     for fn in (test_mask, test_happy_path, test_field_spill, test_hillside_lane,
-               test_unsupported_tail, test_missing_boundary, test_hood, test_hood_only,
+               test_unsupported_tail, test_overlap_limited, test_paint_shortened,
+               test_tiny_overlap, test_missing_boundary, test_hood, test_hood_only,
                test_implausible_width, test_axis_slack, test_axis_inside,
                test_floating, test_gaps, test_empty_ego_band, test_reasons_reported):
         fn()
