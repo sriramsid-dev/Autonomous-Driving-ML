@@ -338,3 +338,27 @@ Version 1 establishes a robust, working pretrained baseline. In **Version 2**, w
 3. **Train Deep Traffic Light State Classifier:** Replace the heuristic baseline with a fine-tuned CNN classifier (e.g. MobileNetV3 / ResNet-18) trained on 4-state labels (`red`, `yellow`, `green`, `off`).
 4. **Fine-Tune Lane Detection:** Adapt UFLD to Waymo urban road geometries.
 5. **Comparative Evaluation:** Benchmark Version 2 mAP@0.5 and MOTA gains against this Version 1 baseline.
+
+## Model Weights
+
+The project requires pretrained model weights to run all perception modules.
+
+### 1. YOLO11n
+The `yolo11n.pt` model is already included in this repository under `models/`.
+
+### 2. Lane Detection Models
+Download these two files from [Google Drive — Lane Detection Models](https://drive.google.com/drive/folders/1fBRmVQ31G7JhCQlGUpdb_Y_HrSuw_A1V?usp=sharing):
+
+- `tusimple_18.pth`
+- `culane_18.pth`
+
+Place both files in the project's `models/` folder, keeping the filenames unchanged.
+
+Your folder should contain:
+
+```text
+models/
+├── yolo11n.pt
+├── tusimple_18.pth
+└── culane_18.pth
+```
